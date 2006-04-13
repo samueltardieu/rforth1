@@ -1,0 +1,17 @@
+#
+# SPI device configuration
+#
+
+menu "SPI devices"
+
+config SPICAN
+	tristate "Support for CAN device through SPI through Sratix"
+	---help---
+	  The CAN device is seen trough a SPI interface driven through
+	  the stratix.
+
+	  To compiler this driver as modules, choose M here: the
+	  module will be called spican.
+
+endmenu
+

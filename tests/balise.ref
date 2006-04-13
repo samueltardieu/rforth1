@@ -1,0 +1,585 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	call init_runtime
+	goto main
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+; TBLPTRU: defined at lib/sfrnames.fs:13
+TBLPTRU equ 0xff8
+
+; TBLPTRH: defined at lib/sfrnames.fs:14
+TBLPTRH equ 0xff7
+
+; TBLPTRL: defined at lib/sfrnames.fs:15
+TBLPTRL equ 0xff6
+
+; TABLAT: defined at lib/sfrnames.fs:16
+TABLAT equ 0xff5
+
+; INDF0: defined at lib/sfrnames.fs:23
+INDF0 equ 0xfef
+
+; POSTINC0: defined at lib/sfrnames.fs:24
+POSTINC0 equ 0xfee
+
+; POSTDEC0: defined at lib/sfrnames.fs:25
+POSTDEC0 equ 0xfed
+
+; PREINC0: defined at lib/sfrnames.fs:26
+PREINC0 equ 0xfec
+
+; FSR0H: defined at lib/sfrnames.fs:28
+FSR0H equ 0xfea
+
+; FSR0L: defined at lib/sfrnames.fs:29
+FSR0L equ 0xfe9
+
+; INDF1: defined at lib/sfrnames.fs:31
+INDF1 equ 0xfe7
+
+; POSTINC1: defined at lib/sfrnames.fs:32
+POSTINC1 equ 0xfe6
+
+; POSTDEC1: defined at lib/sfrnames.fs:33
+POSTDEC1 equ 0xfe5
+
+; FSR1H: defined at lib/sfrnames.fs:36
+FSR1H equ 0xfe2
+
+; FSR1L: defined at lib/sfrnames.fs:37
+FSR1L equ 0xfe1
+
+; POSTDEC2: defined at lib/sfrnames.fs:41
+POSTDEC2 equ 0xfdd
+
+; PREINC2: defined at lib/sfrnames.fs:42
+PREINC2 equ 0xfdc
+
+; FSR2H: defined at lib/sfrnames.fs:44
+FSR2H equ 0xfda
+
+; FSR2L: defined at lib/sfrnames.fs:45
+FSR2L equ 0xfd9
+
+; STATUS: defined at lib/sfrnames.fs:46
+STATUS equ 0xfd8
+
+; TMR0H: defined at lib/sfrnames.fs:47
+TMR0H equ 0xfd7
+
+; TMR0L: defined at lib/sfrnames.fs:48
+TMR0L equ 0xfd6
+
+; T0CON: defined at lib/sfrnames.fs:49
+T0CON equ 0xfd5
+
+; RCREG: defined at lib/sfrnames.fs:85
+RCREG equ 0xfae
+
+; TXREG: defined at lib/sfrnames.fs:86
+TXREG equ 0xfad
+
+; EECON1: defined at lib/sfrnames.fs:92
+EECON1 equ 0xfa6
+
+; PIR1: defined at lib/sfrnames.fs:100
+PIR1 equ 0xf9e
+
+; TRISC: defined at lib/sfrnames.fs:104
+TRISC equ 0xf94
+
+; LATC: defined at lib/sfrnames.fs:109
+LATC equ 0xf8b
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+; init_runtime: defined at lib/primitives.fs:5
+init_runtime
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+	movlb 1
+	clrf nexttimer,1
+	clrf nexttimer+1,1
+	clrf ondelay,1
+	clrf ondelay+1,1
+	clrf offdelay,1
+	clrf offdelay+1,1
+	clrf pattern_MI_1,1
+	clrf pattern_MI_2,1
+	return
+
+; dup: defined at lib/primitives.fs:21
+dup
+	movff FSR0H,FSR1H
+	movff FSR0L,FSR1L
+	movf POSTDEC1,0,0
+	movff INDF1,PREINC0
+	movwf PREINC0,0
+	return
+
+; op_zeroeq_z: defined at lib/primitives.fs:46
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+; op_zeroeq: defined at lib/primitives.fs:55
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	goto op_zeroeq_z
+
+; swap: defined at lib/primitives.fs:186
+swap
+	movff POSTDEC0,temp_x1+1
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff temp_x1,PREINC0
+	movff temp_x1+1,PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+; +!: defined at lib/arithmetic.fs:17
+_PL__EX_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movf POSTDEC0,0,0
+	movf POSTINC0,0,0
+	addwf POSTINC1,1,0
+	movf POSTDEC0,0,0
+	addwfc INDF1,1,0
+	movf POSTDEC0,0,0
+	return
+
+; -: defined at lib/arithmetic.fs:38
+_MI_
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,1
+	subwfb INDF0,1,0
+	return
+
+; and: defined at lib/arithmetic.fs:60
+and
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	andwf POSTINC0,1,0
+	movf temp_x1,0,1
+	andwf INDF0,1,0
+	return
+
+; or: defined at lib/arithmetic.fs:70
+or
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	iorwf POSTINC0,1,0
+	movf temp_x1,0,1
+	iorwf INDF0,1,0
+	return
+
+; xor: defined at lib/arithmetic.fs:80
+xor
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	xorwf POSTINC0,1,0
+	movf temp_x1,0,1
+	xorwf INDF0,1,0
+	return
+
+; 1>2: defined at lib/arithmetic.fs:97
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+; negate: defined at lib/arithmetic.fs:123
+negate
+	comf POSTDEC0,1,0
+	negf POSTINC0,0
+	movlw 0
+	addwfc INDF0,1,0
+	return
+
+; 0<: defined at lib/arithmetic.fs:131
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+; table-addr!: defined at lib/tables.fs:1
+table_MI_addr_EX_
+	clrf TBLPTRU,0
+	call _1_GT_2
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+; type: defined at lib/strings.fs:29
+type
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call table_MI_addr_EX_
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+_lbl___5
+	call dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___6
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _MI_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	call emit
+	bra _lbl___5
+_lbl___6
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+; read4: defined at lib/strings.fs:70
+read4
+	call key
+	call dup
+	movlw 65
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _MI_
+	call _0_LT_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___11
+	movlw 223
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	movlw 55
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto _MI_
+_lbl___11
+	movlw 48
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto _MI_
+
+; read8: defined at lib/strings.fs:71
+read8
+	call read4
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	call read4
+	goto or
+
+; read16: defined at lib/strings.fs:72
+read16
+	call read8
+	call read8
+	call swap
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf INDF0,0
+	return
+
+; emit: defined at lib/tty.fs:4
+emit
+	btfss PIR1,4,0
+	bra emit
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TXREG
+	return
+
+; key: defined at lib/tty.fs:5
+key
+	btfss PIR1,5,0
+	bra key
+	movff RCREG,PREINC0
+	clrf PREINC0,0
+	return
+
+; timer-set: defined at tests/balise.fs:23
+timer_MI_set
+	clrf PREINC0,0
+	movlw HIGH(nexttimer)
+	movwf PREINC0,0
+	goto _PL__EX_
+
+; diff: defined at tests/balise.fs:24
+diff
+	movff TMR0L,PREINC0
+	movff TMR0H,PREINC0
+	movff nexttimer,PREINC0
+	movff nexttimer+1,PREINC0
+	goto _MI_
+
+; neighbour?: defined at tests/balise.fs:25
+neighbour_QM_
+	btfsc INDF0,7,0
+	call negate
+	clrf PREINC0,0
+	movlw HIGH(0x1000)
+	movwf PREINC0,0
+	call _MI_
+	goto _0_LT_
+
+; timer-reached?: defined at tests/balise.fs:26
+timer_MI_reached_QM_
+	call diff
+	call dup
+	call neighbour_QM_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___18
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call _MI_
+	call _0_LT_
+	goto op_zeroeq
+_lbl___18
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	clrf PREINC0,0
+	clrf PREINC0,0
+	return
+
+; timer-wait: defined at tests/balise.fs:28
+timer_MI_wait
+	call timer_MI_set
+_lbl___20
+	call timer_MI_reached_QM_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___20
+	return
+
+; timer-reset: defined at tests/balise.fs:29
+timer_MI_reset
+	clrf TMR0H,0
+	clrf TMR0L,0
+	clrf nexttimer,1
+	clrf nexttimer+1,1
+	return
+
+; alt!: defined at tests/balise.fs:31
+alt_EX_
+	movff LATC,PREINC0
+	clrf PREINC0,0
+	movlw 0xf8
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	call or
+	movff POSTDEC0,LATC+1
+	movff POSTDEC0,LATC
+	return
+
+; alt-1: defined at tests/balise.fs:33
+alt_MI_1
+	movff pattern_MI_1,PREINC0
+	clrf PREINC0,0
+	goto alt_EX_
+
+; alt-2: defined at tests/balise.fs:34
+alt_MI_2
+	movff pattern_MI_2,PREINC0
+	clrf PREINC0,0
+	goto alt_EX_
+
+; leds-off: defined at tests/balise.fs:36
+leds_MI_off
+	clrf PREINC0,0
+	clrf PREINC0,0
+	goto alt_EX_
+
+; pwm: defined at tests/balise.fs:38
+pwm
+	call timer_MI_reset
+_lbl___22
+	call alt_MI_1
+	movff ondelay,PREINC0
+	movff ondelay+1,PREINC0
+	call timer_MI_wait
+	call alt_MI_2
+	movff offdelay,PREINC0
+	movff offdelay+1,PREINC0
+	call timer_MI_wait
+	btfsc PIR1,5,0
+	return
+	bra _lbl___22
+
+; prompt: defined at tests/balise.fs:47
+prompt
+	movlw LOW(_data___1)
+	movwf PREINC0,0
+	movlw HIGH(_data___1)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+
+; main-loop: defined at tests/balise.fs:49
+main_MI_loop
+	call prompt
+	call pwm
+	call key
+	call dup
+	movlw 67
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___25
+	call leds_MI_off
+	call read16
+	movff POSTDEC0,ondelay+1
+	movff POSTDEC0,ondelay
+	call read16
+	movff POSTDEC0,offdelay+1
+	movff POSTDEC0,offdelay
+_lbl___25
+	call dup
+	movlw 80
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___26
+	call leds_MI_off
+	call read4
+	movf POSTDEC0,0,0
+	movff POSTDEC0,pattern_MI_1
+	call read4
+	movf POSTDEC0,0,0
+	movff POSTDEC0,pattern_MI_2
+_lbl___26
+	call dup
+	movlw 83
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___27
+	call leds_MI_off
+	movff T0CON,PREINC0
+	clrf PREINC0,0
+	movlw 0xf0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	call read4
+	call or
+	movf POSTDEC0,0,0
+	movff POSTDEC0,T0CON
+_lbl___27
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	bra main_MI_loop
+
+; greetings: defined at tests/balise.fs:71
+greetings
+	movlw LOW(_data___2)
+	movwf PREINC0,0
+	movlw HIGH(_data___2)
+	movwf PREINC0,0
+	movlw 15
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+
+; init-ports: defined at tests/balise.fs:74
+init_MI_ports
+	movlw 0xb8
+	movwf TRISC,0
+	movlw 0x80
+	movwf T0CON,0
+	clrf ondelay,1
+	movlw HIGH(0xa000)
+	movwf ondelay+1,1
+	clrf offdelay,1
+	movlw HIGH(0xa000)
+	movwf offdelay+1,1
+	return
+
+; main: defined at tests/balise.fs:84
+main
+	movlw 3
+	movwf pattern_MI_1,1
+	movlw 4
+	movwf pattern_MI_2,1
+	call init_MI_ports
+	call greetings
+	goto main_MI_loop
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+; temp_x1: defined at lib/primitives.fs:17
+temp_x1 equ 0x0
+
+; nexttimer: defined at tests/balise.fs:16
+nexttimer equ 0x100
+
+; ondelay: defined at tests/balise.fs:17
+ondelay equ 0x102
+
+; offdelay: defined at tests/balise.fs:18
+offdelay equ 0x104
+
+; pattern-1: defined at tests/balise.fs:20
+pattern_MI_1 equ 0x106
+
+; pattern-2: defined at tests/balise.fs:21
+pattern_MI_2 equ 0x107
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+; defined at tests/balise.fs:47 as:
+; \nOK>
+_data___1
+	db 13,10,79,75,62
+
+; defined at tests/balise.fs:72 as:
+; \nCode balise\n
+_data___2
+	db 13,10,67,111,100,101,32,98
+	db 97,108,105,115,101,13,10
+
+END

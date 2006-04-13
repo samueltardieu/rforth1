@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for rep in `cat utils/replist.txt`; do
+  echo "Pulling from $rep"
+  darcs pull $1 $rep
+done

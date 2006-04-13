@@ -1,0 +1,5 @@
+http://www.rfc1149.net/download/sforth-repository
+http://www.enst.fr/~gruchet/areabot/sforth
+http://banquise.antartic.net/~pinguin/sforth
+http://perso.enst.fr/~oliveira/sforth
+

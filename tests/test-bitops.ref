@@ -1,0 +1,613 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+; TBLPTRU: defined at lib/sfrnames.fs:13
+TBLPTRU equ 0xff8
+
+; TBLPTRH: defined at lib/sfrnames.fs:14
+TBLPTRH equ 0xff7
+
+; TBLPTRL: defined at lib/sfrnames.fs:15
+TBLPTRL equ 0xff6
+
+; TABLAT: defined at lib/sfrnames.fs:16
+TABLAT equ 0xff5
+
+; INDF0: defined at lib/sfrnames.fs:23
+INDF0 equ 0xfef
+
+; POSTINC0: defined at lib/sfrnames.fs:24
+POSTINC0 equ 0xfee
+
+; POSTDEC0: defined at lib/sfrnames.fs:25
+POSTDEC0 equ 0xfed
+
+; PREINC0: defined at lib/sfrnames.fs:26
+PREINC0 equ 0xfec
+
+; PLUSW0: defined at lib/sfrnames.fs:27
+PLUSW0 equ 0xfeb
+
+; FSR0H: defined at lib/sfrnames.fs:28
+FSR0H equ 0xfea
+
+; FSR0L: defined at lib/sfrnames.fs:29
+FSR0L equ 0xfe9
+
+; WREG: defined at lib/sfrnames.fs:30
+WREG equ 0xfe8
+
+; INDF1: defined at lib/sfrnames.fs:31
+INDF1 equ 0xfe7
+
+; FSR1H: defined at lib/sfrnames.fs:36
+FSR1H equ 0xfe2
+
+; FSR1L: defined at lib/sfrnames.fs:37
+FSR1L equ 0xfe1
+
+; INDF2: defined at lib/sfrnames.fs:39
+INDF2 equ 0xfdf
+
+; POSTDEC2: defined at lib/sfrnames.fs:41
+POSTDEC2 equ 0xfdd
+
+; PREINC2: defined at lib/sfrnames.fs:42
+PREINC2 equ 0xfdc
+
+; FSR2H: defined at lib/sfrnames.fs:44
+FSR2H equ 0xfda
+
+; FSR2L: defined at lib/sfrnames.fs:45
+FSR2L equ 0xfd9
+
+; STATUS: defined at lib/sfrnames.fs:46
+STATUS equ 0xfd8
+
+; TXREG: defined at lib/sfrnames.fs:86
+TXREG equ 0xfad
+
+; EEADR: defined at lib/sfrnames.fs:89
+EEADR equ 0xfa9
+
+; EEDATA: defined at lib/sfrnames.fs:90
+EEDATA equ 0xfa8
+
+; EECON1: defined at lib/sfrnames.fs:92
+EECON1 equ 0xfa6
+
+; PIR1: defined at lib/sfrnames.fs:100
+PIR1 equ 0xf9e
+
+; bl: defined at lib/strings.fs:5
+bl equ 0x20
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+	clrf x,1
+	clrf (x+1),1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+; main: defined at tests/test-bitops.fs:14
+main
+	call cr
+	movlw LOW((_data___5+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___5+0x8000))
+	movwf PREINC0,0
+	movlw 15
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	call depth
+	call _DT_
+	call cr
+	bsf x,3,1
+	bcf x,5,1
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call op_bit_clr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call op_bit_set
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call op_bit_toggle
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call op_bit_toggle
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_set
+	call _space
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_MI_clr
+	call cr
+	movlw LOW((_data___6+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___6+0x8000))
+	movwf PREINC0,0
+	movlw 15
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	call depth
+	call _DT_
+
+; cr: defined at lib/strings.fs:8
+cr
+	movlw 0xa
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call emit
+	movlw 0xd
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; emit: defined at lib/tty.fs:4
+emit
+	btfss PIR1,4,0
+	bra emit
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TXREG
+	return
+
+; test-set: defined at tests/test-bitops.fs:7
+test_MI_set
+	call op_bit_set_q
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___185
+	movlw LOW((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+_lbl___185
+	movlw LOW((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; type: defined at lib/strings.fs:27
+type
+	call dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	goto _2drop
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	movwf PREINC2,0
+_lbl___92
+	call dup
+	call op_cfetch_tos
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___92
+	movf POSTDEC2,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; .: defined at lib/strings.fs:25
+_DT_
+	call _1_GT_2
+	call emit_MI_8
+
+; emit-8: defined at lib/strings.fs:24
+emit_MI_8
+	call dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	call emit_MI_4
+	movlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+
+; emit-4: defined at lib/strings.fs:23
+emit_MI_4
+	call nibble_MI_to_MI_hex
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto emit
+
+; table-addr!: defined at lib/tables.fs:1
+table_MI_addr_EX_
+	clrf TBLPTRU,0
+	call _1_GT_2
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+; flash-addr!: defined at lib/tables.fs:3
+flash_MI_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_MI_addr_EX_
+
+; space: defined at lib/strings.fs:7
+_space
+	movlw bl
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto emit
+
+; test-clr: defined at tests/test-bitops.fs:8
+test_MI_clr
+	call op_bit_clr_q
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___188
+	movlw LOW((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+_lbl___188
+	movlw LOW((_data___4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___4+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+
+; dup: defined at lib/primitives.fs:29
+dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+; op_bit_mask_to_w: defined at lib/primitives.fs:79
+op_bit_mask_to_w
+	movf POSTDEC0,0,0
+	incf INDF0,1,0
+	movlw 1
+op_bit_mask_loop
+	dcfsnz INDF0,1,0
+	return
+	rlncf WREG,1,0
+	bra op_bit_mask_loop
+
+; op_bit_mask: defined at lib/primitives.fs:94
+op_bit_mask
+	call op_bit_mask_to_w
+	movwf POSTINC0,0
+	clrf INDF0,0
+	return
+
+; op_bit_test_common: defined at lib/primitives.fs:101
+op_bit_test_common
+	call op_bit_mask
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	andwf INDF1,0,0
+	return
+
+; op_bit_set: defined at lib/primitives.fs:111
+op_bit_set
+	call op_bit_mask_to_w
+	movf POSTDEC0,1,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	iorwf INDF1,1,0
+	return
+
+; op_bit_clr: defined at lib/primitives.fs:120
+op_bit_clr
+	call op_bit_mask_to_w
+	movf POSTDEC0,1,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	comf WREG,1,0
+	andwf INDF1,1,0
+	return
+
+; op_bit_toggle: defined at lib/primitives.fs:130
+op_bit_toggle
+	call op_bit_mask_to_w
+	movf POSTDEC0,1,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	xorwf INDF1,1,0
+	return
+
+; op_bit_set_q: defined at lib/primitives.fs:139
+op_bit_set_q
+	call op_bit_test_common
+	btfss STATUS,2,0
+	movlw -1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+; op_bit_clr_q: defined at lib/primitives.fs:148
+op_bit_clr_q
+	call op_bit_test_common
+	movlw 0
+	btfsc STATUS,2,0
+	movlw -1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+; op_cfetch_tos: defined at lib/primitives.fs:197
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+; 2drop: defined at lib/primitives.fs:243
+_2drop
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; and: defined at lib/arithmetic.fs:63
+and
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	andwf POSTINC0,1,0
+	movf temp_x1,0,0
+	andwf INDF0,1,0
+	return
+
+; 1>2: defined at lib/arithmetic.fs:106
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+; depth: defined at lib/arithmetic.fs:236
+depth
+	movff (FSR0L+1),(temp_x1+1)
+	movff FSR0L,temp_x1
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movlw LOW((-0x5f))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-0x5f))
+	addwfc INDF0,1,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	return
+
+; flashc@: defined at lib/tables.fs:14
+flashc_AT_
+	call flash_MI_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+; eeprom-addr!: defined at lib/tables.fs:17
+eeprom_MI_addr_EX_
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	return
+
+; eepromc@: defined at lib/tables.fs:19
+eepromc_AT_
+	call eeprom_MI_addr_EX_
+	bsf EECON1,0,0
+	movf EEDATA,0,0
+	return
+
+; nibble-to-hex: defined at lib/strings.fs:11
+nibble_MI_to_MI_hex
+	movf POSTDEC0,0,0
+	movlw 0xf6
+	addwf INDF0,1,0
+	movlw 0x3a
+	btfsc STATUS,0,0
+	addlw 7
+	addwf POSTDEC0,0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+; temp_x1: defined at lib/primitives.fs:22
+temp_x1 equ 0x0
+
+; x: defined at tests/test-bitops.fs:3
+x equ 0x100
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+; defined at tests/test-bitops.fs:7 as:
+; set
+_data___1
+	db 115,101,116
+
+; defined at tests/test-bitops.fs:7 as:
+; not set
+_data___2
+	db 110,111,116,32,115,101,116
+
+; defined at tests/test-bitops.fs:8 as:
+; clr
+_data___3
+	db 99,108,114
+
+; defined at tests/test-bitops.fs:8 as:
+; not clr
+_data___4
+	db 110,111,116,32,99,108,114
+
+; defined at tests/test-bitops.fs:16 as:
+; Current depth: 
+_data___5
+	db 67,117,114,114,101,110,116,32
+	db 100,101,112,116,104,58,32
+
+; defined at tests/test-bitops.fs:26 as:
+; Current depth: 
+_data___6
+	db 67,117,114,114,101,110,116,32
+	db 100,101,112,116,104,58,32
+
+END

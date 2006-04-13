@@ -1,0 +1,5 @@
+#! /usr/bin/kermit
+set carrier-watch off
+set line /dev/ttyS0
+set speed 115200
+connect

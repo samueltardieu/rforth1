@@ -1,0 +1,4 @@
+* If the completion of a forwarded object uses inw or outw, it is not
+  honored in previous calls and will lead into problems.
+
+* .s is limited to 256 values on the stack
