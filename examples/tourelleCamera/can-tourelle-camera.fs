@@ -1,6 +1,8 @@
 \
 \ Interface CAN Carte Moteurs
 \ AREABOT
+\
+\ This example uses an obsolete CAN library and will not compile anymore
 
 
 needs lib/can.fs
