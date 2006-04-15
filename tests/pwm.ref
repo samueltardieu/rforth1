@@ -1,8 +1,7 @@
 	processor pic18f248
 	radix dec
 	org 0x2000
-	call init_runtime
-	goto main
+	goto init_runtime
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -43,6 +42,9 @@ FSR0H equ 0xfea
 
 ; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
+
+; WREG: defined at lib/sfrnames.fs:30
+WREG equ 0xfe8
 
 ; INDF1: defined at lib/sfrnames.fs:31
 INDF1 equ 0xfe7
@@ -135,29 +137,59 @@ delta equ 10
 ; Section: code
 ;---------------------------------------------------------
 
-; init_runtime: defined at lib/primitives.fs:4
-init_runtime
-	movlw 0x5f
-	movwf FSR0L,0
-	clrf FSR0H,0
-	movlw 0xbf
-	movwf FSR2L,0
-	clrf FSR2H,0
-	movlb 1
-	clrf pulse0,1
-	clrf (pulse0+1),1
-	clrf pulse1,1
-	clrf (pulse1+1),1
+; .: defined at lib/strings.fs:25
+_DT_
+	call _1_GT_2
+	call emit_MI_8
+
+; emit-8: defined at lib/strings.fs:24
+emit_MI_8
+	call dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	call emit_MI_4
+	movlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+
+; emit-4: defined at lib/strings.fs:23
+emit_MI_4
+	call nibble_MI_to_MI_hex
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; emit: defined at lib/tty.fs:4
+emit
+	btfss PIR1,4,0
+	bra emit
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TXREG
 	return
 
-; dup: defined at lib/primitives.fs:20
-dup
-	movlw -1
-	movff PLUSW0,PREINC0
-	movff PLUSW0,PREINC0
-	return
+; >=: defined at lib/arithmetic.fs:175
+_GT__EQ_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___26
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___26
+	call op_minus
+	call _0_LT_
 
-; op_zeroeq_z: defined at lib/primitives.fs:52
+; op_zeroeq: defined at lib/primitives.fs:70
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+; op_zeroeq_z: defined at lib/primitives.fs:61
 op_zeroeq_z
 	movlw -1
 	btfss STATUS,2,0
@@ -166,75 +198,180 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-; op_zeroeq: defined at lib/primitives.fs:61
-op_zeroeq
+; tmr1-wait: defined at tests/pwm.fs:14
+tmr1_MI_wait
+	btfsc PIR1,0,0
+	return
+	bra tmr1_MI_wait
+
+; main: defined at tests/pwm.fs:74
+main
+	call greetings
+	call init_MI_pwm
+
+; main-loop: defined at tests/pwm.fs:32
+main_MI_loop
+	movlw LOW(-6000)
+	movwf pulse0,1
+	movlw HIGH(-6000)
+	movwf (pulse0+1),1
+	movlw LOW(-6000)
+	movwf pulse1,1
+	movlw HIGH(-6000)
+	movwf (pulse1+1),1
+_lbl___197
+	call pwm
+	call key
+	call dup
+	movlw 48
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	goto op_zeroeq_z
-
-; op_cfetch_tos: defined at lib/primitives.fs:188
-op_cfetch_tos
-	btfsc INDF0,7,0
-	goto flashc_AT_
-	btfsc INDF0,4,0
-	goto eepromc_AT_
-	movff POSTDEC0,FSR1H
-	movff POSTDEC0,FSR1L
-	movff INDF1,PREINC0
+	bz _lbl___199
+	call read16
+	movff POSTDEC0,(pulse0+1)
+	movff POSTDEC0,pulse0
+	movlw LOW((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
 	clrf PREINC0,0
-	return
-
-; swap: defined at lib/primitives.fs:226
-swap
-	movff POSTDEC0,(temp_x1+1)
-	movff POSTDEC0,temp_x1
-	movff POSTDEC0,PREINC2
-	movff POSTDEC0,PREINC2
-	movff temp_x1,PREINC0
-	movff (temp_x1+1),PREINC0
-	movff POSTDEC2,PREINC0
-	movff POSTDEC2,PREINC0
-	return
-
-; 2drop: defined at lib/primitives.fs:228
-_2drop
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	return
-
-; op_plus: defined at lib/arithmetic.fs:6
-op_plus
-	movff POSTDEC0,temp_x1
+	call type
+_lbl___199
+	call dup
+	movlw 49
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
 	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___201
+	call read16
+	movff POSTDEC0,(pulse1+1)
+	movff POSTDEC0,pulse1
+	movlw LOW((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+_lbl___201
+	call dup
+	movlw 112
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___203
+	movlw LOW((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	movff pulse0,PREINC0
+	movff (pulse0+1),PREINC0
+	call _DT_
+	call cr
+	movlw LOW((_data___4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___4+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	movff pulse1,PREINC0
+	movff (pulse1+1),PREINC0
+	call _DT_
+	call cr
+_lbl___203
+	call dup
+	movlw 43
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___205
+	movff pulse1,PREINC0
+	movff (pulse1+1),PREINC0
+	movlw LOW(delta)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movf temp_x1,0,0
+	movlw HIGH(delta)
 	addwfc INDF0,1,0
-	return
-
-; op_minus: defined at lib/arithmetic.fs:37
-op_minus
-	movff POSTDEC0,temp_x1
+	movff POSTDEC0,(pulse1+1)
+	movff POSTDEC0,pulse1
+	movlw LOW((_data___5+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___5+0x8000))
+	movwf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	movff pulse1,PREINC0
+	movff (pulse1+1),PREINC0
+	call _DT_
+	call cr
+_lbl___205
+	call dup
+	movlw 45
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
 	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___207
+	movff pulse1,PREINC0
+	movff (pulse1+1),PREINC0
+	movlw LOW((-delta))
 	movf POSTDEC0,1,0
-	subwf POSTINC0,1,0
-	movf temp_x1,0,0
-	subwfb INDF0,1,0
-	return
+	addwf POSTINC0,1,0
+	movlw HIGH((-delta))
+	addwfc INDF0,1,0
+	movff POSTDEC0,(pulse1+1)
+	movff POSTDEC0,pulse1
+	movlw LOW((_data___6+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___6+0x8000))
+	movwf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call type
+	movff pulse1,PREINC0
+	movff (pulse1+1),PREINC0
+	call _DT_
+	call cr
+_lbl___207
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	bra _lbl___197
 
-; and: defined at lib/arithmetic.fs:59
-and
-	movff POSTDEC0,temp_x1
+; read8: defined at lib/strings.fs:69
+read8
+	call read4
 	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
-	return
+	swapf POSTINC0,1,0
+	call read4
 
-; or: defined at lib/arithmetic.fs:69
+; or: defined at lib/arithmetic.fs:75
 or
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -242,40 +379,6 @@ or
 	iorwf POSTINC0,1,0
 	movf temp_x1,0,0
 	iorwf INDF0,1,0
-	return
-
-; xor: defined at lib/arithmetic.fs:79
-xor
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	xorwf POSTINC0,1,0
-	movf temp_x1,0,0
-	xorwf INDF0,1,0
-	return
-
-; 1>2: defined at lib/arithmetic.fs:96
-_1_GT_2
-	movf INDF0,0,0
-	clrf INDF0,0
-	movwf PREINC0,0
-	clrf PREINC0,0
-	return
-
-; 0<: defined at lib/arithmetic.fs:130
-_0_LT_
-	movlw -1
-	btfss POSTDEC0,7,0
-	movlw 0
-	movwf POSTINC0,0
-	movwf INDF0,0
-	return
-
-; 1+: defined at lib/arithmetic.fs:186
-_1_PL_
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
 	return
 
 ; table-addr!: defined at lib/tables.fs:1
@@ -289,11 +392,165 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
+; greetings: defined at tests/pwm.fs:62
+greetings
+	movlw LOW((_data___7+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___7+0x8000))
+	movwf PREINC0,0
+	movlw 18
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; type: defined at lib/strings.fs:27
+type
+	call dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	goto _2drop
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	movwf PREINC2,0
+_lbl___92
+	call dup
+	call op_cfetch_tos
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___92
+	movf POSTDEC2,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+	clrf pulse0,1
+	clrf (pulse0+1),1
+	clrf pulse1,1
+	clrf (pulse1+1),1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+	goto main
+
 ; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
+
+; cr: defined at lib/strings.fs:8
+cr
+	movlw 0xa
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call emit
+	movlw 0xd
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto emit
+
+; dup: defined at lib/primitives.fs:29
+dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+; op_cfetch_tos: defined at lib/primitives.fs:197
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+; swap: defined at lib/primitives.fs:241
+swap
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+; 2drop: defined at lib/primitives.fs:243
+_2drop
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; op_minus: defined at lib/arithmetic.fs:39
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
+; and: defined at lib/arithmetic.fs:63
+and
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	andwf POSTINC0,1,0
+	movf temp_x1,0,0
+	andwf INDF0,1,0
+	return
+
+; xor: defined at lib/arithmetic.fs:87
+xor
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	xorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	xorwf INDF0,1,0
+	return
+
+; 1>2: defined at lib/arithmetic.fs:106
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+; 0<: defined at lib/arithmetic.fs:140
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+; 2dupxor>w: defined at lib/arithmetic.fs:159
+_2dupxor_GT_w
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
+	return
 
 ; flashc@: defined at lib/tables.fs:14
 flashc_AT_
@@ -317,17 +574,6 @@ eepromc_AT_
 	movf EEDATA,0,0
 	return
 
-; cr: defined at lib/strings.fs:8
-cr
-	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call emit
-	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto emit
-
 ; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
 	movf POSTDEC0,0,0
@@ -339,57 +585,6 @@ nibble_MI_to_MI_hex
 	addwf POSTDEC0,0,0
 	return
 
-; emit-4: defined at lib/strings.fs:23
-emit_MI_4
-	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto emit
-
-; emit-8: defined at lib/strings.fs:24
-emit_MI_8
-	call dup
-	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
-	call emit_MI_4
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
-	goto emit_MI_4
-
-; .: defined at lib/strings.fs:25
-_DT_
-	call _1_GT_2
-	call emit_MI_8
-	goto emit_MI_8
-
-; type: defined at lib/strings.fs:27
-type
-	call dup
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	btfsc STATUS,2,0
-	goto _2drop
-	movf POSTDEC0,0
-	movf POSTDEC0,0
-	movwf PREINC2,0
-_lbl___67
-	call dup
-	call op_cfetch_tos
-	call emit
-	call _1_PL_
-	decfsz INDF2,1,0
-	bra _lbl___67
-	movf POSTDEC2,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	return
-
 ; read4: defined at lib/strings.fs:68
 read4
 	call key
@@ -397,33 +592,27 @@ read4
 	movlw 65
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call op_minus
-	call _0_LT_
-	call op_zeroeq
+	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___78
+	bz _lbl___99
 	movlw 223
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call and
-	movlw 55
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto op_minus
-_lbl___78
-	movlw 48
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto op_minus
-
-; read8: defined at lib/strings.fs:69
-read8
-	call read4
-	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	call read4
-	goto or
+	movlw LOW((-55))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-55))
+	addwfc INDF0,1,0
+	return
+_lbl___99
+	movlw LOW((-48))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-48))
+	addwfc INDF0,1,0
+	return
 
 ; read16: defined at lib/strings.fs:70
 read16
@@ -433,14 +622,6 @@ read16
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf INDF0,0
-	return
-
-; emit: defined at lib/tty.fs:4
-emit
-	btfss PIR1,4,0
-	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
 	return
 
 ; key: defined at lib/tty.fs:5
@@ -459,16 +640,10 @@ set_MI_tmr0_MI_wait
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR0L
 	bcf INTCON,2,0
-_lbl___91
+_lbl___185
 	btfsc INTCON,2,0
 	return
-	bra _lbl___91
-
-; tmr1-wait: defined at tests/pwm.fs:14
-tmr1_MI_wait
-	btfsc PIR1,0,0
-	return
-	bra tmr1_MI_wait
+	bra _lbl___185
 
 ; set-tmr1: defined at tests/pwm.fs:16
 set_MI_tmr1
@@ -509,176 +684,12 @@ pwm
 	movlw HIGH(main_MI_time)
 	movwf PREINC0,0
 	call set_MI_tmr1
-_lbl___99
+_lbl___193
 	btfsc PIR1,5,0
 	return
 	btfsc PIR1,0,0
 	bra pwm
-	bra _lbl___99
-
-; main-loop: defined at tests/pwm.fs:32
-main_MI_loop
-	movlw LOW(-6000)
-	movwf pulse0,1
-	movlw HIGH(-6000)
-	movwf (pulse0+1),1
-	movlw LOW(-6000)
-	movwf pulse1,1
-	movlw HIGH(-6000)
-	movwf (pulse1+1),1
-_lbl___103
-	call pwm
-	call key
-	call dup
-	movlw 48
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	call op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___105
-	call read16
-	movff POSTDEC0,(pulse0+1)
-	movff POSTDEC0,pulse0
-	movlw LOW((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw 1
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-_lbl___105
-	call dup
-	movlw 49
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	call op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___107
-	call read16
-	movff POSTDEC0,(pulse1+1)
-	movff POSTDEC0,pulse1
-	movlw LOW((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw 1
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-_lbl___107
-	call dup
-	movlw 112
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	call op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___109
-	movlw LOW((_data___3+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
-	movwf PREINC0,0
-	movlw 8
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movff pulse0,PREINC0
-	movff (pulse0+1),PREINC0
-	call _DT_
-	call cr
-	movlw LOW((_data___4+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
-	movwf PREINC0,0
-	movlw 8
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movff pulse1,PREINC0
-	movff (pulse1+1),PREINC0
-	call _DT_
-	call cr
-_lbl___109
-	call dup
-	movlw 43
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	call op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___111
-	movff pulse1,PREINC0
-	movff (pulse1+1),PREINC0
-	movlw delta
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call op_plus
-	movff POSTDEC0,(pulse1+1)
-	movff POSTDEC0,pulse1
-	movlw LOW((_data___5+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
-	movwf PREINC0,0
-	movlw 1
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movff pulse1,PREINC0
-	movff (pulse1+1),PREINC0
-	call _DT_
-	call cr
-_lbl___111
-	call dup
-	movlw 45
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	call op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___113
-	movff pulse1,PREINC0
-	movff (pulse1+1),PREINC0
-	movlw delta
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call op_minus
-	movff POSTDEC0,(pulse1+1)
-	movff POSTDEC0,pulse1
-	movlw LOW((_data___6+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
-	movwf PREINC0,0
-	movlw 1
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movff pulse1,PREINC0
-	movff (pulse1+1),PREINC0
-	call _DT_
-	call cr
-_lbl___113
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	bra _lbl___103
-
-; greetings: defined at tests/pwm.fs:62
-greetings
-	movlw LOW((_data___7+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___7+0x8000))
-	movwf PREINC0,0
-	movlw 18
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto type
+	bra _lbl___193
 
 ; init-pwm: defined at tests/pwm.fs:65
 init_MI_pwm
@@ -694,11 +705,18 @@ init_MI_pwm
 	movwf T1CON,0
 	return
 
-; main: defined at tests/pwm.fs:74
-main
-	call greetings
-	call init_MI_pwm
-	goto main_MI_loop
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+; temp_x1: defined at lib/primitives.fs:22
+temp_x1 equ 0x0
+
+; pulse0: defined at tests/pwm.fs:9
+pulse0 equ 0x100
+
+; pulse1: defined at tests/pwm.fs:10
+pulse1 equ 0x102
 
 ;---------------------------------------------------------
 ; Section: static data
@@ -740,18 +758,5 @@ _data___7
 	db 13,10,80,87,77,32,71,101
 	db 110,101,114,97,116,111,114,62
 	db 13,10
-
-;---------------------------------------------------------
-; Section: memory
-;---------------------------------------------------------
-
-; temp_x1: defined at lib/primitives.fs:16
-temp_x1 equ 0x0
-
-; pulse0: defined at tests/pwm.fs:9
-pulse0 equ 0x100
-
-; pulse1: defined at tests/pwm.fs:10
-pulse1 equ 0x102
 
 END
