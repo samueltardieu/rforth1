@@ -21,7 +21,7 @@ Memory usage:
      variables used in computations
    - user-defined variables are located starting at 0x0100"""
 
-import getopt, os, sre, string, sys
+import optparse, os, sre, string, sys
 
 def parse_number (str):
   """Parse a string and return a Number object with the right number and the
@@ -2217,55 +2217,53 @@ class Compiler:
             "%s: cannot find internal entity %s" % (self.current_location (),
                                                     item)
 
-def usage (exit_code):
-  stderror ("Usage: %s [options] source.fs" % os.path.split(sys.argv[0])[-1])
-  stderror ("Options:")
-  stderror ("   -a         --auto-inline        Turn on automatic inlining")
-  stderror ("                                     (experimental)")
-  stderror ("   -c         --compile            Compile only, do not link")
-  stderror ("   -h         --help               This help")
-  stderror ("   -m word    --main=word          Main word (main)")
-  stderror ("   -o name    --output=name        Set output file name")
-  stderror ("   -p model   --processor=model    Set processor type (18f248)")
-  stderror ("   -s addr    --start=addr         Set starting address (0x2000)")
-  sys.exit (exit_code)
+def set_start_cb (option, opt, value, parser):
+  s = parse_number (value)
+  if s is None:
+    raise optparse.OptionValueError, "%s is not a valid address" % value
+  setattr (parser.values, option.dest, s)
 
 def main ():
   global compiler
-  # Handle args
-  opts, args = getopt.gnu_getopt (sys.argv[1:], 'achim:o:p:s:',
-                                  ['auto-inline', 'compile', 'interrupts',
-                                   'help', 'main', 'output=',
-                                   'processor=', 'start='])
-  if len (args) != 1: usage (1)
+  parser = optparse.OptionParser (usage = '%prog [options] FILE')
+  parser.add_option ('-a', '--auto-inline', action = 'store_true',
+                     default = False, dest = 'automatic_inlining',
+                     help = 'turn on automatic inlining (experimental)')
+  parser.add_option ('-c', '--compile', action = 'store_true',
+                     default = False, dest = 'compile_only',
+                     help = 'compile only, do not link')
+  parser.add_option ('-i', '--interrupts', dest = 'enable_interrupts',
+                     action = 'store_true', default = False,
+                     help = 'enable interrupts usage')
+  parser.add_option ('-m', '--main', dest = 'root', metavar = 'WORD',
+                     default = 'main',
+                     help = 'main word [main]')
+  parser.add_option ('-o', '--output', metavar = 'FILE', dest = 'outfile',
+                     help = 'set output file name', default = None)
+  parser.add_option ('-p', '--processor', metavar = 'MODEL',
+                     default = '18f248',
+                     help = 'set processor type [18f248]')
+  parser.add_option ('-s', '--start', default = parse_number ('0x2000'),
+                     action = 'callback', callback = set_start_cb,
+                     metavar = 'ADDR', type='str',
+                     help = 'set starting address [0x2000]')
+  opts, args = parser.parse_args ()
+  if len (args) != 1:
+    parser.print_help ()
+    sys.exit (1)
   infile = args[0]
-  compile_only = False
-  outfile = None
-  root = 'main'
-  processor = '18f248'
-  start = parse_number ('0x2000')
-  enable_interrupts = False
-  automatic_inlining = False
-  for o, v in opts:
-    if o in ['-a', '--auto-inline']: automatic_inlining = True
-    if o in ['-c', '--compile']: compile_only = True
-    if o in ['-h', '--help']: usage (0)
-    if o in ['-i', '--interrupts']: enable_interrupts = True
-    if o in ['-m', '--main']: root = v
-    if o in ['-o', '--output']: outfile = v
-    if o in ['-p', '--processor']: processor = v
-    if o in ['-s', '--start']: start = parse_number (v)
   # Do the real job
   asmfile = os.path.splitext(infile)[0] + '.asm'
   hexfile = os.path.splitext(infile)[0] + '.hex'
-  if outfile:
-    if compile_only: asmfile = outfile
-    else: hexfile = outfile
-  compiler = Compiler (processor, start, root, automatic_inlining,
+  if opts.outfile:
+    if opts.compile_only: asmfile = opts.outfile
+    else: hexfile = opts.outfile
+  compiler = Compiler (opts.processor, opts.start, opts.root,
+                       opts.automatic_inlining,
                        infile, asmfile)
-  if enable_interrupts: compiler.enable_interrupts ()
+  if opts.enable_interrupts: compiler.enable_interrupts ()
   compiler.process ()
-  if not compile_only:
+  if not opts.compile_only:
     if os.fork () == 0:
       os.execlp ('gpasm', 'gpasm', '-o', hexfile, asmfile)
     else:
