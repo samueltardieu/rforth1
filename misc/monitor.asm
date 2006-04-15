@@ -76,7 +76,8 @@ serial_init:
 command:
 	btg	LATA,1		; Toggle led A1
 	rcall	ok
-	
+
+command_no_prompt:	
 	rcall	get_char
 	
 	xorlw	H'57'		; Command 'W'
@@ -91,8 +92,17 @@ command:
 	btfsc	STATUS,Z
 	bra	command_read
 
+	xorlw	H'6'		; Command 'T'
+	btfsc	STATUS,Z
+	bra	command_sync
+	
 	bra	command		; No command recognized, retry
 
+command_sync:
+	movlw	H'21'		; ! is the answer to T
+	rcall	put_char
+	bra	command_no_prompt
+	
 	;; Read 3 bytes and display the content of a given address
 command_read:
 	btg	LATA,0		; Toggle led A0
