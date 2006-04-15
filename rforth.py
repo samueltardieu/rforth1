@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 #
+# (c) 2005-2006 Samuel Tardieu <sam@rfc1149.net>
+#
+# rforth1 is released under the GNU General Public License (see the
+# file COPYING in this directory)
+
 """Forth compiler targetting the PIC18Fxxx microcontrollers family.
 
 Memory usage:

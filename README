@@ -1,3 +1,11 @@
+rforth1 requires Python 2.3
+
+rforth1 is (c) 2005-2006 Samuel Tardieu <sam@rfc1149.net>
+and is being distributed under the General Public License version 2
+(see the file COPYING in the distribution)
+
+The accompanying libraries and examples are placed in the public domain.
+
 Thanks go to:
 
   - Jean-Baptiste Mayer <jibee@jibee.com> for naming this compiler and
