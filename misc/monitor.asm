@@ -8,11 +8,19 @@
 ;;;   3) read an address content
 ;;;         Raaaaaa
 ;;; This should be enough to let one up and running.
+;;; 
+;;; This monitor has been written by Samuel Tardieu <sam@rfc1149.net>
+;;; and has been placed in the public domain.
+;;; 
+;;; Do not forget to customize the monitor to your need:
+;;;   - oscillator type
+;;;   - serial port settings
+;;;   - led handling
 
 include "p18f258.inc"
 	
 	processor	18f258
-	__config	_CONFIG1H, _OSCS_OFF_1H & _HS_OSC_1H
+	__config	_CONFIG1H, _OSCS_OFF_1H & _HSPLL_OSC_1H
 	__config	_CONFIG2L, _BOR_ON_2L & _PWRT_ON_2L & _BORV_45_2L
 	__config	_CONFIG2H, _WDT_OFF_2H
 	__config	_CONFIG4L, _DEBUG_OFF_4L & _LVP_OFF_4L & _STVR_ON_4L
@@ -47,9 +55,9 @@ leds_init:
 	clrf	LATA
 	btg	LATA,0		; Lit led A0
 	movlw	H'7'
-	; movwf	ADCON1
+	movwf	ADCON1
 	movlw	H'F0'
-	; movwf	TRISA
+	movwf	TRISA
 	return
 
 	;; Serial port initialization
