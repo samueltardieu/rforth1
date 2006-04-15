@@ -1,11 +1,12 @@
-needs lib/can.fs
+needs lib/canlib.fs
 needs lib/tty.fs
 
 \ To test loopback, use same local and remote address and uncomment
-\ the call to can_loopback
+\ the call to can-loopback
 
-0x80E0 constant local_addr
-0x8060 constant remote_addr
+0x80E0 constant local-addr
+0x8060 constant remote-addr
+0b11111111111 constant addr-mask
 
 64 constant buffer-size
 
@@ -27,20 +28,24 @@ variable next-read
   next-read @ inc-wrap next-read !
 ;
 
-: buffer-not-empty ( -- f ) next-read @ next-write @ <> ;
+: buffer-not-empty? ( -- f ) next-read @ next-write @ <> ;
+
+: serial-to-can ( -- ) key remote-addr can-emit-1 ;
+: can-to-buffer ( -- ) can-receive can-msg-0 c@ bufferc! ;
+: buffer-to-serial ( -- ) txif bit-set? if bufferc@ emit then ;
 
 : step ( -- )
-  key? if key can_emit then
-  buffer-not-empty if txif bit-set? if bufferc@ emit then then
-  can_msg_present if can_receive bufferc! then
+  key? if serial-to-can then
+  can-msg-present? if can-to-buffer then
+  buffer-not-empty? if buffer-to-serial then
 ;
 
 : mainloop ( -- ) begin step again ;
 
 : main ( -- )
-  can_init
-  0xFFE0 local_addr can_set_mask
-  \ can_loopback
+  can-init
+  can-config local-addr 0 can-set-filter addr-mask 0 can-set-mask can-normal
+  \ can-loopback
     ." CAN bootloader relay\n"
     ." RXM0SIDL " RXM0SIDL @ . cr
     ." RXM0SIDH " RXM0SIDH @ . cr
