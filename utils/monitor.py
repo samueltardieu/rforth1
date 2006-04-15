@@ -13,7 +13,7 @@
 #   - DOS/Windows: monitor.py com1: hexfile
 #
 
-import socket, getopt, serial, snooper, sys
+import optparse, socket, serial, snooper, sys
 
 flash = [0xff] * 65536
 
@@ -129,7 +129,7 @@ def makeup_lines (options):
     for a in range (0, len (flash), 64):
         line = flash [a:a+64]
         if line != [0xff] * 64:
-            if a < 0x200 and not options['force']:
+            if a < 0x200 and not options.force:
                 raise PermissionDenied, 'Set force flag to True'
             lines.append ((a, line))
     return lines
@@ -157,7 +157,7 @@ def sync_device (fd):
 def program_device (fd, options):
     """Program the device."""
     print "Switching to bootloader mode"
-    if options['sync']: sync_device (fd)
+    if options.sync: sync_device (fd)
     for addr, data in makeup_lines(options):
         print "Programming flash starting at %06X" % addr
         writefd (fd, "W%06X" % addr)
@@ -173,30 +173,33 @@ def load_hex_file (file):
 
 
 def open_port (options):
-    print "Opening %s at %s bps" % (options['port'], options['speed'])
-    fd = serial.Serial (options['port'], options['speed'])
-    if options['snoop']:
+    print "Opening %s at %s bps" % (options.port, options.speed)
+    fd = serial.Serial (options.port, options.speed)
+    if options.snoop:
         print "Activating snooper"
         fd = Snooper (fd)
-    if options['sync']: sync_device (fd)
-    if options['can']:
-        print "Connecting to remote CAN device %03x" % int (options['can'], 16)
-        writefd (fd, ":%03x" % int (options['can'], 16))
-        if options['sync']: sync_device (fd)
+    if options.sync: sync_device (fd)
+    if options.can:
+        print "Connecting to remote CAN device %03x" % int (options.can, 16)
+        writefd (fd, ":%03x" % int (options.can, 16))
+        if options.sync: sync_device (fd)
     return fd
 
 def close_port (fd, options):
-    if options['can']:
+    if options.can:
         print "Disconnecting from remote CAN deviec"
         writefd (fd, chr (27))
 
 def check_argv (args, n):
-    if len (args) != n: usage (1)
+    if len (args) != n:
+        print "Error: this mode requires a different number of arguments " \
+              "(%d instead of %d given)" % (n, len (args))
+        sys.exit (1)
 
 def action_dump (options, args):
     check_argv (args, 0)
+    fd = open_port (options)
     try:
-        fd = open_port (options)
         c = Config (read_line (fd, 0x1FC0))
         c.print_config ()
     finally:
@@ -231,7 +234,7 @@ def action_client (options, args):
 	check_argv (args, 1)
 	try:
             s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            host, port = options['server-addr'], options['server-port']
+            host, port = options.server_addr, options.server_port
             if host == 'auto': host = 'localhost'
             s.connect((host, port))
             print "Connected to", addr
@@ -254,8 +257,8 @@ def action_server (options, args):
 	check_argv (args, 0)
 	try:
 		s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		port = int(options['server-port'])
-		host=options['server-addr']
+		port = options.server_port
+		host=options.server_addr
 		if host == 'auto':
                     host= ''
 		addr = (host, port)	
@@ -279,43 +282,59 @@ def action_server (options, args):
 		s.close()
 			
 def main ():
-    opts, args = getopt.gnu_getopt (sys.argv[1:],
-                                    'c:Dp:Psh',
-                                    ['can=',
-				     'server', 'client',
-                                     'server-addr=', 'server-port=',
-                                     'factory-defaults', 'dump', 'force',
-                                     'no-sync',
-                                     'port=', 'program',
-                                     'speed=', 'set', 'snoop', 'help'])
-    action = None
-    options = {'port': '/dev/ttyS0',
-               'file': None,
-               'force': False,
-               'sync': True,
-               'speed': 115200,
-               'can': None,
-               'snoop': False,
-               'server-addr': 'auto',
-               'server-port': 3435}
-    for o, v in opts:
-        if o in ['-h', '--help']: usage (0)
-        if o == '--server': action = action_server
-        if o == '--client': action = action_client
-	if o == '--server-addr': options['server-addr'] = v
-	if o == '--server-port': options['server-port'] = v
-        if o in ['-c', '--can']: options['can'] = v
-        if o in ['-D', '--dump']: action = action_dump
-        if o == '--factory-defaults': action = action_factory_defaults
-        if o == '--force': options['force'] = True
-        if o == '--no-sync': options['sync'] = False
-        if o in ['-p', '--port']: options['port'] = v
-        if o in ['-P', '--program']: action = action_program
-        if o == '--set': action = action_set
-        if o == '--snoop': options['snoop'] = True
-        if o in ['-s', '--speed']: options ['speed'] = int (v)
-    if action is None: usage (1)
-    action (options, args)
+    usage = '%prog [options] [hexfile]'
+    description = """Communicate with the embedded bootloader.
+
+You have to choose one mode amongst program, dump, client or server.
+Each mode has its own option requirements."""
+    parser = optparse.OptionParser (usage = usage, description = description)
+    parser.add_option ('--server',
+                       action = 'store_const',
+                       const = action_server,
+                       dest = 'action',
+                       default = None,
+                       help = 'activate server mode')
+    parser.add_option ('--client',
+                       action = 'store_const',
+                       const = action_client,
+                       dest = 'action',
+                       help = 'activate client mode')
+    parser.add_option ('--server-addr', metavar = 'ADDR', dest = 'server_addr',
+                       default = 'auto',
+                       help = 'server address')
+    parser.add_option ('--server-port', metavar = 'PORT', type = 'int',
+                       dest = 'server_port',
+                       help = 'server port')
+    parser.add_option ('-c', '--can', action = 'store_true',
+                       default = False,
+                       help = 'program through CAN to serial interface')
+    parser.add_option ('-D', '--dump',
+                       action = 'store_const',
+                       const = action_dump,
+                       dest = 'action',
+                       help = 'dump configuration')
+    parser.add_option ('--force', action = 'store_true', default = 'False',
+                       help = 'allow programming of low bytes (dangerous!)')
+    parser.add_option ('--no-sync', action = 'store_false', default = 'True',
+                       dest = 'sync',
+                       help = 'skip synchronization phase')
+    parser.add_option ('-p', '--port', default = '/dev/ttyS0',
+                       help = 'communication port to use [/dev/ttyS0]')
+    parser.add_option ('-P', '--program',
+                       action = 'store_const',
+                       const = action_program,
+                       dest = 'action',
+                       help = 'programming mode')
+    parser.add_option ('--snoop', action = 'store_true', default = False,
+                       help = 'snoop ongoing traffic while programming')
+    parser.add_option ('-s', '--speed', type = 'int',
+                       help = 'speed to use for programming [115200]',
+                       default = 115200)
+    opts, args = parser.parse_args ()
+    if opts.action is None:
+        parser.print_help ()
+        sys.exit (1)
+    opts.action (opts, args)
 
 if __name__ == '__main__':
     main ()
