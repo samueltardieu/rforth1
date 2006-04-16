@@ -40,7 +40,7 @@ color-mode 3 bit DOBLUE
   \ Compute the time difference and shut down module
   deselect CCPR1L @ swap - ;
 
-: init-vars ( -- ) 15 color-mode ! ;
+: init-vars ( -- ) 15 color-mode c! ;
 : init-ccp ( -- ) $05 CCP1CON c! $81 T1CON c! $00 T3CON c! ;
 
 : help ( -- )
