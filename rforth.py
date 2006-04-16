@@ -171,7 +171,7 @@ class Named:
                   ('-', 'MI'), ('*', 'ST'), ('/', 'SL'), ('=', 'EQ'),
                   ('<', 'LT'), ('>', 'GT'), ('$', 'DO'), ('.', 'DT'),
                   ('"', 'QU'), ("'", 'QT'), (':', 'CL'), (';', 'SC'),
-                  ('(', 'OP'), (')', 'CP')]:
+                  ('(', 'OP'), (')', 'CP'), ('%', 'PC')]:
         name = string.replace (name, k, "_%s_" % v)
     if self.occurrence: suffix = '__%d' % self.occurrence
     else: suffix = ''
