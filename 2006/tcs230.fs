@@ -1,4 +1,5 @@
 needs lib/tty.fs
+needs 2006/ds1804.fs
 
 LATB 6 bit S0
 LATB 7 bit S1
@@ -15,8 +16,8 @@ color-mode 1 bit DORED
 color-mode 2 bit DOGREEN
 color-mode 3 bit DOBLUE
 
-: select ( -- ) /OE bit-clr ;
-: deselect ( -- ) /OE bit-set ;
+: select-tcs230 ( -- ) /OE bit-clr ;
+: deselect-tcs230 ( -- ) /OE bit-set ;
 : clear ( -- ) S2 bit-set S3 bit-clr ;
 : blue ( -- ) S2 bit-clr S3 bit-set ;
 : green ( -- ) S2 bit-set S3 bit-set ;
@@ -34,11 +35,11 @@ color-mode 3 bit DOBLUE
 
 : count-pulses ( n -- time )
   \ Turn the module on and Wait for the first pulse
-  select wait-for-up reset-ccp wait-for-ccp CCPR1L @ swap
+  select-tcs230 wait-for-up reset-ccp wait-for-ccp CCPR1L @ swap
   \ Wait for the required number of cycles
   cfor wait-for-ccp cnext
   \ Compute the time difference and shut down module
-  deselect CCPR1L @ swap - ;
+  deselect-tcs230 CCPR1L @ swap - ;
 
 : init-vars ( -- ) 15 color-mode c! ;
 : init-ccp ( -- ) $05 CCP1CON c! $81 T1CON c! $00 T3CON c! ;
@@ -47,6 +48,7 @@ color-mode 3 bit DOBLUE
   ." 0: off  1: 100% [default] 2: 20%  3: 2%" cr
   ." C: clear  R: red  G: green  B: blue  A: all [default]" cr
   ." W: 1 pulse  X: 10 pulses  C: 100 pulses" cr
+  ." >: increment led power  <: decrement led power  !: store led power" cr
 ;
 
 : prompt ( -- ) ." ?>" ;
@@ -74,6 +76,9 @@ color-mode 3 bit DOBLUE
   dup [char] W = if drop 1 do-measure exit then
   dup [char] X = if drop 10 do-measure exit then
   dup [char] C = if drop 100 do-measure exit then
+  dup [char] < = if drop down exit then
+  dup [char] > = if drop up exit then
+  dup [char] ! = if drop save-to-eeprom then
   drop help
 ;
 
