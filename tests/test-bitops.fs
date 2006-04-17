@@ -1,4 +1,4 @@
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 variable x
 x 3 bit t1

@@ -1,4 +1,4 @@
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 : 8* ( n -- 8*n ) 2* 2* 2* ;
 : select-channel ( n -- ) 8* adcon0 c@ 0b11000111 and or adcon0 c! ;

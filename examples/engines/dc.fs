@@ -1,7 +1,7 @@
 \ Commande de moteurs
 \ AREABOT
 
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 needs examples/engines/dc-card-setup.fs
 needs examples/engines/dc-vars.fs
 needs examples/engines/can-engines.fs

@@ -1,4 +1,4 @@
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 : main ( -- )
   can-init

@@ -11,7 +11,7 @@
 \ The smallest value is 0x1000, which corresponds to 1.638ms. The greatest
 \ value is 0xEFFF.
 
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 variable nexttimer
 variable ondelay

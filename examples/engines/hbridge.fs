@@ -1,4 +1,4 @@
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 create pattern1 0b0111 c, 0b1101 c, 0b1011 c, 0b1110 c,
 create pattern2 0b1001 c, 0b1010 c, 0b0110 c, 0b0101 c,

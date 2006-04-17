@@ -1,4 +1,4 @@
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 needs 2006/ds1804.fs
 
 LATB 6 bit S0

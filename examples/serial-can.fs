@@ -1,5 +1,5 @@
 needs lib/canlib.fs
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 \ To test loopback, use same local and remote address and uncomment
 \ the call to can-loopback

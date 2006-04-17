@@ -1,6 +1,6 @@
 \ Source of the color sensors command card 
 
-needs lib/tty.fs
+needs lib/tty-rs232.fs
 
 \ Port naming
 ADCON0 2 bit GO/DONE
