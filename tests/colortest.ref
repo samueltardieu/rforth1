@@ -153,7 +153,7 @@ emit_MI_4
 	movwf PREINC0,0
 	clrf PREINC0,0
 
-; emit: defined at lib/tty.fs:4
+; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
@@ -378,7 +378,7 @@ _lbl___92
 	movf POSTDEC0,1,0
 	return
 
-; key: defined at lib/tty.fs:5
+; key: defined at lib/tty-rs232.fs:5
 key
 	btfss PIR1,5,0
 	bra key
