@@ -1,13 +1,13 @@
 needs lib/tty.fs
 
-LATA 0 bit S0
-LATA 1 bit S1
-LATA 2 bit S2
-LATA 3 bit S3
-LATA 4 bit /OE
+LATB 6 bit S0
+LATB 7 bit S1
+LATC 0 bit S2
+LATC 1 bit S3
+LATA 0 bit /OE
 PORTC 2 bit IN
 
-: init-tcs ( -- ) $e0 TRISA c! LATC 2 bit-clr ;
+: init-tcs ( -- ) $fe TRISA c! $3f TRISB c! $bc TRISC c! LATC 2 bit-clr ;
 
 cvariable color-mode
 color-mode 0 bit DOCLEAR
