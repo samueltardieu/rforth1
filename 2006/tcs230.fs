@@ -1,14 +1,16 @@
 needs lib/tty-rs232.fs
 needs 2006/ds1804.fs
 
-LATB 6 bit S0
-LATB 7 bit S1
-LATC 0 bit S2
-LATC 1 bit S3
-LATA 0 bit /OE
+LATA 1 bit S0
+LATC 0 bit S1
+LATC 1 bit S2
+LATA 0 bit S3
+LATA 5 bit /OE
 PORTC 2 bit IN
 
-: init-tcs ( -- ) $fe TRISA c! $3f TRISB c! $bc TRISC c! LATC 2 bit-clr ;
+: init-tcs ( -- )
+  TRISA 1 bit-clr TRISA 0 bit-clr TRISC 1 bit-clr TRISC 0 bit-clr
+  TRISA 5 bit-clr TRISC 2 bit-set ;
 
 cvariable color-mode
 color-mode 0 bit DOCLEAR
