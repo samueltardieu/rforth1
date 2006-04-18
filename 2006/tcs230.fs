@@ -66,6 +66,7 @@ color-mode 3 bit DOBLUE
 ;
 
 : handle-key ( c -- )
+  dup [char] a >= if 32 - then
   dup [char] 0 = if drop mode-down exit then
   dup [char] 1 = if drop mode-100% exit then
   dup [char] 2 = if drop mode-20% exit then
