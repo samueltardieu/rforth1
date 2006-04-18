@@ -50,7 +50,7 @@ color-mode 3 bit DOBLUE
   ." 0: off  1: 100% [default] 2: 20%  3: 2%" cr
   ." C: clear  R: red  G: green  B: blue  A: all [default]" cr
   ." W: 1 pulse  X: 10 pulses  C: 100 pulses" cr
-  ." >: increment led power  <: decrement led power  !: store led power" cr
+  ." >: inc. led  <: dec. led  !: store led  Z: zero led M: max led" cr
 ;
 
 : prompt ( -- ) ." ?>" ;
@@ -80,7 +80,9 @@ color-mode 3 bit DOBLUE
   dup [char] C = if drop 100 do-measure exit then
   dup [char] < = if drop down exit then
   dup [char] > = if drop up exit then
-  dup [char] ! = if drop save-to-eeprom then
+  dup [char] ! = if drop save-to-eeprom exit then
+  dup [char] Z = if drop zero exit then
+  dup [char] M = if drop max exit then
   drop help
 ;
 

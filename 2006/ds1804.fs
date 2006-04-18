@@ -19,4 +19,7 @@ LATC 5 bit /INC
 : up ( -- ) U/D bit-set cycle ;
 : down ( -- ) U/D bit-clr cycle ;
 
+: zero ( -- ) 100 cfor down cnext ;
+: max ( -- ) 100 cfor up cnext ;
+
 : init-ds1804 ( -- ) deselect TRISC 3 bit-clr TRISC 4 bit-clr TRISC 5 bit-clr ;
