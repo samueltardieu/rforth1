@@ -50,7 +50,8 @@ color-mode 3 bit DOBLUE
   ." 0: off  1: 100% [default] 2: 20%  3: 2%" cr
   ." C: clear  R: red  G: green  B: blue  A: all [default]" cr
   ." W: 1 pulse  X: 10 pulses  C: 100 pulses" cr
-  ." >: inc. led  <: dec. led  !: store led  Z: zero led M: max led" cr
+  ." >: inc. led  <: dec. led  !: store led" cr
+  ." Z: zero led M: max led  H: half led" cr
 ;
 
 : prompt ( -- ) ." ?>" ;
@@ -84,6 +85,7 @@ color-mode 3 bit DOBLUE
   dup [char] ! = if drop save-to-eeprom exit then
   dup [char] Z = if drop zero exit then
   dup [char] M = if drop max exit then
+  dup [char] H = if drop medium exit then
   drop help
 ;
 
