@@ -10,6 +10,8 @@ PREDEFINED = lib/core.fs lib/sfrnames.fs lib/primitives.fs lib/arithmetic.fs \
              lib/canlib.fs
 
 STARTADDR ?= 0x2000
+PORT ?= /dev/ttyS0
+SPEED ?= 115200
 
 tests: ${TESTCASES}
 
@@ -32,4 +34,4 @@ clean:
 	cp -p ${@:.newref=.asm} ${@:.newref=.ref}
 
 %.load: %.hex
-	python utils/monitor.py --program $<
+	python utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
