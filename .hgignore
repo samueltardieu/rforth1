@@ -1,0 +1,13 @@
+\.orig.*
+.*?~
+\..*?\.cmd
+.*?\.o
+.*?\.a
+.*?\.asm
+.*?\.vcd
+\.hg/.*?
+TAGS
+tags
+\.hex
+\.lst
+\.cod
