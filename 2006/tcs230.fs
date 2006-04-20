@@ -60,7 +60,7 @@ variable overflows
 
 variable clear-value
 
-: .ratio ( n -- ) 100 clear-value @ */ . [char] % emit cr ;
+: .ratio ( n -- ) 100 clear-value @ */ .10 [char] % emit cr ;
 : 16bits-measure ( -- x ) 1 count-pulses drop ;
 : ratios ( -- )
   clear 16bits-measure clear-value !
