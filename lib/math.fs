@@ -122,5 +122,7 @@ math-flags 0 bit negative
   intr-unprotect
   apply-sign32 ;
 
-  : +32 ( n1l n1h n2l n2h -- [n1+n2]l [n1+n2]h )
+: +32 ( n1l n1h n2l n2h -- [n1+n2]l [n1+n2]h )
     >r swap >r + C bit-set? if 1 else 0 then r> + r> + ;
+
+: umod ( ua ub -- ua%ub ) 2dup / * - ;
