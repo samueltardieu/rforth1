@@ -68,3 +68,12 @@ compiler.add_primitive ('."', DotQuote)
 : read4 ( -- n ) key dup 65 >= if 223 and 55 - else 48 - then ;
 : read8 ( -- n ) read4 swapf-lsb read4 or ;
 : read16 ( -- n ) read8 read8 swap 2>1  ;
+
+: .10 ( n -- )
+  dup 0< if [char] - emit abs then
+  dup 10000 >= if dup 10000 / emit-4 then
+  dup 1000 >= if dup 10000 umod 1000 / emit-4 then
+  dup 100 >= if dup 1000 umod 100 / emit-4 then
+  dup 10 >= if dup 100 umod 10 / emit-4 then
+  10 umod emit-4
+;
