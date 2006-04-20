@@ -32,31 +32,35 @@ color-mode 3 bit DOBLUE
 : wait-for-down ( -- ) begin IN bit-clr? until ; inline
 : wait-for-up ( -- ) begin IN bit-set? until ; inline
 
-: wait-for-ccp ( -- ) begin CCP1IF bit-set? until CCP1IF bit-clr ; inline
-: reset-ccp ( -- ) CCP1IF bit-clr 0 TMR1L ! ;
+variable overflows
 
-: count-pulses ( n -- time )
+: ovf ( -- ) TMR1IF bit-set? if 1 overflows +! TMR1IF bit-clr then ; inline
+: wait-for-ccp ( -- ) begin ovf CCP1IF bit-set? until CCP1IF bit-clr ; inline
+: reset-ccp ( -- ) CCP1IF bit-clr 0 TMR1L ! TMR1IF bit-clr 0 overflows ! ;
+
+: count-pulses ( n -- timel timeh )
   \ Turn the module on and Wait for the first pulse
   select-tcs230 wait-for-up reset-ccp wait-for-ccp CCPR1L @ swap
   \ Wait for the required number of cycles
   cfor wait-for-ccp cnext
   \ Compute the time difference and shut down module
-  deselect-tcs230 CCPR1L @ swap - ;
+  deselect-tcs230 CCPR1L @ swap - overflows @ ;
 
 : init-vars ( -- ) 15 color-mode c! ;
 : init-ccp ( -- ) $05 CCP1CON c! $81 T1CON c! $00 T3CON c! ;
 
 : help ( -- )
   ." 0: off  1: 100% [default] 2: 20%  3: 2%" cr
-  ." C: clear  R: red  G: green  B: blue  A: all [default]" cr
+  ." N: clear  R: red  G: green  B: blue  A: all [default]" cr
   ." W: 1 pulse  X: 10 pulses  C: 100 pulses" cr
   ." >: inc. led  <: dec. led  !: store led" cr
   ." Z: zero led M: max led  H: half led" cr
+  ." S: select device  D: deselect device" cr
 ;
 
-: prompt ( -- ) ." ?>" ;
+: prompt ( -- ) .s cr ." ?>" ;
 
-: .measure ( n -- ) count-pulses . cr ;
+: .measure ( n -- ) count-pulses . . cr ;
 
 : do-measure ( n -- )
   DOCLEAR bit-set? if ." CLEAR: " dup clear .measure then
@@ -72,7 +76,7 @@ color-mode 3 bit DOBLUE
   dup [char] 1 = if drop mode-100% exit then
   dup [char] 2 = if drop mode-20% exit then
   dup [char] 3 = if drop mode-2% exit then
-  dup [char] C = if drop 1 color-mode c! exit then
+  dup [char] N = if drop 1 color-mode c! exit then
   dup [char] R = if drop 2 color-mode c! exit then
   dup [char] G = if drop 4 color-mode c! exit then
   dup [char] B = if drop 8 color-mode c! exit then
@@ -86,9 +90,11 @@ color-mode 3 bit DOBLUE
   dup [char] Z = if drop zero exit then
   dup [char] M = if drop max exit then
   dup [char] H = if drop medium exit then
+  dup [char] S = if drop select-tcs230 exit then
+  dup [char] D = if drop deselect-tcs230 exit then
   drop help
 ;
 
 : mainloop ( -- ) begin prompt key dup emit cr handle-key again ;
 
-: main ( -- ) init-tcs mode-100% init-vars init-ccp help mainloop ;
+: main ( -- ) init-tcs mode-100% init-vars init-ccp init-ds1804 help mainloop ;
