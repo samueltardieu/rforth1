@@ -52,10 +52,21 @@ variable overflows
 : help ( -- )
   ." 0: off  1: 100% [default] 2: 20%  3: 2%" cr
   ." N: clear  R: red  G: green  B: blue  A: all [default]" cr
-  ." W: 1 pulse  X: 10 pulses  C: 100 pulses" cr
+  ." W: 1 pulse  X: 10 pulses  C: 100 pulses  L: ratios" cr
   ." >: inc. led  <: dec. led  !: store led" cr
   ." Z: zero led M: max led  H: half led" cr
   ." S: select device  D: deselect device" cr
+;
+
+variable clear-value
+
+: .ratio ( n -- ) 100 clear-value @ */ . [char] % emit cr ;
+: 16bits-measure ( -- x ) 1 count-pulses drop ;
+: ratios ( -- )
+  clear 16bits-measure clear-value !
+  ." Red:   " red 16bits-measure .ratio
+  ." Green: " green 16bits-measure .ratio
+  ." Blue:  " blue 16bits-measure .ratio
 ;
 
 : prompt ( -- ) .s cr ." ?>" ;
@@ -92,6 +103,7 @@ variable overflows
   dup [char] H = if drop medium exit then
   dup [char] S = if drop select-tcs230 exit then
   dup [char] D = if drop deselect-tcs230 exit then
+  dup [char] L = if drop ratios exit then
   drop help
 ;
 
