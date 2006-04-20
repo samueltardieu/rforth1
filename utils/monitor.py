@@ -141,8 +141,11 @@ def writefd (fd, data):
         fd.close ()
     else:
         fd.write (data)
-        if data == 'TT': data = 'T!T!'
-        wait_for (fd, data)
+        if data == 'TT':
+            wait_for (fd, '!')
+            wait_for (fd, '!')
+        else:
+            wait_for (fd, data)
 
 def wait_for (fd, s):
     for c in s:
