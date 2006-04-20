@@ -55,12 +55,12 @@ variable overflows
   ." W: 1 pulse  X: 10 pulses  C: 100 pulses  L: ratios" cr
   ." >: inc. led  <: dec. led  !: store led" cr
   ." Z: zero led M: max led  H: half led" cr
-  ." S: select device  D: deselect device" cr
+  ." S: select device  D: deselect device  @: reset" cr
 ;
 
 variable clear-value
 
-: .ratio ( n -- ) 100 clear-value @ */ .10 [char] % emit cr ;
+: .ratio ( n -- ) >r clear-value @ 100 r> */ .10 [char] % emit cr ;
 : 16bits-measure ( -- x ) 1 count-pulses drop ;
 : ratios ( -- )
   clear 16bits-measure clear-value !
@@ -104,6 +104,7 @@ variable clear-value
   dup [char] S = if drop select-tcs230 exit then
   dup [char] D = if drop deselect-tcs230 exit then
   dup [char] L = if drop ratios exit then
+  dup [char] @ = if reset then
   drop help
 ;
 
