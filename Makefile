@@ -13,6 +13,8 @@ STARTADDR ?= 0x2000
 PORT ?= /dev/ttyS0
 SPEED ?= 115200
 
+PYTHON ?= python
+
 tests: ${TESTCASES}
 
 update-tests: ${TESTCASES:.cmp=.newref}
@@ -25,7 +27,7 @@ clean:
 	${RM} *.cod tests/*.cod examples/*.cod examples/engines/*.cod
 
 %.asm %.hex %.lst %.map %.cod: %.fs ${COMPILER} ${PREDEFINED}
-	python ${COMPILER} -s ${STARTADDR} $<
+	${PYTHON} ${COMPILER} -s ${STARTADDR} $<
 
 %.cmp: %.asm %.ref
 	diff -u ${@:.cmp=.ref} ${@:.cmp=.asm}
@@ -34,4 +36,4 @@ clean:
 	cp -p ${@:.newref=.asm} ${@:.newref=.ref}
 
 %.load: %.hex
-	python utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
+	${PYTHON} utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
