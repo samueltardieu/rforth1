@@ -2226,7 +2226,7 @@ def set_start_cb (option, opt, value, parser):
   s = parse_number (value)
   if s is None:
     raise optparse.OptionValueError, "%s is not a valid address" % value
-  setattr (parser.values, option.dest, s)
+  setattr (parser.values, 'start', s)
 
 def main ():
   global compiler
