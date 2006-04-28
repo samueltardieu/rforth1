@@ -279,9 +279,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___76
+_lbl___77
 	btfsc EECON1,1,0
-	bra _lbl___76
+	bra _lbl___77
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
@@ -309,37 +309,37 @@ receive_MI_byte
 send_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___182
+_lbl___191
 	call dup
 	call op_cfetch_tos
-_lbl___183
+_lbl___192
 	btfsc PORTA,5,0
 	goto _2drop
 	btfsc PIR1,3,0
-	bra _lbl___183
+	bra _lbl___192
 	movf POSTDEC0,0,0
 	movff POSTDEC0,SSPBUF
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___182
+	bra _lbl___191
 
 ; receive-bytes: defined at tests/spi-pic.fs:50
 receive_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___187
+_lbl___196
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___188
+_lbl___197
 	btfss PORTA,5,0
-	bra _lbl___189
+	bra _lbl___198
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___189
+_lbl___198
 	btfss PIR1,3,0
-	bra _lbl___188
+	bra _lbl___197
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
@@ -350,24 +350,24 @@ _lbl___189
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___187
+	bra _lbl___196
 
 ; receive-masks-bytes: defined at tests/spi-pic.fs:61
 receive_MI_masks_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___192
+_lbl___201
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___193
+_lbl___202
 	btfss PORTA,5,0
-	bra _lbl___194
+	bra _lbl___203
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___194
+_lbl___203
 	btfss PIR1,3,0
-	bra _lbl___193
+	bra _lbl___202
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	comf POSTDEC0,1,0
@@ -376,17 +376,17 @@ _lbl___194
 	movff POSTINC2,PREINC0
 	call op_cfetch_tos
 	call and
-_lbl___196
+_lbl___205
 	btfss PORTA,5,0
-	bra _lbl___197
+	bra _lbl___206
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
-_lbl___197
+_lbl___206
 	btfss PIR1,3,0
-	bra _lbl___196
+	bra _lbl___205
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	call or
@@ -398,7 +398,7 @@ _lbl___197
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___192
+	bra _lbl___201
 
 ; handle-command: defined at tests/spi-pic.fs:74
 handle_MI_command
@@ -412,11 +412,11 @@ handle_MI_command
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___200
+	bnz _lbl___209
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto send_MI_bytes
-_lbl___200
+_lbl___209
 	call dup
 	movlw read_MI_command
 	movwf PREINC0,0
@@ -425,11 +425,11 @@ _lbl___200
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___202
+	bz _lbl___211
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto receive_MI_bytes
-_lbl___202
+_lbl___211
 	call dup
 	movlw bit_MI_change_MI_command
 	movwf PREINC0,0
@@ -438,11 +438,11 @@ _lbl___202
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___204
+	bz _lbl___213
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call receive_MI_masks_MI_bytes
-_lbl___204
+_lbl___213
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return

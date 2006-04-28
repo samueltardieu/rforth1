@@ -192,9 +192,9 @@ an
 ; measure: defined at tests/colortest.fs:5
 measure
 	bsf ADCON0,2,0
-_lbl___187
+_lbl___196
 	btfsc ADCON0,2,0
-	bra _lbl___187
+	bra _lbl___196
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	return
@@ -221,14 +221,14 @@ main
 	call type
 	call cr
 	call init_MI_adc
-_lbl___196
+_lbl___205
 	call key
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call disp0
 	call disp1
 	call disp2
-	bra _lbl___196
+	bra _lbl___205
 
 ; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
@@ -364,7 +364,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___92
+_lbl___93
 	call dup
 	call op_cfetch_tos
 	call emit
@@ -372,7 +372,7 @@ _lbl___92
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___92
+	bra _lbl___93
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0

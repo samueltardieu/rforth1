@@ -200,7 +200,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___92
+_lbl___93
 	call dup
 	call op_cfetch_tos
 	call emit
@@ -208,7 +208,7 @@ _lbl___92
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___92
+	bra _lbl___93
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -1476,7 +1476,7 @@ _DT_s
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___94
+	bz _lbl___95
 	call dup
 	movlw 8
 	movwf PREINC0,0
@@ -1484,7 +1484,7 @@ _DT_s
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___95
+	bz _lbl___96
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data_+0x8000))
@@ -1498,11 +1498,11 @@ _DT_s
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___95
+_lbl___96
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___96
+_lbl___97
 	call _space
 	movff INDF2,PREINC0
 	clrf PREINC0,0
@@ -1514,10 +1514,10 @@ _lbl___96
 	call pick
 	call _DT_
 	decfsz INDF2,1,0
-	bra _lbl___96
+	bra _lbl___97
 	movf POSTDEC2,1,0
 	return
-_lbl___94
+_lbl___95
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
