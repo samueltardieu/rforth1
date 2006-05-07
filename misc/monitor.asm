@@ -2,7 +2,7 @@
 ;;; This monitor initializes the serial port, then takes two kind of commands
 ;;; that can be executed on site:
 ;;;   1) write something in flash memory after erasing it
-;;;         Waaaaaaxxxxxx (3 words address and 64 bytes of data)
+;;;         Waaaaaaxxxxxx (3 bytes address and 64 bytes of data)
 ;;;   2) jump to an address
 ;;;         Xaaaaaa
 ;;;   3) read an address content
