@@ -60,13 +60,13 @@ variable overflows
 
 variable clear-value
 
-: .ratio ( n -- ) >r clear-value @ 100 r> */ .10 [char] % emit cr ;
+: .ratio ( m n -- ) >r clear-value @ 100 r> */ 100 * swap / .10 [char] % emit cr ;
 : 16bits-measure ( -- x ) 1 count-pulses drop ;
-: ratios ( -- )
+: ratios ( n -- )
   clear 16bits-measure clear-value !
-  ." Red:   " red 16bits-measure .ratio
-  ." Green: " green 16bits-measure .ratio
-  ." Blue:  " blue 16bits-measure .ratio
+  ." Red:   " red 21 16bits-measure .ratio
+  ." Green: " green 28 16bits-measure .ratio
+  ." Blue:  " blue 33 16bits-measure .ratio
 ;
 
 : prompt ( -- ) .s cr ." ?>" ;
@@ -95,11 +95,12 @@ variable clear-value
   dup [char] W = if drop 1 do-measure exit then
   dup [char] X = if drop 10 do-measure exit then
   dup [char] C = if drop 100 do-measure exit then
-  dup [char] < = if drop down exit then
-  dup [char] > = if drop up exit then
+  \ For the leds, direction is inverted
+  dup [char] < = if drop up exit then
+  dup [char] > = if drop down exit then
   dup [char] ! = if drop save-to-eeprom exit then
-  dup [char] Z = if drop zero exit then
-  dup [char] M = if drop max exit then
+  dup [char] Z = if drop max exit then
+  dup [char] M = if drop zero exit then
   dup [char] H = if drop medium exit then
   dup [char] S = if drop select-tcs230 exit then
   dup [char] D = if drop deselect-tcs230 exit then
