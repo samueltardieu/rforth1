@@ -1670,11 +1670,11 @@ class Compiler:
                  'tblwt*', 'tblwt*+', 'tblwt*-', 'tblwt+*']
   
   pic_opcodes_l = ['bc', 'bn', 'bnc', 'bnn', 'bnov', 'bnz', 'bov',
-                   'bra', 'bz', 'goto', 'rcall', 'retfie',
+                   'bra', 'bz', 'goto', 'rcall',
                    'addlw', 'andlw', 'iorlw', 'movlb',
                    'movlw', 'mullw', 'retlw', 'sublw', 'xorlw']
 
-  pic_opcodes_s = ['return']
+  pic_opcodes_s = ['return', 'retfie']
                    
   pic_opcodes_la = ['clrf', 'cpfseq', 'cpfsgt', 'cpfslt',
                     'movwf', 'mulwf', 'negf', 'setf', 'tstfsz',
