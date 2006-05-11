@@ -79,6 +79,9 @@ class Number (LiteralValue):
 
   def static_value (self): return self.value
 
+  def __add__ (self, i):
+    return Number (self.value + i, self.base)
+
 dst_w = Number (0)
 dst_f = Number (1)
 access = Number (0)
@@ -1097,6 +1100,20 @@ class Inline (Primitive):
   def run (self):
     compiler.current_object.inlined = True
 
+class LowInterrupt (Primitive):
+  """Mark the latest defined word as being the low-level interrupt."""
+
+  def run (self):
+    compiler.check_interrupts ()
+    compiler.low_interrupt = compiler.current_object
+
+class HighInterrupt (Primitive):
+  """Mark the latest defined word as being the low-level interrupt."""
+
+  def run (self):
+    compiler.check_interrupts ()
+    compiler.high_interrupt = compiler.current_object
+
 class InW (Primitive):
   """Mark the latest defined word as getting its argument in W."""
 
@@ -1256,6 +1273,8 @@ class Word (Named):
     else: return `self`
 
   def can_inline (self):
+    if self in [compiler.low_interrupt, compiler.high_interrupt]:
+      return False
     for n, p in self.opcodes[:-1]:
       if is_external_jump ((n, p)): return False
     return True
@@ -1701,8 +1720,9 @@ class Compiler:
                       'da', 'data', 'db', 'de', 'dt', 'dw', 'else',
                       'end', 'endc', 'endif', 'endm', 'endw', 'equ',
                       'error', 'errorlevel', 'extern', 'exitm',
-                      'expand', 'fill', 'global', 'idata', 'if', 'ifdef',
-                      'ifndef', 'list', 'local', 'macro', 'messg',
+                      'expand', 'fill', 'global', 'high',
+                      'idata', 'if', 'ifdef',
+                      'ifndef', 'list', 'local', 'low', 'macro', 'messg',
                       'noexpand', 'nolist', 'org', 'page', 'pagesel',
                       'processor', 'radix', 'res', 'set', 'space',
                       'subtitle', 'title', 'udata', 'udata_acs',
@@ -1732,6 +1752,8 @@ class Compiler:
     self.order = 0
     self.use_interrupts = False
     self.inline_list = []
+    self.low_interrupt = None
+    self.high_interrupt = None
 
   def process (self):
     self.add_default_content ()
@@ -1743,6 +1765,12 @@ class Compiler:
       self.error ("interrupts need to be enabled at the beginning")
     self.use_interrupts = True
 
+  def check_interrupts (self):
+    if not compiler.use_interrupts:
+      raise Compiler.FATAL_ERROR, \
+            "%s: interrupts need to be enabled with -i" % \
+            self.current_location ()
+    
   def add_default_content (self):
     self.add_asm_instructions ()
     self.add_primitives ()
@@ -1811,6 +1839,8 @@ class Compiler:
     self.add_primitive ('bit-clr', BitClr)
     self.add_primitive ('bit-toggle', BitToggle)
     self.add_primitive ('inline', Inline)
+    self.add_primitive ('low-interrupt', LowInterrupt)
+    self.add_primitive ('high-interrupt', HighInterrupt)
     self.add_primitive ('>w', ToW)
     self.add_primitive ('w>', FromW)
     self.add_primitive ('inw', InW)    
@@ -2046,8 +2076,15 @@ class Compiler:
     # Force expansion of main and friends to make potential renaming
     # of main possible
     root.deep_references ([])
+    roots = [root]
+    if self.low_interrupt:
+      self.low_interrupt.deep_references ([])
+      roots.append (self.low_interrupt)
+    if self.high_interrupt:
+      self.high_interrupt.deep_references ([])
+      roots.append (self.high_interrupt)
     self.output_prologue (outfd)
-    self.deep_output (outfd, root)
+    self.deep_output (outfd, roots)
     self.output_epilogue (outfd)
 
   def count_references (self, l):
@@ -2093,8 +2130,12 @@ class Compiler:
         r.append (i)
     return r
 
-  def deep_output (self, outfd, root):
-    l = [x for x in root.deep_references ([]) if not isinstance (x, Label)]
+  def deep_output (self, outfd, roots):
+    l = []
+    for r in roots:
+      p = [x for x in r.deep_references ([]) if not isinstance (x, Label)]
+      for i in p:
+        if i not in l: l.append (i)
     l.sort (lambda x, y: cmp (x.order, y.order))
     sections = []
     for i in l:
@@ -2119,6 +2160,12 @@ class Compiler:
     outfd.write ("\tradix dec\n")
     outfd.write ("\torg %s\n" % self.start)
     outfd.write ("\tgoto %s\n" % self['init_runtime'])
+    if self.high_interrupt:
+      outfd.write ("\torg %s\n" % (self.start + 8))
+      outfd.write ("\tgoto %s\n" % self.high_interrupt)
+    if self.low_interrupt:
+      outfd.write ("\torg %s\n" % (self.start + 0x18))
+      outfd.write ("\tgoto %s\n" % self.low_interrupt)
 
   def output_epilogue (self, outfd):
     outfd.write ("END\n")
