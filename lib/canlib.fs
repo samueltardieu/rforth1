@@ -178,7 +178,7 @@ can-flags 0 bit can-use-monobuffer
   can-msg-4 !
   can-msg-2 !
   can-msg-0 !
-  6 can-msg-length c!
+  8 can-msg-length c!
   can-transmit
 ;
 
