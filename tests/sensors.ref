@@ -1475,13 +1475,13 @@ _lbl___127
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0
 	bsf can_MI_msg_MI_flags,0,0
-	lfsr 1,RXB1CON
-	bcf INDF1,7,0
 	movff RXB1SIDL,PREINC0
 	movff RXB1SIDH,PREINC0
 	call _5_GT__GT_
 	movff POSTDEC0,(can_MI_arbitration+1)
 	movff POSTDEC0,can_MI_arbitration
+	lfsr 1,RXB1CON
+	bcf INDF1,7,0
 	return
 
 ; set-thresholds: defined at tests/sensors.fs:160
@@ -1859,12 +1859,12 @@ _lbl___124
 	clrf can_MI_msg_MI_flags,0
 	btfsc RXB0DLC,6,0
 	bsf can_MI_msg_MI_flags,0,0
-	bcf RXB0CON,7,0
 	movff RXB0SIDL,PREINC0
 	movff RXB0SIDH,PREINC0
 	call _5_GT__GT_
 	movff POSTDEC0,(can_MI_arbitration+1)
 	movff POSTDEC0,can_MI_arbitration
+	bcf RXB0CON,7,0
 	return
 
 ; can-clr-rtr: defined at lib/canlib.fs:92
