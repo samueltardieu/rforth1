@@ -1,7 +1,7 @@
 TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/test-bitops.cmp tests/pwm.cmp \
             tests/test-can.cmp tests/test-plusminus.cmp tests/spi-pic.cmp \
-            tests/colortest.cmp
+            tests/colortest.cmp tests/interrupts.cmp
 
 COMPILER = rforth.py
 
@@ -37,3 +37,6 @@ clean:
 
 %.load: %.hex
 	${PYTHON} utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
+
+tests/interrupts.asm: tests/interrupts.fs
+	${PYTHON} ${COMPILER} -i -s ${STARTADDR} tests/interrupts.fs

@@ -1,0 +1,51 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	goto _high
+	org 0x2018
+	goto _low
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+	clrf a,1
+	clrf (a+1),1
+	clrf w_save,1
+
+; main: defined at tests/interrupts.fs:6
+main
+	return
+
+; high: defined at tests/interrupts.fs:4
+_high
+	movlw 1
+	movwf a,1
+	clrf (a+1),1
+	retfie 1
+
+; low: defined at tests/interrupts.fs:5
+_low
+	movwf w_save,1
+	movlw 2
+	movwf a,1
+	clrf (a+1),1
+	movf w_save,0,1
+	retfie 0
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+; a: defined at tests/interrupts.fs:1
+a equ 0x100
+
+; w_save: defined at tests/interrupts.fs:2
+w_save equ 0x102
+
+END
