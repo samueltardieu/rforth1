@@ -33,8 +33,8 @@ can-flags 0 bit can-use-monobuffer
   if RXB0D0 can-msg can-msg-length c@ memcpy then
   0 can-msg-flags c!
   RXB0RXRTR bit-set? if can-msg-rtr bit-set then
-  RXB0RXFUL bit-clr 
   RXB0SIDL c@ RXB0SIDH c@ 2>1 5>> can-arbitration !
+  RXB0RXFUL bit-clr 
 ;
 
 : can-receive-buffer1 ( -- )
@@ -42,8 +42,8 @@ can-flags 0 bit can-use-monobuffer
   if RXB1D0 can-msg can-msg-length c@ memcpy then
   0 can-msg-flags c!
   RXB1RXRTR bit-set? if can-msg-rtr bit-set then
-  RXB1RXFUL bit-clr 
   RXB1SIDL c@ RXB1SIDH c@ 2>1 5>> can-arbitration !
+  RXB1RXFUL bit-clr 
 ;
 
 : can-receive ( -- )
