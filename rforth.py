@@ -1118,6 +1118,15 @@ class HighInterrupt (Primitive):
     compiler.rewind ()
     compiler.add_instruction ('retfie', [no_fast])
 
+class Fast (Primitive):
+  """Mark the latest word as returning fast (return or retfie)."""
+
+  def run (self):
+    name, params = compiler.last_instruction ()
+    if params == [no_fast]:
+      compiler.rewind ()
+      compiler.add_instruction (name, [fast])
+
 class InW (Primitive):
   """Mark the latest defined word as getting its argument in W."""
 
@@ -1845,6 +1854,7 @@ class Compiler:
     self.add_primitive ('inline', Inline)
     self.add_primitive ('low-interrupt', LowInterrupt)
     self.add_primitive ('high-interrupt', HighInterrupt)
+    self.add_primitive ('fast', Fast)
     self.add_primitive ('>w', ToW)
     self.add_primitive ('w>', FromW)
     self.add_primitive ('inw', InW)    
