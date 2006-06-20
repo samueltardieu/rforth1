@@ -1106,6 +1106,8 @@ class LowInterrupt (Primitive):
   def run (self):
     compiler.check_interrupts ()
     compiler.low_interrupt = compiler.current_object
+    compiler.rewind ()
+    compiler.add_instruction ('retfie', [no_fast])
 
 class HighInterrupt (Primitive):
   """Mark the latest defined word as being the low-level interrupt."""
@@ -1113,6 +1115,8 @@ class HighInterrupt (Primitive):
   def run (self):
     compiler.check_interrupts ()
     compiler.high_interrupt = compiler.current_object
+    compiler.rewind ()
+    compiler.add_instruction ('retfie', [no_fast])
 
 class InW (Primitive):
   """Mark the latest defined word as getting its argument in W."""
@@ -1136,7 +1140,7 @@ def is_internal_jump (opcode):
   return opcode[0] in ['goto', 'bra'] and isinstance (opcode[1][0], Label)
 
 def is_external_jump (opcode):
-  if opcode[0] == 'return': return True
+  if opcode[0] in ['return', 'retfie']: return True
   return opcode[0] == 'goto' and isinstance (opcode[1][0], (Label, Word))
 
 def is_jump (opcode):
@@ -1359,7 +1363,7 @@ class Word (Named):
       if self.opcodes[o][0] in ['goto', 'bra']:
         target = self.opcodes[o][1][0]
         ins = self.instruction_at_label (target)
-        if ins and ins[0] in ['goto', 'bra', 'return', 'reset']:
+        if ins and ins[0] in ['goto', 'bra', 'return', 'retfie', 'reset']:
           self.opcodes[o] = ins
 
   def optimize_dead_labels (self):
@@ -1391,7 +1395,7 @@ class Word (Named):
         o += 1
         new.append (self.opcodes[o])
       elif not dead and self.opcodes[o][0] in ['goto', 'bra',
-                                               'return', 'reset']:
+                                               'return', 'retfie', 'reset']:
         new.append (self.opcodes[o])
         dead = True
       elif not dead:
