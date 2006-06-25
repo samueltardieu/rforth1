@@ -759,6 +759,24 @@ class OneMinus (Primitive):
     compiler.push (Number (1))
     compiler['-'].run()
 
+class OnePlusStore (Primitive):
+
+  def run (self):
+    if compiler.state:
+      name, params = compiler.last_instruction ()
+      if name == 'OP_PUSH' and ram_addr (params[0]):
+        # Increment a statically known RAM address
+        compiler.rewind ()
+        addr = params[0]
+        compiler.add_instruction ('infsnz', [addr, dst_f])
+        compiler.add_instruction ('incf', [Add (addr, Number (1)), dst_f])
+        return
+    compiler['dup'].run ()
+    compiler['@'].run ()
+    compiler['1+'].run ()
+    compiler['swap'].run ()
+    compiler['!'].run ()
+
 class Equal (Primitive):
 
   def run (self):
@@ -1864,6 +1882,7 @@ class Compiler:
     self.add_primitive ('+', Plus)
     self.add_primitive ('-', Minus)
     self.add_primitive ('1+', OnePlus)
+    self.add_primitive ('1+!', OnePlusStore)
     self.add_primitive ('1-', OneMinus)
     self.add_primitive ('literal', Literal)
     self.add_primitive ('[', OpeningBracket)
