@@ -777,6 +777,26 @@ class OnePlusStore (Primitive):
     compiler['swap'].run ()
     compiler['!'].run ()
 
+class LShift (Primitive):
+
+  def run (self):
+    if compiler.state:
+      if is_static_push (compiler.last_instruction()) and \
+         is_static_push (compiler.before_last_instruction()):
+        name, nsteps = compiler.last_instruction ()
+        compiler.rewind ()
+        name, operand = compiler.last_instruction ()
+        compiler.rewind ()
+        compiler.push (LeftShift (operand[0], nsteps[0]))
+      else:
+        compiler['cfor'].run ()
+        compiler['2*'].run ()
+        compiler['cnext'].run ()
+    else:
+      nsteps = compiler.ct_pop ()
+      operand = compiler.ct_pop ()
+      compiler.ct_push (LeftShift (operand, nsteps))
+
 class Equal (Primitive):
 
   def run (self):
@@ -1884,6 +1904,7 @@ class Compiler:
     self.add_primitive ('1+', OnePlus)
     self.add_primitive ('1+!', OnePlusStore)
     self.add_primitive ('1-', OneMinus)
+    self.add_primitive ('lshift', LShift)
     self.add_primitive ('literal', Literal)
     self.add_primitive ('[', OpeningBracket)
     self.add_primitive (']', ClosingBracket)
