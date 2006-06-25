@@ -1,7 +1,7 @@
 TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/test-bitops.cmp tests/pwm.cmp \
             tests/test-can.cmp tests/test-plusminus.cmp tests/spi-pic.cmp \
-            tests/colortest.cmp tests/interrupts.cmp
+            tests/colortest.cmp tests/interrupts.cmp tests/increment.cmp
 
 COMPILER = rforth.py
 
