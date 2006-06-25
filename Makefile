@@ -2,7 +2,7 @@ TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/test-bitops.cmp tests/pwm.cmp \
             tests/test-can.cmp tests/test-plusminus.cmp tests/spi-pic.cmp \
             tests/colortest.cmp tests/interrupts.cmp tests/increment.cmp \
-            tests/lshift.cmp
+            tests/lshift.cmp tests/interrupts2.cmp
 
 COMPILER = rforth.py
 
@@ -41,3 +41,6 @@ clean:
 
 tests/interrupts.asm: tests/interrupts.fs
 	${PYTHON} ${COMPILER} -i -s ${STARTADDR} tests/interrupts.fs
+
+tests/interrupts2.asm: tests/interrupts2.fs
+	${PYTHON} ${COMPILER} -i -s ${STARTADDR} tests/interrupts2.fs

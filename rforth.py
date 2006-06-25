@@ -1911,6 +1911,8 @@ class Compiler:
     self.add_primitive ('intr-protect', IntrProtect)
     self.add_primitive ('intr-unprotect', IntrUnprotect)
     self.include ('lib/core.fs')
+    if self.use_interrupts:
+      self.include ('lib/interrupts.fs')
 
   def push_object (self, object):
     """Temporarily install object as the current object."""
