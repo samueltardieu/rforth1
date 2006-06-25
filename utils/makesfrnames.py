@@ -66,6 +66,7 @@ def output_bits_for_reg (regname, lines, prefix = ''):
             if name[:4] == 'NOT_': name = '/%s' % name[4:]
             if name == 'TO': continue
             if prefix + name in all_bits: continue
+            if name[:4] == prefix[:4]: name = name[4:]
             all_bits.append (name)
             d = "%s %d bit %s%s" % (regname, bit, prefix, name)
             if comment:
