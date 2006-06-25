@@ -216,7 +216,7 @@ code (*)
     intr-unprotect
     PREINC0 ,a movwf
     return
-;code
+;code inline
 
 : * intr-protect temp_x1 ! temp_x2 ! (*) ;
 

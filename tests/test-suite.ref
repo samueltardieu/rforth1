@@ -366,29 +366,6 @@ op_fetch_tos
 	movff INDF1,PREINC0
 	return
 
-; *: defined at lib/arithmetic.fs:221
-_ST_
-	movff POSTDEC0,(temp_x1+1)
-	movff POSTDEC0,temp_x1
-	movff POSTDEC0,(temp_x2+1)
-	movff POSTDEC0,temp_x2
-
-; (*): defined at lib/arithmetic.fs:204
-_OP__ST__CP_
-	movf temp_x1,0,0
-	mulwf temp_x2,0
-	movff PRODL,PREINC0
-	movff PRODH,temp_x3
-	mulwf (temp_x2+1),0
-	movf PRODL,0,0
-	addwf temp_x3,1,0
-	movf (temp_x1+1),0,0
-	mulwf temp_x2,0
-	movf PRODL,0,0
-	addwfc temp_x3,0,0
-	movwf PREINC0,0
-	return
-
 ; table-addr!: defined at lib/tables.fs:1
 table_MI_addr_EX_
 	clrf TBLPTRU,0
@@ -1278,6 +1255,26 @@ _2_ST_
 	movf POSTDEC0,0,0
 	rlcf POSTINC0,1,0
 	rlcf INDF0,1,0
+	return
+
+; *: defined at lib/arithmetic.fs:221
+_ST_
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,(temp_x2+1)
+	movff POSTDEC0,temp_x2
+	movf temp_x1,0,0
+	mulwf temp_x2,0
+	movff PRODL,PREINC0
+	movff PRODH,temp_x3
+	mulwf (temp_x2+1),0
+	movf PRODL,0,0
+	addwf temp_x3,1,0
+	movf (temp_x1+1),0,0
+	mulwf temp_x2,0
+	movf PRODL,0,0
+	addwfc temp_x3,0,0
+	movwf PREINC0,0
 	return
 
 ; depth: defined at lib/arithmetic.fs:236
