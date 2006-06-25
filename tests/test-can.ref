@@ -241,7 +241,7 @@ op_cstore
 	movff POSTDEC0,INDF1
 	return
 
-; can-init: defined at lib/canlib.fs:127
+; can-init: defined at lib/canlib.fs:130
 can_MI_init
 	bsf TRISB,3,0
 	bcf TRISB,2,0
@@ -256,7 +256,7 @@ can_MI_init
 	movwf CIOCON,0
 	call can_MI_disable_MI_all_MI_filters
 
-; can-normal: defined at lib/canlib.fs:109
+; can-normal: defined at lib/canlib.fs:112
 can_MI_normal
 	clrf PREINC0,0
 	clrf PREINC0,0
@@ -451,7 +451,7 @@ emit
 	movff POSTDEC0,TXREG
 	return
 
-; can-emit-1: defined at lib/canlib.fs:151
+; can-emit-1: defined at lib/canlib.fs:154
 can_MI_emit_MI_1
 	movff POSTDEC0,(can_MI_arbitration+1)
 	movff POSTDEC0,can_MI_arbitration
@@ -608,7 +608,7 @@ compute_MI_can_MI_offset
 	movff POSTDEC0,can_MI_offset
 	return
 
-; can-emit-rtr: defined at lib/canlib.fs:137
+; can-emit-rtr: defined at lib/canlib.fs:140
 can_MI_emit_MI_rtr
 	movff POSTDEC0,(can_MI_arbitration+1)
 	movff POSTDEC0,can_MI_arbitration
@@ -772,21 +772,21 @@ _space
 	clrf PREINC0,0
 	goto emit
 
-; can-config: defined at lib/canlib.fs:108
+; can-config: defined at lib/canlib.fs:111
 can_MI_config
 	movlw 0x4
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_mode
 
-; can-loopback: defined at lib/canlib.fs:110
+; can-loopback: defined at lib/canlib.fs:113
 can_MI_loopback
 	movlw 0x2
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_mode
 
-; can-set-filter: defined at lib/canlib.fs:117
+; can-set-filter: defined at lib/canlib.fs:120
 can_MI_set_MI_filter
 	movwf can_MI_buffer,0
 	call _5_LT__LT_
@@ -803,7 +803,7 @@ can_MI_set_MI_filter
 	call m0_GT_mn
 	goto op_cstore
 
-; can-set-mask: defined at lib/canlib.fs:120
+; can-set-mask: defined at lib/canlib.fs:123
 can_MI_set_MI_mask
 	movwf can_MI_buffer,0
 	call _5_LT__LT_
@@ -1178,7 +1178,7 @@ can_MI_clr_MI_rtr
 	bcf INDF1,6,0
 	return
 
-; can-disable-all-filters: defined at lib/canlib.fs:123
+; can-disable-all-filters: defined at lib/canlib.fs:126
 can_MI_disable_MI_all_MI_filters
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
@@ -1194,7 +1194,7 @@ can_MI_disable_MI_all_MI_filters
 	call can_MI_set_MI_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___171
+_lbl___173
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -1210,11 +1210,11 @@ _lbl___171
 	movf POSTDEC0,0
 	call can_MI_set_MI_filter
 	decfsz INDF2,1,0
-	bra _lbl___171
+	bra _lbl___173
 	movf POSTDEC2,1,0
 	return
 
-; can-receive-1: defined at lib/canlib.fs:190
+; can-receive-1: defined at lib/canlib.fs:193
 can_MI_receive_MI_1
 	call can_MI_receive
 	movff can_MI_msg_MI_0,PREINC0

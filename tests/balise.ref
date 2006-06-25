@@ -168,7 +168,7 @@ main_MI_loop
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___218
+	bz _lbl___220
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -176,7 +176,7 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___218
+_lbl___220
 	call dup
 	movlw 80
 	movwf PREINC0,0
@@ -185,7 +185,7 @@ _lbl___218
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___220
+	bz _lbl___222
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -193,7 +193,7 @@ _lbl___218
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___220
+_lbl___222
 	call dup
 	movlw 83
 	movwf PREINC0,0
@@ -202,7 +202,7 @@ _lbl___220
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___222
+	bz _lbl___224
 	call leds_MI_off
 	movff T0CON,PREINC0
 	clrf PREINC0,0
@@ -214,7 +214,7 @@ _lbl___220
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___222
+_lbl___224
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
@@ -568,11 +568,11 @@ timer_MI_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___199
+	bz _lbl___201
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___199
+_lbl___201
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
@@ -582,11 +582,11 @@ _lbl___199
 ; timer-wait: defined at tests/balise.fs:28
 timer_MI_wait
 	call timer_MI_set
-_lbl___203
+_lbl___205
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___203
+	bz _lbl___205
 	return
 
 ; timer-reset: defined at tests/balise.fs:29
@@ -600,7 +600,7 @@ timer_MI_reset
 ; pwm: defined at tests/balise.fs:38
 pwm
 	call timer_MI_reset
-_lbl___211
+_lbl___213
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -616,7 +616,7 @@ _lbl___211
 	movwf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___211
+	bz _lbl___213
 	return
 
 ; init-ports: defined at tests/balise.fs:74

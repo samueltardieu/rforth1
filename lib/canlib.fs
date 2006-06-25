@@ -105,6 +105,9 @@ can-flags 0 bit can-use-monobuffer
 : can-multibuffer ( -- ) can-use-monobuffer bit-clr ;
 : can-monobuffer ( -- ) can-use-monobuffer bit-set ;
 
+: can-allow-overflow ( -- ) RXB0DBEN bit-set ; inline
+: can-deny-overflow ( -- ) RXB0DBEN bit-clr ; inline
+
 : can-config ( -- ) 0b100 can-mode ;
 : can-normal ( -- ) 0b000 can-mode ;
 : can-loopback ( -- ) 0b010 can-mode ;
