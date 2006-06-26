@@ -1214,11 +1214,16 @@ _lbl___173
 	movf POSTDEC2,1,0
 	return
 
-; can-receive-1: defined at lib/canlib.fs:193
-can_MI_receive_MI_1
-	call can_MI_receive
+; can-decode-1: defined at lib/canlib.fs:193
+can_MI_decode_MI_1
 	movff can_MI_msg_MI_0,PREINC0
 	movff (can_MI_msg_MI_0+1),PREINC0
+	return
+
+; can-receive-1: defined at lib/canlib.fs:197
+can_MI_receive_MI_1
+	call can_MI_receive
+	call can_MI_decode_MI_1
 	movff can_MI_arbitration,PREINC0
 	movff (can_MI_arbitration+1),PREINC0
 	return

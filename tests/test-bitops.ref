@@ -278,7 +278,7 @@ test_MI_set
 	call op_bit_set_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___196
+	bz _lbl___200
 	movlw LOW((_data___1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___1+0x8000))
@@ -287,7 +287,7 @@ test_MI_set
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___196
+_lbl___200
 	movlw LOW((_data___2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___2+0x8000))
@@ -376,7 +376,7 @@ test_MI_clr
 	call op_bit_clr_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___199
+	bz _lbl___203
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___3+0x8000))
@@ -385,7 +385,7 @@ test_MI_clr
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___199
+_lbl___203
 	movlw LOW((_data___4+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___4+0x8000))

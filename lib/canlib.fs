@@ -190,32 +190,48 @@ can-flags 0 bit can-use-monobuffer
   can-arbitration @
 ;
 
+: can-decode-1 ( -- u )
+  can-msg-0 @
+;
+
 : can-receive-1 ( -- u a )
   can-receive
-  can-msg-0 @
+  can-decode-1
   can-arbitration @
+;
+
+: can-decode-2 ( -- u1 u2 )
+  can-msg-0 @
+  can-msg-2 @
 ;
 
 : can-receive-2 ( -- u1 u2 a )
   can-receive
+  can-decode-2
+  can-arbitration @
+;
+
+: can-decode-3 ( -- u1 u2 u3 )
   can-msg-0 @
   can-msg-2 @
-  can-arbitration @
+  can-msg-4 @
 ;
 
 : can-receive-3 ( -- u1 u2 u3 a )
   can-receive
-  can-msg-0 @
-  can-msg-2 @
-  can-msg-4 @
+  can-decode-3
   can-arbitration @
 ;
 
-: can-receive-4 ( -- u1 u2 u3 a )
-  can-receive
+: can-decode-4 ( -- u1 u2 u3 u4 )
   can-msg-0 @
   can-msg-2 @
   can-msg-4 @
   can-msg-6 @
+;
+
+: can-receive-4 ( -- u1 u2 u3 a )
+  can-receive
+  can-decode-4
   can-arbitration @
 ;

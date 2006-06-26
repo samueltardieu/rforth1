@@ -219,7 +219,7 @@ main_MI_loop
 	movwf pulse1,1
 	movlw HIGH(-6000)
 	movwf (pulse1+1),1
-_lbl___208
+_lbl___212
 	call pwm
 	call key
 	call dup
@@ -230,7 +230,7 @@ _lbl___208
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___210
+	bz _lbl___214
 	call read16
 	movff POSTDEC0,(pulse0+1)
 	movff POSTDEC0,pulse0
@@ -242,7 +242,7 @@ _lbl___208
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call type
-_lbl___210
+_lbl___214
 	call dup
 	movlw 49
 	movwf PREINC0,0
@@ -251,7 +251,7 @@ _lbl___210
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___212
+	bz _lbl___216
 	call read16
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
@@ -263,7 +263,7 @@ _lbl___210
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call type
-_lbl___212
+_lbl___216
 	call dup
 	movlw 112
 	movwf PREINC0,0
@@ -272,7 +272,7 @@ _lbl___212
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___214
+	bz _lbl___218
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___3+0x8000))
@@ -297,7 +297,7 @@ _lbl___212
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___214
+_lbl___218
 	call dup
 	movlw 43
 	movwf PREINC0,0
@@ -306,7 +306,7 @@ _lbl___214
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___216
+	bz _lbl___220
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW(delta)
@@ -328,7 +328,7 @@ _lbl___214
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___216
+_lbl___220
 	call dup
 	movlw 45
 	movwf PREINC0,0
@@ -337,7 +337,7 @@ _lbl___216
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___218
+	bz _lbl___222
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW((-delta))
@@ -359,10 +359,10 @@ _lbl___216
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___218
+_lbl___222
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
-	bra _lbl___208
+	bra _lbl___212
 
 ; read8: defined at lib/strings.fs:69
 read8
@@ -640,10 +640,10 @@ set_MI_tmr0_MI_wait
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR0L
 	bcf INTCON,2,0
-_lbl___196
+_lbl___200
 	btfsc INTCON,2,0
 	return
-	bra _lbl___196
+	bra _lbl___200
 
 ; set-tmr1: defined at tests/pwm.fs:16
 set_MI_tmr1
@@ -684,12 +684,12 @@ pwm
 	movlw HIGH(main_MI_time)
 	movwf PREINC0,0
 	call set_MI_tmr1
-_lbl___204
+_lbl___208
 	btfsc PIR1,5,0
 	return
 	btfsc PIR1,0,0
 	bra pwm
-	bra _lbl___204
+	bra _lbl___208
 
 ; init-pwm: defined at tests/pwm.fs:65
 init_MI_pwm

@@ -309,37 +309,37 @@ receive_MI_byte
 send_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___193
+_lbl___197
 	call dup
 	call op_cfetch_tos
-_lbl___194
+_lbl___198
 	btfsc PORTA,5,0
 	goto _2drop
 	btfsc PIR1,3,0
-	bra _lbl___194
+	bra _lbl___198
 	movf POSTDEC0,0,0
 	movff POSTDEC0,SSPBUF
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___193
+	bra _lbl___197
 
 ; receive-bytes: defined at tests/spi-pic.fs:50
 receive_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___198
+_lbl___202
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___199
+_lbl___203
 	btfss PORTA,5,0
-	bra _lbl___200
+	bra _lbl___204
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___200
+_lbl___204
 	btfss PIR1,3,0
-	bra _lbl___199
+	bra _lbl___203
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
@@ -350,24 +350,24 @@ _lbl___200
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___198
+	bra _lbl___202
 
 ; receive-masks-bytes: defined at tests/spi-pic.fs:61
 receive_MI_masks_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___203
+_lbl___207
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___204
+_lbl___208
 	btfss PORTA,5,0
-	bra _lbl___205
+	bra _lbl___209
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___205
+_lbl___209
 	btfss PIR1,3,0
-	bra _lbl___204
+	bra _lbl___208
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	comf POSTDEC0,1,0
@@ -376,17 +376,17 @@ _lbl___205
 	movff POSTINC2,PREINC0
 	call op_cfetch_tos
 	call and
-_lbl___207
+_lbl___211
 	btfss PORTA,5,0
-	bra _lbl___208
+	bra _lbl___212
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
-_lbl___208
+_lbl___212
 	btfss PIR1,3,0
-	bra _lbl___207
+	bra _lbl___211
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	call or
@@ -398,7 +398,7 @@ _lbl___208
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___203
+	bra _lbl___207
 
 ; handle-command: defined at tests/spi-pic.fs:74
 handle_MI_command
@@ -412,11 +412,11 @@ handle_MI_command
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___211
+	bnz _lbl___215
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto send_MI_bytes
-_lbl___211
+_lbl___215
 	call dup
 	movlw read_MI_command
 	movwf PREINC0,0
@@ -425,11 +425,11 @@ _lbl___211
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___213
+	bz _lbl___217
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto receive_MI_bytes
-_lbl___213
+_lbl___217
 	call dup
 	movlw bit_MI_change_MI_command
 	movwf PREINC0,0
@@ -438,11 +438,11 @@ _lbl___213
 	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___215
+	bz _lbl___219
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call receive_MI_masks_MI_bytes
-_lbl___215
+_lbl___219
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
