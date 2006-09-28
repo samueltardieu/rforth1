@@ -69,10 +69,10 @@ main
 	movff a,PREINC0
 	movff (a+1),PREINC0
 	movff b,PREINC2
-_lbl___192
+_lbl___187
 	call _2_ST_
 	decfsz INDF2,1,0
-	bra _lbl___192
+	bra _lbl___187
 	movf POSTDEC2,1,0
 	movlw (3<<4)
 	movwf PREINC0,0

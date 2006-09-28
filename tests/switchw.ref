@@ -40,6 +40,9 @@ FSR0H equ 0xfea
 ; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
 
+; WREG: defined at lib/sfrnames.fs:30
+WREG equ 0xfe8
+
 ; INDF1: defined at lib/sfrnames.fs:31
 INDF1 equ 0xfe7
 
@@ -67,15 +70,6 @@ FSR2L equ 0xfd9
 ; STATUS: defined at lib/sfrnames.fs:46
 STATUS equ 0xfd8
 
-; ADRESL: defined at lib/sfrnames.fs:67
-ADRESL equ 0xfc3
-
-; ADCON0: defined at lib/sfrnames.fs:68
-ADCON0 equ 0xfc2
-
-; ADCON1: defined at lib/sfrnames.fs:69
-ADCON1 equ 0xfc1
-
 ; RCREG: defined at lib/sfrnames.fs:85
 RCREG equ 0xfae
 
@@ -98,80 +92,36 @@ PIR1 equ 0xf9e
 ; Section: code
 ;---------------------------------------------------------
 
-; disp0: defined at tests/colortest.fs:9
-disp0
-	movlw LOW((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw 10
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	clrf PREINC0,0
-	clrf PREINC0,0
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
 
-; an.: defined at tests/colortest.fs:7
-an_DT_
-	call an
-	call _DT_
+; main: defined at tests/switchw.fs:11
+main
+	call read4
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	call handle_MI_key
+	bra main
 
-; cr: defined at lib/strings.fs:8
-cr
-	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call emit
-	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto emit
-
-; .: defined at lib/strings.fs:25
-_DT_
-	call _1_GT_2
-	call emit_MI_8
-
-; emit-8: defined at lib/strings.fs:24
-emit_MI_8
-	call dup
+; op_zeroeq: defined at lib/primitives.fs:70
+op_zeroeq
 	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	movlw 0xf
+	iorwf POSTDEC0,0,0
+
+; op_zeroeq_z: defined at lib/primitives.fs:61
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
 	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
-	call emit_MI_4
-	movlw 0xf
 	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
-
-; emit-4: defined at lib/strings.fs:23
-emit_MI_4
-	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
-
-; emit: defined at lib/tty-rs232.fs:4
-emit
-	btfss PIR1,4,0
-	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
-	return
-
-; 8*: defined at tests/colortest.fs:3
-_8_ST_
-	call _2_ST_
-	call _2_ST_
-
-; 2*: defined at lib/arithmetic.fs:196
-_2_ST_
-	bcf STATUS,0,0
-	movf POSTDEC0,0,0
-	rlcf POSTINC0,1,0
-	rlcf INDF0,1,0
 	return
 
 ; table-addr!: defined at lib/tables.fs:1
@@ -185,86 +135,84 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-; an: defined at tests/colortest.fs:6
-an
-	call select_MI_channel
-
-; measure: defined at tests/colortest.fs:5
-measure
-	bsf ADCON0,2,0
-_lbl___197
-	btfsc ADCON0,2,0
-	bra _lbl___197
-	movff ADRESL,PREINC0
-	movff (ADRESL+1),PREINC0
-	return
-
-; init_runtime: defined at lib/primitives.fs:3
-init_runtime
-	movlb 1
-	movlw 0x5f
-	movwf FSR0L,0
-	clrf FSR0H,0
-	movlw 0xbf
-	movwf FSR2L,0
-	clrf FSR2H,0
-
-; main: defined at tests/colortest.fs:14
-main
-	movlw LOW((_data___4+0x8000))
+; handle-key: defined at tests/switchw.fs:3
+handle_MI_key
+	xorlw 0
+	bnz _lbl___192
+	movlw LOW((_data___1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((_data___1+0x8000))
 	movwf PREINC0,0
-	movlw 7
+	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call type
-	call cr
-	call init_MI_adc
-_lbl___206
-	call key
+	goto type
+_lbl___192
+	xorlw 1
+	bnz _lbl___193
+	movlw LOW((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+_lbl___193
+	xorlw 3
+	btfss STATUS,2,0
+	return
+	movlw LOW((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; type: defined at lib/strings.fs:27
+type
+	call dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	goto _2drop
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	movwf PREINC2,0
+_lbl___88
+	call dup
+	call op_cfetch_tos
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___88
+	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
-	call disp0
-	call disp1
-	call disp2
-	bra _lbl___206
+	return
+
+; >=: defined at lib/arithmetic.fs:175
+_GT__EQ_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___25
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___25
+	call op_minus
+	call _0_LT_
+	goto op_zeroeq
 
 ; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
-
-; disp1: defined at tests/colortest.fs:10
-disp1
-	movlw LOW((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw 10
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movlw 1
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto an_DT_
-
-; disp2: defined at tests/colortest.fs:11
-disp2
-	movlw LOW((_data___3+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
-	movwf PREINC0,0
-	movlw 10
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call type
-	movlw 2
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto an_DT_
 
 ; dup: defined at lib/primitives.fs:29
 dup
@@ -293,6 +241,16 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
+; op_minus: defined at lib/arithmetic.fs:39
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
 ; and: defined at lib/arithmetic.fs:63
 and
 	movff POSTDEC0,temp_x1
@@ -303,22 +261,29 @@ and
 	andwf INDF0,1,0
 	return
 
-; or: defined at lib/arithmetic.fs:75
-or
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	iorwf POSTINC0,1,0
-	movf temp_x1,0,0
-	iorwf INDF0,1,0
-	return
-
 ; 1>2: defined at lib/arithmetic.fs:106
 _1_GT_2
 	movf INDF0,0,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
+	return
+
+; 0<: defined at lib/arithmetic.fs:140
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+; 2dupxor>w: defined at lib/arithmetic.fs:159
+_2dupxor_GT_w
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
 	return
 
 ; flashc@: defined at lib/tables.fs:14
@@ -343,39 +308,41 @@ eepromc_AT_
 	movf EEDATA,0,0
 	return
 
-; nibble-to-hex: defined at lib/strings.fs:11
-nibble_MI_to_MI_hex
-	movf POSTDEC0,0,0
-	movlw 0xf6
-	addwf INDF0,1,0
-	movlw 0x3a
-	btfsc STATUS,0,0
-	addlw 7
-	addwf POSTDEC0,0,0
-	return
-
-; type: defined at lib/strings.fs:27
-type
+; read4: defined at lib/strings.fs:68
+read4
+	call key
 	call dup
+	movlw 65
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	btfsc STATUS,2,0
-	goto _2drop
-	movf POSTDEC0,0
-	movf POSTDEC0,0
-	movwf PREINC2,0
-_lbl___88
-	call dup
-	call op_cfetch_tos
-	call emit
+	bz _lbl___95
+	movlw 223
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	movlw LOW((-55))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-55))
+	addwfc INDF0,1,0
+	return
+_lbl___95
+	movlw LOW((-48))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-48))
+	addwfc INDF0,1,0
+	return
+
+; emit: defined at lib/tty-rs232.fs:4
+emit
+	btfss PIR1,4,0
+	bra emit
 	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
-	decfsz INDF2,1,0
-	bra _lbl___88
-	movf POSTDEC2,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movff POSTDEC0,TXREG
 	return
 
 ; key: defined at lib/tty-rs232.fs:5
@@ -384,28 +351,6 @@ key
 	bra key
 	movff RCREG,PREINC0
 	clrf PREINC0,0
-	return
-
-; select-channel: defined at tests/colortest.fs:4
-select_MI_channel
-	call _8_ST_
-	movff ADCON0,PREINC0
-	clrf PREINC0,0
-	movlw 0xc7
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
-	call or
-	movf POSTDEC0,0,0
-	movff POSTDEC0,ADCON0
-	return
-
-; init-adc: defined at tests/colortest.fs:13
-init_MI_adc
-	movlw 0x81
-	movwf ADCON0,0
-	movlw 0xc2
-	movwf ADCON1,0
 	return
 
 ;---------------------------------------------------------
@@ -419,27 +364,19 @@ temp_x1 equ 0x0
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/colortest.fs:9 as:
-; Sensor 0: 
+; defined at tests/switchw.fs:5 as:
+; 000
 _data___1
-	db 83,101,110,115,111,114,32,48
-	db 58,32
+	db 48,48,48
 
-; defined at tests/colortest.fs:10 as:
-; Sensor 1: 
+; defined at tests/switchw.fs:6 as:
+; 111
 _data___2
-	db 83,101,110,115,111,114,32,49
-	db 58,32
+	db 49,49,49
 
-; defined at tests/colortest.fs:11 as:
-; Sensor 2: 
+; defined at tests/switchw.fs:7 as:
+; 222
 _data___3
-	db 83,101,110,115,111,114,32,50
-	db 58,32
-
-; defined at tests/colortest.fs:14 as:
-; Welcome
-_data___4
-	db 87,101,108,99,111,109,101
+	db 50,50,50
 
 END

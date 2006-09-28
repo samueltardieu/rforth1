@@ -512,6 +512,54 @@ class If (Primitive):
     compiler.add_instruction (ins, [value, bit, acc])
     compiler['ahead'].run()
 
+class SwitchW (Primitive):
+  """Simple switch statement"""
+
+  # Structure of the switch statement on the compile stack is:
+  #   - next label or None for the first case
+  #   - switch end label
+  #   - xored value
+
+  def run (self):
+    compiler.ct_push (None)
+    compiler.ct_push (Label ())
+    compiler.ct_push (0)
+
+class CaseW (Primitive):
+
+  def run (self):
+    name, params = compiler.last_instruction ()
+    if name != 'OP_PUSH':
+      raise Compiler.FATAL_ERROR, \
+            "%s: casew must be used with a constant" % \
+            compiler.current_location
+    compiler.rewind ()
+    xored = compiler.ct_pop ()
+    label = compiler.ct_pop ()
+    nlabel = compiler.ct_pop ()
+    if nlabel is not None:
+      compiler.add_instruction ('bra', [label])
+      compiler.add_instruction ('LABEL', [nlabel])
+    xored ^= params[0].static_value ()
+    compiler.add_instruction ('xorlw', [Number (xored)])
+    value, bit = compiler['Z']
+    compiler.add_instruction ('btfss', [value, bit, access])
+    nlabel = Label ()
+    compiler.add_instruction ('bra', [nlabel])
+    compiler.ct_push (nlabel)
+    compiler.ct_push (label)
+    compiler.ct_push (xored)
+    print label, nlabel, xored
+
+class EndSwitchW (Primitive):
+
+  def run (self):
+    xored = compiler.ct_pop ()
+    label = compiler.ct_pop ()
+    nlabel = compiler.ct_pop ()
+    compiler.add_instruction ('LABEL', [nlabel])
+    compiler.add_instruction ('LABEL', [label])
+
 class While (Primitive):
   """Implement the while word."""
 
@@ -1910,6 +1958,9 @@ class Compiler:
     self.add_primitive (']', ClosingBracket)
     self.add_primitive ('intr-protect', IntrProtect)
     self.add_primitive ('intr-unprotect', IntrUnprotect)
+    self.add_primitive ('switchw', SwitchW)
+    self.add_primitive ('casew', CaseW)
+    self.add_primitive ('endswitchw', EndSwitchW)
     self.include ('lib/core.fs')
     if self.use_interrupts:
       self.include ('lib/interrupts.fs')
@@ -2254,13 +2305,23 @@ class Compiler:
     # as we inline them. The final return must not be inlined.
     # Also, warn if external goto or return are detected; we do not perform
     # this check in inline assembly code.
+    multiple_exits = False
     for n, p in target.opcodes[:-1]:
+      if is_internal_jump ((n, p)) and p == target.end_label:
+        multiple_exits = True
       if is_external_jump ((n, p)):
         self.warning ('inlining of %s uses a non-local jump' % target.name)
       if p and rep.has_key (p[0]): self.add_instruction (n, [rep[p[0]]])
       else: self.add_instruction (n, p)
     # Check that the latest opcode was a return or an inlined call to return.
     assert (target.opcodes[-1][0] == 'return')
+    # If there were no multiple exits, remove the end_label so that
+    # optimizations can be performed between the inlined word and
+    # subsequent instructions.
+    if not multiple_exits:
+      name, params = compiler.last_instruction ()
+      if name == 'LABEL' and params == [rep[target.end_label]]:
+        compiler.rewind()
     # Transfer dependencies from target to current object
     for r in target.references: self.current_object.refers_to (r)
 
