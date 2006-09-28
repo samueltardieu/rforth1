@@ -549,7 +549,6 @@ class CaseW (Primitive):
     compiler.ct_push (nlabel)
     compiler.ct_push (label)
     compiler.ct_push (xored)
-    print label, nlabel, xored
 
 class EndSwitchW (Primitive):
 
