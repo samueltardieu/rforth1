@@ -1,0 +1,382 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+; TBLPTRU: defined at lib/sfrnames.fs:13
+TBLPTRU equ 0xff8
+
+; TBLPTRH: defined at lib/sfrnames.fs:14
+TBLPTRH equ 0xff7
+
+; TBLPTRL: defined at lib/sfrnames.fs:15
+TBLPTRL equ 0xff6
+
+; TABLAT: defined at lib/sfrnames.fs:16
+TABLAT equ 0xff5
+
+; INDF0: defined at lib/sfrnames.fs:23
+INDF0 equ 0xfef
+
+; POSTINC0: defined at lib/sfrnames.fs:24
+POSTINC0 equ 0xfee
+
+; POSTDEC0: defined at lib/sfrnames.fs:25
+POSTDEC0 equ 0xfed
+
+; PREINC0: defined at lib/sfrnames.fs:26
+PREINC0 equ 0xfec
+
+; PLUSW0: defined at lib/sfrnames.fs:27
+PLUSW0 equ 0xfeb
+
+; FSR0H: defined at lib/sfrnames.fs:28
+FSR0H equ 0xfea
+
+; FSR0L: defined at lib/sfrnames.fs:29
+FSR0L equ 0xfe9
+
+; WREG: defined at lib/sfrnames.fs:30
+WREG equ 0xfe8
+
+; INDF1: defined at lib/sfrnames.fs:31
+INDF1 equ 0xfe7
+
+; FSR1H: defined at lib/sfrnames.fs:36
+FSR1H equ 0xfe2
+
+; FSR1L: defined at lib/sfrnames.fs:37
+FSR1L equ 0xfe1
+
+; INDF2: defined at lib/sfrnames.fs:39
+INDF2 equ 0xfdf
+
+; POSTDEC2: defined at lib/sfrnames.fs:41
+POSTDEC2 equ 0xfdd
+
+; PREINC2: defined at lib/sfrnames.fs:42
+PREINC2 equ 0xfdc
+
+; FSR2H: defined at lib/sfrnames.fs:44
+FSR2H equ 0xfda
+
+; FSR2L: defined at lib/sfrnames.fs:45
+FSR2L equ 0xfd9
+
+; STATUS: defined at lib/sfrnames.fs:46
+STATUS equ 0xfd8
+
+; RCREG: defined at lib/sfrnames.fs:85
+RCREG equ 0xfae
+
+; TXREG: defined at lib/sfrnames.fs:86
+TXREG equ 0xfad
+
+; EEADR: defined at lib/sfrnames.fs:89
+EEADR equ 0xfa9
+
+; EEDATA: defined at lib/sfrnames.fs:90
+EEDATA equ 0xfa8
+
+; EECON1: defined at lib/sfrnames.fs:92
+EECON1 equ 0xfa6
+
+; PIR1: defined at lib/sfrnames.fs:100
+PIR1 equ 0xf9e
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+; main: defined at tests/switchw.fs:11
+main
+	call read4
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	call handle_MI_key
+	bra main
+
+; op_zeroeq: defined at lib/primitives.fs:70
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+; op_zeroeq_z: defined at lib/primitives.fs:61
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+; table-addr!: defined at lib/tables.fs:1
+table_MI_addr_EX_
+	clrf TBLPTRU,0
+	call _1_GT_2
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+; handle-key: defined at tests/switchw.fs:3
+handle_MI_key
+	xorlw 0
+	bnz _lbl___192
+	movlw LOW((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+_lbl___192
+	xorlw 1
+	bnz _lbl___193
+	movlw LOW((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto type
+_lbl___193
+	xorlw 3
+	btfss STATUS,2,0
+	return
+	movlw LOW((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___3+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+; type: defined at lib/strings.fs:27
+type
+	call dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	goto _2drop
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	movwf PREINC2,0
+_lbl___88
+	call dup
+	call op_cfetch_tos
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___88
+	movf POSTDEC2,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; >=: defined at lib/arithmetic.fs:175
+_GT__EQ_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___25
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___25
+	call op_minus
+	call _0_LT_
+	goto op_zeroeq
+
+; flash-addr!: defined at lib/tables.fs:3
+flash_MI_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_MI_addr_EX_
+
+; dup: defined at lib/primitives.fs:29
+dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+; op_cfetch_tos: defined at lib/primitives.fs:197
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+; 2drop: defined at lib/primitives.fs:243
+_2drop
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	return
+
+; op_minus: defined at lib/arithmetic.fs:39
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
+; and: defined at lib/arithmetic.fs:63
+and
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	andwf POSTINC0,1,0
+	movf temp_x1,0,0
+	andwf INDF0,1,0
+	return
+
+; 1>2: defined at lib/arithmetic.fs:106
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+; 0<: defined at lib/arithmetic.fs:140
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+; 2dupxor>w: defined at lib/arithmetic.fs:159
+_2dupxor_GT_w
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
+	return
+
+; flashc@: defined at lib/tables.fs:14
+flashc_AT_
+	call flash_MI_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+; eeprom-addr!: defined at lib/tables.fs:17
+eeprom_MI_addr_EX_
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	return
+
+; eepromc@: defined at lib/tables.fs:19
+eepromc_AT_
+	call eeprom_MI_addr_EX_
+	bsf EECON1,0,0
+	movf EEDATA,0,0
+	return
+
+; read4: defined at lib/strings.fs:68
+read4
+	call key
+	call dup
+	movlw 65
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___95
+	movlw 223
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call and
+	movlw LOW((-55))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-55))
+	addwfc INDF0,1,0
+	return
+_lbl___95
+	movlw LOW((-48))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-48))
+	addwfc INDF0,1,0
+	return
+
+; emit: defined at lib/tty-rs232.fs:4
+emit
+	btfss PIR1,4,0
+	bra emit
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TXREG
+	return
+
+; key: defined at lib/tty-rs232.fs:5
+key
+	btfss PIR1,5,0
+	bra key
+	movff RCREG,PREINC0
+	clrf PREINC0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+; temp_x1: defined at lib/primitives.fs:22
+temp_x1 equ 0x0
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+; defined at tests/switchw.fs:5 as:
+; 000
+_data___1
+	db 48,48,48
+
+; defined at tests/switchw.fs:6 as:
+; 111
+_data___2
+	db 49,49,49
+
+; defined at tests/switchw.fs:7 as:
+; 222
+_data___3
+	db 50,50,50
+
+END
