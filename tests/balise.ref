@@ -165,10 +165,9 @@ main_MI_loop
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
-	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___220
+	bnz _lbl___215
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -176,16 +175,15 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___220
+_lbl___215
 	call dup
 	movlw 80
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
-	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___222
+	bnz _lbl___217
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -193,16 +191,15 @@ _lbl___220
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___222
+_lbl___217
 	call dup
 	movlw 83
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
-	call op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___224
+	bnz _lbl___219
 	call leds_MI_off
 	movff T0CON,PREINC0
 	clrf PREINC0,0
@@ -214,7 +211,7 @@ _lbl___222
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___224
+_lbl___219
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
@@ -229,7 +226,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___93
+_lbl___88
 	call dup
 	call op_cfetch_tos
 	call emit
@@ -237,7 +234,7 @@ _lbl___93
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___93
+	bra _lbl___88
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -247,12 +244,12 @@ _lbl___93
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___26
+	bra _lbl___25
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___26
+_lbl___25
 	call op_minus
 	call _0_LT_
 
@@ -282,11 +279,11 @@ neighbour_QM_
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___22
+	bra _lbl___21
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto _0_LT_
-_lbl___22
+_lbl___21
 	call op_minus
 
 ; 0<: defined at lib/arithmetic.fs:140
@@ -516,7 +513,7 @@ read4
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___100
+	bz _lbl___95
 	movlw 223
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -527,7 +524,7 @@ read4
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___100
+_lbl___95
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -568,11 +565,11 @@ timer_MI_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___201
+	bz _lbl___196
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___201
+_lbl___196
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
@@ -582,11 +579,11 @@ _lbl___201
 ; timer-wait: defined at tests/balise.fs:28
 timer_MI_wait
 	call timer_MI_set
-_lbl___205
+_lbl___200
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___205
+	bz _lbl___200
 	return
 
 ; timer-reset: defined at tests/balise.fs:29
@@ -600,7 +597,7 @@ timer_MI_reset
 ; pwm: defined at tests/balise.fs:38
 pwm
 	call timer_MI_reset
-_lbl___213
+_lbl___208
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -609,15 +606,9 @@ _lbl___213
 	movff offdelay,PREINC0
 	movff (offdelay+1),PREINC0
 	call timer_MI_wait
-	movlw -1
-	btfss PIR1,5,0
-	addlw 1
-	movwf PREINC0,0
-	movwf PREINC0,0
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___213
+	btfsc PIR1,5,0
 	return
+	bra _lbl___208
 
 ; init-ports: defined at tests/balise.fs:74
 init_MI_ports
