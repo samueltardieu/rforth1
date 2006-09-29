@@ -371,15 +371,17 @@ cvariable led-blink-current
 ;
 
 : bootloader-command ( -- )
-  key
-  dup [char] X = if drop bootloader-execute exit then
-  dup [char] R = if drop bootloader-read exit then
-  dup [char] W = if drop bootloader-write exit then
-  dup [char] : = if drop bootloader-relay exit then
-  dup [char] O = if drop observer exit then
-  dup [char] V = if drop bootloader-version exit then
-  dup [char] T = if drop ." !!" cr exit then
-  drop cr
+  key >w
+  switchw
+  [char] X casew bootloader-execute exit
+  [char] R casew bootloader-read exit
+  [char] W casew bootloader-write exit
+  [char] : casew bootloader-relay exit
+  [char] O casew observer exit
+  [char] V casew bootloader-version exit
+  [char] T casew ." !!" cr exit
+  endswitchw
+  cr  
 ;
 
 : bootloader-prompt ( -- ) ." ok>" ;

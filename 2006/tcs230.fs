@@ -82,31 +82,33 @@ variable clear-value
 ;
 
 : handle-key ( c -- )
-  dup [char] a >= if 32 - then
-  dup [char] 0 = if drop mode-down exit then
-  dup [char] 1 = if drop mode-100% exit then
-  dup [char] 2 = if drop mode-20% exit then
-  dup [char] 3 = if drop mode-2% exit then
-  dup [char] N = if drop 1 color-mode c! exit then
-  dup [char] R = if drop 2 color-mode c! exit then
-  dup [char] G = if drop 4 color-mode c! exit then
-  dup [char] B = if drop 8 color-mode c! exit then
-  dup [char] A = if drop 15 color-mode c! exit then
-  dup [char] W = if drop 1 do-measure exit then
-  dup [char] X = if drop 10 do-measure exit then
-  dup [char] C = if drop 100 do-measure exit then
+  [char] a >= if 32 - then
+  >w switchw
+  [char] 0 casew mode-down exit
+  [char] 1 casew mode-100% exit
+  [char] 2 casew mode-20% exit
+  [char] 3 casew mode-2% exit
+  [char] N casew 1 color-mode c! exit
+  [char] R casew 2 color-mode c! exit
+  [char] G casew 4 color-mode c! exit
+  [char] B casew 8 color-mode c! exit
+  [char] A casew 15 color-mode c! exit
+  [char] W casew 1 do-measure exit
+  [char] X casew 10 do-measure exit
+  [char] C casew 100 do-measure exit
   \ For the leds, direction is inverted
-  dup [char] < = if drop up exit then
-  dup [char] > = if drop down exit then
-  dup [char] ! = if drop save-to-eeprom exit then
-  dup [char] Z = if drop max exit then
-  dup [char] M = if drop zero exit then
-  dup [char] H = if drop medium exit then
-  dup [char] S = if drop select-tcs230 exit then
-  dup [char] D = if drop deselect-tcs230 exit then
-  dup [char] L = if drop ratios exit then
-  dup [char] @ = if reset then
-  drop help
+  [char] < casew up exit
+  [char] > casew down exit
+  [char] ! casew save-to-eeprom exit
+  [char] Z casew max exit
+  [char] M casew zero exit
+  [char] H casew medium exit
+  [char] S casew select-tcs230 exit
+  [char] D casew deselect-tcs230 exit
+  [char] L casew ratios exit
+  [char] @ casew reset
+  endswitchw
+  help
 ;
 
 : mainloop ( -- ) begin prompt key dup emit cr handle-key again ;
