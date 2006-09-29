@@ -1512,7 +1512,7 @@ class Word(Named):
     new = []
     o = 0
     while o < len(self.opcodes):
-      if Word.conditions.has_key(self.opcodes[o][0]) and \
+      if self.opcodes[o][0] in Word.conditions and \
              is_internal_jump(self.opcodes[o+1]):
         if is_external_jump(self.opcodes[o+2]):
           new.append((Word.conditions[self.opcodes[o][0]],
@@ -1545,11 +1545,11 @@ class Word(Named):
     o = 0
     while o < len(self.opcodes):
       t = make_tuple(self.opcodes[o][0], self.opcodes[o][1])
-      if short_conditions.has_key(t) and \
+      if t in short_conditions and \
          is_internal_jump(self.opcodes[o+1]):
         new.append((short_conditions[t], [self.opcodes[o+1][1][0]]))
         o += 1
-      elif short_conditions.has_key(t) and \
+      elif t in short_conditions and \
            o+2 < len(self.opcodes) and \
            is_internal_jump(self.opcodes[o+2]):
         reverse =(Word.conditions[t[0]], t[1])
@@ -2310,7 +2310,7 @@ class Compiler:
         multiple_exits = True
       if is_external_jump((n, p)):
         self.warning('inlining of %s uses a non-local jump' % target.name)
-      if p and rep.has_key(p[0]): self.add_instruction(n, [rep[p[0]]])
+      if p and p[0] in rep: self.add_instruction(n, [rep[p[0]]])
       else: self.add_instruction(n, p)
     # Check that the latest opcode was a return or an inlined call to return.
     assert(target.opcodes[-1][0] == 'return')
