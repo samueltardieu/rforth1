@@ -337,6 +337,10 @@ class MakeLabel(Primitive):
 class Forward(Label):
   """Forward declaration."""
 
+  def __init__(self, name):
+    Label.__init__(self, name)
+    compiler.start_compilation(self)
+
   def run(self):
     if compiler.state:
       compiler.add_call(self)
