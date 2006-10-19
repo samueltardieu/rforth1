@@ -55,14 +55,14 @@ leds_init:
 	clrf	LATA
 	btg	LATA,0		; Lit led A0
 	movlw	H'7'
-	movwf	ADCON1
+	movwf	ADCON1		; Use port A as GPIO
 	movlw	H'F0'
-	movwf	TRISA
+	movwf	TRISA		; Ports A0 to A3 are outputs for leds
 	return
 
 	;; Serial port initialization
 serial_init:
-	bcf	TRISC,6		; (useless but in datasheet)
+	bcf	TRISC,6		; Set TX as an output
 	movlw	D'21'		; Select 115200 bps at 40MHz
 	movwf	SPBRG
 	bsf	TXSTA,BRGH
