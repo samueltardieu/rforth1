@@ -144,46 +144,37 @@ test200_MI_
 ; cr: defined at lib/strings.fs:8
 cr
 	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
 
 ; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
+	movwf TXREG,0
 	return
 
-; .: defined at lib/strings.fs:25
+; .: defined at lib/strings.fs:22
 _DT_
 	call _1_GT_2
 	call emit_MI_8
 
-; emit-8: defined at lib/strings.fs:24
+; emit-8: defined at lib/strings.fs:21
 emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 	call emit_MI_4
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 
-; emit-4: defined at lib/strings.fs:23
+; emit-4: defined at lib/strings.fs:20
 emit_MI_4
 	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto emit
 
 ; table-addr!: defined at lib/tables.fs:1
@@ -357,16 +348,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; and: defined at lib/arithmetic.fs:63
-and
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
-	return
-
 ; 1>2: defined at lib/arithmetic.fs:106
 _1_GT_2
 	movf INDF0,0,0
@@ -399,16 +380,13 @@ eepromc_AT_
 
 ; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
-	movf POSTDEC0,0,0
-	movlw 0xf6
-	addwf INDF0,1,0
-	movlw 0x3a
+	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
-	addwf POSTDEC0,0,0
+	addlw 0x3a
 	return
 
-; type: defined at lib/strings.fs:27
+; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -421,6 +399,8 @@ type
 _lbl___88
 	call dup
 	call op_cfetch_tos
+	movf POSTDEC0,0
+	movf POSTDEC0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -452,9 +432,6 @@ init
 ;---------------------------------------------------------
 ; Section: memory
 ;---------------------------------------------------------
-
-; temp_x1: defined at lib/primitives.fs:22
-temp_x1 equ 0x0
 
 ; x: defined at tests/test-plusminus.fs:3
 x equ 0x100

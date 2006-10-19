@@ -137,38 +137,33 @@ delta equ 10
 ; Section: code
 ;---------------------------------------------------------
 
-; .: defined at lib/strings.fs:25
+; .: defined at lib/strings.fs:22
 _DT_
 	call _1_GT_2
 	call emit_MI_8
 
-; emit-8: defined at lib/strings.fs:24
+; emit-8: defined at lib/strings.fs:21
 emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 	call emit_MI_4
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 
-; emit-4: defined at lib/strings.fs:23
+; emit-4: defined at lib/strings.fs:20
 emit_MI_4
 	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
 
 ; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
+	movwf TXREG,0
 	return
 
 ; >=: defined at lib/arithmetic.fs:175
@@ -219,9 +214,11 @@ main_MI_loop
 	movwf pulse1,1
 	movlw HIGH(-6000)
 	movwf (pulse1+1),1
-_lbl___207
+_lbl___208
 	call pwm
 	call key
+	movwf PREINC0,0
+	clrf PREINC0,0
 	call dup
 	movlw 48
 	movwf PREINC0,0
@@ -229,7 +226,7 @@ _lbl___207
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___209
+	bnz _lbl___210
 	call read16
 	movff POSTDEC0,(pulse0+1)
 	movff POSTDEC0,pulse0
@@ -241,7 +238,7 @@ _lbl___207
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call type
-_lbl___209
+_lbl___210
 	call dup
 	movlw 49
 	movwf PREINC0,0
@@ -249,7 +246,7 @@ _lbl___209
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___211
+	bnz _lbl___212
 	call read16
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
@@ -261,7 +258,7 @@ _lbl___209
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call type
-_lbl___211
+_lbl___212
 	call dup
 	movlw 112
 	movwf PREINC0,0
@@ -269,7 +266,7 @@ _lbl___211
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___213
+	bnz _lbl___214
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___3+0x8000))
@@ -294,7 +291,7 @@ _lbl___211
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___213
+_lbl___214
 	call dup
 	movlw 43
 	movwf PREINC0,0
@@ -302,7 +299,7 @@ _lbl___213
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___215
+	bnz _lbl___216
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW(delta)
@@ -324,7 +321,7 @@ _lbl___213
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___215
+_lbl___216
 	call dup
 	movlw 45
 	movwf PREINC0,0
@@ -332,7 +329,7 @@ _lbl___215
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___217
+	bnz _lbl___218
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW((-delta))
@@ -354,12 +351,12 @@ _lbl___215
 	movff (pulse1+1),PREINC0
 	call _DT_
 	call cr
-_lbl___217
+_lbl___218
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
-	bra _lbl___207
+	bra _lbl___208
 
-; read8: defined at lib/strings.fs:69
+; read8: defined at lib/strings.fs:66
 read8
 	call read4
 	movf POSTDEC0,0,0
@@ -397,7 +394,7 @@ greetings
 	movwf PREINC0,0
 	clrf PREINC0,0
 
-; type: defined at lib/strings.fs:27
+; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -410,6 +407,8 @@ type
 _lbl___88
 	call dup
 	call op_cfetch_tos
+	movf POSTDEC0,0
+	movf POSTDEC0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -445,12 +444,8 @@ flash_MI_addr_EX_
 ; cr: defined at lib/strings.fs:8
 cr
 	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto emit
 
 ; dup: defined at lib/primitives.fs:29
@@ -500,16 +495,6 @@ op_minus
 	subwf POSTINC0,1,0
 	movf temp_x1,0,0
 	subwfb INDF0,1,0
-	return
-
-; and: defined at lib/arithmetic.fs:63
-and
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
 	return
 
 ; xor: defined at lib/arithmetic.fs:87
@@ -571,18 +556,17 @@ eepromc_AT_
 
 ; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
-	movf POSTDEC0,0,0
-	movlw 0xf6
-	addwf INDF0,1,0
-	movlw 0x3a
+	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
-	addwf POSTDEC0,0,0
+	addlw 0x3a
 	return
 
-; read4: defined at lib/strings.fs:68
+; read4: defined at lib/strings.fs:65
 read4
 	call key
+	movwf PREINC0,0
+	clrf PREINC0,0
 	call dup
 	movlw 65
 	movwf PREINC0,0
@@ -591,10 +575,11 @@ read4
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___95
-	movlw 223
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 223
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	movlw LOW((-55))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -609,7 +594,7 @@ _lbl___95
 	addwfc INDF0,1,0
 	return
 
-; read16: defined at lib/strings.fs:70
+; read16: defined at lib/strings.fs:67
 read16
 	call read8
 	call read8
@@ -619,12 +604,11 @@ read16
 	movwf INDF0,0
 	return
 
-; key: defined at lib/tty-rs232.fs:5
+; key: defined at lib/tty-rs232.fs:6
 key
 	btfss PIR1,5,0
 	bra key
-	movff RCREG,PREINC0
-	clrf PREINC0,0
+	movf RCREG,0,0
 	return
 
 ; set-tmr0-wait: defined at tests/pwm.fs:12
@@ -635,10 +619,10 @@ set_MI_tmr0_MI_wait
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR0L
 	bcf INTCON,2,0
-_lbl___195
+_lbl___196
 	btfsc INTCON,2,0
 	return
-	bra _lbl___195
+	bra _lbl___196
 
 ; set-tmr1: defined at tests/pwm.fs:16
 set_MI_tmr1
@@ -679,12 +663,12 @@ pwm
 	movlw HIGH(main_MI_time)
 	movwf PREINC0,0
 	call set_MI_tmr1
-_lbl___203
+_lbl___204
 	btfsc PIR1,5,0
 	return
 	btfsc PIR1,0,0
 	bra pwm
-	bra _lbl___203
+	bra _lbl___204
 
 ; init-pwm: defined at tests/pwm.fs:65
 init_MI_pwm

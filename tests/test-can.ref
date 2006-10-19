@@ -265,23 +265,19 @@ can_MI_normal
 can_MI_mode
 	call _5_LT__LT_
 	call dup
-	movff CANCON,PREINC0
-	clrf PREINC0,0
-	movlw 0x1f
+	movf CANCON,0,0
+	andlw 0x1f
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
 _lbl___153
 	call dup
-	movff CANSTAT,PREINC0
-	clrf PREINC0,0
-	movlw 0xe0
+	movf CANSTAT,0,0
+	andlw 0xe0
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
@@ -435,19 +431,14 @@ main
 ; cr: defined at lib/strings.fs:8
 cr
 	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
 
 ; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
+	movwf TXREG,0
 	return
 
 ; can-emit-1: defined at lib/canlib.fs:154
@@ -500,31 +491,27 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-; .: defined at lib/strings.fs:25
+; .: defined at lib/strings.fs:22
 _DT_
 	call _1_GT_2
 	call emit_MI_8
 
-; emit-8: defined at lib/strings.fs:24
+; emit-8: defined at lib/strings.fs:21
 emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 	call emit_MI_4
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 
-; emit-4: defined at lib/strings.fs:23
+; emit-4: defined at lib/strings.fs:20
 emit_MI_4
 	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto emit
 
 ; 5<<: defined at lib/canlib.fs:21
@@ -695,12 +682,10 @@ can_MI_receive
 
 ; can-receive-buffer1: defined at lib/canlib.fs:40
 can_MI_receive_MI_buffer1
-	movff RXB1DLC,PREINC0
-	clrf PREINC0,0
-	movlw 0xf
+	movff RXB1DLC,WREG
+	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call dup
 	movf POSTDEC0,0,0
 	movff POSTDEC0,can_MI_msg_MI_length
@@ -739,8 +724,6 @@ flash_MI_addr_EX_
 ; space: defined at lib/strings.fs:7
 _space
 	movlw bl
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto emit
 
 ; can-config: defined at lib/canlib.fs:111
@@ -829,16 +812,6 @@ _2drop
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
-	return
-
-; and: defined at lib/arithmetic.fs:63
-and
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
 	return
 
 ; or: defined at lib/arithmetic.fs:75
@@ -975,16 +948,13 @@ _lbl___72
 
 ; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
-	movf POSTDEC0,0,0
-	movlw 0xf6
-	addwf INDF0,1,0
-	movlw 0x3a
+	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
-	addwf POSTDEC0,0,0
+	addlw 0x3a
 	return
 
-; type: defined at lib/strings.fs:27
+; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -997,6 +967,8 @@ type
 _lbl___88
 	call dup
 	call op_cfetch_tos
+	movf POSTDEC0,0
+	movf POSTDEC0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -1008,18 +980,14 @@ _lbl___88
 	movf POSTDEC0,1,0
 	return
 
-; .s: defined at lib/strings.fs:56
+; .s: defined at lib/strings.fs:53
 _DT_s
 	movlw 60
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	call depth
 	call dup
 	call _DT_
 	movlw 62
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	call dup
 	movf POSTDEC0,0,0
@@ -1088,12 +1056,10 @@ memcpy_loop
 
 ; can-receive-buffer0: defined at lib/canlib.fs:31
 can_MI_receive_MI_buffer0
-	movff RXB0DLC,PREINC0
-	clrf PREINC0,0
-	movlw 0xf
+	movf RXB0DLC,0,0
+	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call dup
 	movf POSTDEC0,0,0
 	movff POSTDEC0,can_MI_msg_MI_length
@@ -1233,7 +1199,7 @@ can_MI_flags equ 0x20
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at lib/strings.fs:60 as:
+; defined at lib/strings.fs:57 as:
 ;  ...
 _data_
 	db 32,46,46,46

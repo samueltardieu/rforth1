@@ -119,46 +119,37 @@ an_DT_
 ; cr: defined at lib/strings.fs:8
 cr
 	movlw 0xa
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call emit
 	movlw 0xd
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto emit
 
-; .: defined at lib/strings.fs:25
+; .: defined at lib/strings.fs:22
 _DT_
 	call _1_GT_2
 	call emit_MI_8
 
-; emit-8: defined at lib/strings.fs:24
+; emit-8: defined at lib/strings.fs:21
 emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 	call emit_MI_4
-	movlw 0xf
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call and
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 0xf
 
-; emit-4: defined at lib/strings.fs:23
+; emit-4: defined at lib/strings.fs:20
 emit_MI_4
 	call nibble_MI_to_MI_hex
-	movwf PREINC0,0
-	clrf PREINC0,0
 
 ; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
+	movwf TXREG,0
 	return
 
 ; 8*: defined at tests/colortest.fs:3
@@ -192,9 +183,9 @@ an
 ; measure: defined at tests/colortest.fs:5
 measure
 	bsf ADCON0,2,0
-_lbl___197
+_lbl___198
 	btfsc ADCON0,2,0
-	bra _lbl___197
+	bra _lbl___198
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	return
@@ -221,14 +212,16 @@ main
 	call type
 	call cr
 	call init_MI_adc
-_lbl___206
+_lbl___207
 	call key
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call disp0
 	call disp1
 	call disp2
-	bra _lbl___206
+	bra _lbl___207
 
 ; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
@@ -293,16 +286,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; and: defined at lib/arithmetic.fs:63
-and
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
-	return
-
 ; or: defined at lib/arithmetic.fs:75
 or
 	movff POSTDEC0,temp_x1
@@ -345,16 +328,13 @@ eepromc_AT_
 
 ; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
-	movf POSTDEC0,0,0
-	movlw 0xf6
-	addwf INDF0,1,0
-	movlw 0x3a
+	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
-	addwf POSTDEC0,0,0
+	addlw 0x3a
 	return
 
-; type: defined at lib/strings.fs:27
+; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -367,6 +347,8 @@ type
 _lbl___88
 	call dup
 	call op_cfetch_tos
+	movf POSTDEC0,0
+	movf POSTDEC0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -378,23 +360,20 @@ _lbl___88
 	movf POSTDEC0,1,0
 	return
 
-; key: defined at lib/tty-rs232.fs:5
+; key: defined at lib/tty-rs232.fs:6
 key
 	btfss PIR1,5,0
 	bra key
-	movff RCREG,PREINC0
-	clrf PREINC0,0
+	movf RCREG,0,0
 	return
 
 ; select-channel: defined at tests/colortest.fs:4
 select_MI_channel
 	call _8_ST_
-	movff ADCON0,PREINC0
-	clrf PREINC0,0
-	movlw 0xc7
+	movf ADCON0,0,0
+	andlw 0xc7
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,ADCON0

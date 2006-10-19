@@ -117,12 +117,10 @@ alt_MI_1
 
 ; alt!: defined at tests/balise.fs:31
 alt_EX_
-	movff LATC,PREINC0
-	clrf PREINC0,0
-	movlw 0xf8
+	movf LATC,0,0
+	andlw 0xf8
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call or
 	movff POSTDEC0,(LATC+1)
 	movff POSTDEC0,LATC
@@ -160,6 +158,8 @@ main_MI_loop
 	call prompt
 	call pwm
 	call key
+	movwf PREINC0,0
+	clrf PREINC0,0
 	call dup
 	movlw 67
 	movwf PREINC0,0
@@ -167,7 +167,7 @@ main_MI_loop
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___219
+	bnz _lbl___220
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -175,7 +175,7 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___219
+_lbl___220
 	call dup
 	movlw 80
 	movwf PREINC0,0
@@ -183,7 +183,7 @@ _lbl___219
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___221
+	bnz _lbl___222
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -191,7 +191,7 @@ _lbl___219
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___221
+_lbl___222
 	call dup
 	movlw 83
 	movwf PREINC0,0
@@ -199,24 +199,22 @@ _lbl___221
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___223
+	bnz _lbl___224
 	call leds_MI_off
-	movff T0CON,PREINC0
-	clrf PREINC0,0
-	movlw 0xf0
+	movf T0CON,0,0
+	andlw 0xf0
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	call read4
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___223
+_lbl___224
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
 
-; type: defined at lib/strings.fs:27
+; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -229,6 +227,8 @@ type
 _lbl___88
 	call dup
 	call op_cfetch_tos
+	movf POSTDEC0,0
+	movf POSTDEC0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -330,7 +330,7 @@ op_minus
 	subwfb INDF0,1,0
 	return
 
-; read8: defined at lib/strings.fs:69
+; read8: defined at lib/strings.fs:66
 read8
 	call read4
 	movf POSTDEC0,0,0
@@ -437,16 +437,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; and: defined at lib/arithmetic.fs:63
-and
-	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	andwf POSTINC0,1,0
-	movf temp_x1,0,0
-	andwf INDF0,1,0
-	return
-
 ; xor: defined at lib/arithmetic.fs:87
 xor
 	movff POSTDEC0,temp_x1
@@ -503,9 +493,11 @@ eepromc_AT_
 	movf EEDATA,0,0
 	return
 
-; read4: defined at lib/strings.fs:68
+; read4: defined at lib/strings.fs:65
 read4
 	call key
+	movwf PREINC0,0
+	clrf PREINC0,0
 	call dup
 	movlw 65
 	movwf PREINC0,0
@@ -514,10 +506,11 @@ read4
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___95
-	movlw 223
+	movf POSTDEC0,0
+	movf POSTDEC0,0
+	andlw 223
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call and
 	movlw LOW((-55))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -532,7 +525,7 @@ _lbl___95
 	addwfc INDF0,1,0
 	return
 
-; read16: defined at lib/strings.fs:70
+; read16: defined at lib/strings.fs:67
 read16
 	call read8
 	call read8
@@ -546,16 +539,14 @@ read16
 emit
 	btfss PIR1,4,0
 	bra emit
-	movf POSTDEC0,0,0
-	movff POSTDEC0,TXREG
+	movwf TXREG,0
 	return
 
-; key: defined at lib/tty-rs232.fs:5
+; key: defined at lib/tty-rs232.fs:6
 key
 	btfss PIR1,5,0
 	bra key
-	movff RCREG,PREINC0
-	clrf PREINC0,0
+	movf RCREG,0,0
 	return
 
 ; timer-reached?: defined at tests/balise.fs:26
@@ -565,11 +556,11 @@ timer_MI_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___200
+	bz _lbl___201
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___200
+_lbl___201
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
@@ -579,11 +570,11 @@ _lbl___200
 ; timer-wait: defined at tests/balise.fs:28
 timer_MI_wait
 	call timer_MI_set
-_lbl___204
+_lbl___205
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___204
+	bz _lbl___205
 	return
 
 ; timer-reset: defined at tests/balise.fs:29
@@ -597,7 +588,7 @@ timer_MI_reset
 ; pwm: defined at tests/balise.fs:38
 pwm
 	call timer_MI_reset
-_lbl___212
+_lbl___213
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -608,7 +599,7 @@ _lbl___212
 	call timer_MI_wait
 	btfsc PIR1,5,0
 	return
-	bra _lbl___212
+	bra _lbl___213
 
 ; init-ports: defined at tests/balise.fs:74
 init_MI_ports
