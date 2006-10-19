@@ -2322,20 +2322,20 @@ class Compiler:
     # as we inline them. The final return must not be inlined.
     # Also, warn if external goto or return are detected; we do not perform
     # this check in inline assembly code.
-    multiple_exits = False
+    removable_end = True
     for n, p in target.opcodes[:-1]:
       if is_internal_jump((n, p)) and p == target.end_label:
-        multiple_exits = True
+        removable_end = False
       if is_external_jump((n, p)):
         self.warning('inlining of %s uses a non-local jump' % target.name)
       if p and p[0] in rep: self.add_instruction(n, [rep[p[0]]])
       else: self.add_instruction(n, p)
-    # Check that the latest opcode was a return or an inlined call to return.
-    assert(target.opcodes[-1][0] == 'return')
     # If there were no multiple exits, remove the end_label so that
     # optimizations can be performed between the inlined word and
     # subsequent instructions.
-    if not multiple_exits:
+    if removable_end:
+      # Check that the latest opcode was a return or an inlined call to return.
+      assert(target.opcodes[-1][0] == 'return')
       name, params = compiler.last_instruction()
       if name == 'LABEL' and params == [rep[target.end_label]]:
         compiler.rewind()
