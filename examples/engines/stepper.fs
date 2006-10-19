@@ -68,9 +68,9 @@ done-flag bit-clr? if send-done done-flag bit-set then
 
 : timers-reached timer0-reached timer3-reached ;
 \ Non blocant emit code
-: emit begin timers-reached TXIF bit-set? until TXREG c! ;
+: emit w> begin timers-reached TXIF bit-set? until TXREG c! ; inw
 : key? RCIF bit-set? ; \ inline
-: key begin timers-reached key? until RCREG c@ ;
+: key begin timers-reached key? until RCREG c@ >w ; outw
 
 : init-timers 
 \ timer0  (1:16 prescaler)

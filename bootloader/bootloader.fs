@@ -165,11 +165,12 @@ cvariable next-to-write
 \ Console I/O
 \ ----------------------------------------------------------------------
 
-: emit ( c -- ) console-can bit-set? if can-emit else serial-emit then ;
+: emit ( c/w -- )
+  w> console-can bit-set? if can-emit else serial-emit then ; inw
 : key? ( -- f ) console-can bit-set? if can-key? else serial-key? then ;
-: key ( -- c )
+: key ( -- c/w )
   console-can bit-set? if can-key else serial-key then
-  echo bit-set? if dup emit then ;
+  echo bit-set? if dup emit then >w ; outw
 
 \ ----------------------------------------------------------------------
 \ Global configuration

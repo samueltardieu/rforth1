@@ -1,6 +1,6 @@
-forward emit
+forward emit inw
 forward key?
-forward key
+forward key outw
 
 0x20 constant bl
 
