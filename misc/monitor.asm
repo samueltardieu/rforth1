@@ -160,6 +160,7 @@ start_of_buffer:
 	
 	;; Get a character from serial line into W with echo
 get_char:
+	clrwdt
 	btfss	PIR1,RCIF
 	bra	get_char
 	movf	RCREG,w
@@ -306,7 +307,7 @@ ok:
 	rcall	put_char
 	movlw	'>'
 	rcall	put_char
-	bra	put_space
+	;; Fallback through put_space
 
 put_space:
 	movlw	' '
