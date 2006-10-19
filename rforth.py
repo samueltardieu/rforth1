@@ -54,6 +54,10 @@ def error(str):
 def make_tuple(insn, parameters):
   return insn, tuple(parameters)
 
+def octet(n):
+  """Check whether n is between 0 and 255."""
+  return n >= 0 and n <= 255
+
 class LiteralValue:
   """Represent any literal value that can be put on the stack."""
 
@@ -436,6 +440,19 @@ class FromW(Primitive):
       compiler.rewind()
     else:
       compiler.add_instruction('OP_PUSH_W', [])
+
+class LAnd(Primitive):
+  """Logical and."""
+
+  def run(self):
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and octet(params[0].static_value()):
+      compiler.rewind()
+      compiler['>w'].run()
+      compiler.add_instruction('andlw', params)
+      compiler['w>'].run()
+    else:
+      compiler['op_and'].run()
 
 class CFor(Primitive):
   """Simple loop with a one byte index."""
@@ -1960,6 +1977,7 @@ class Compiler:
     self.add_primitive('switchw', SwitchW)
     self.add_primitive('casew', CaseW)
     self.add_primitive('endswitchw', EndSwitchW)
+    self.add_primitive('and', LAnd)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')

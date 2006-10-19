@@ -60,7 +60,7 @@ code -!
     return
 ;code
 
-code and
+code op_and
     intr-protect
     POSTDEC0 temp_x1 movff   \ Store high byte of 2nd argument in temp_x1
     POSTDEC0 ,w ,a movf   \ Store low byte of 2nd argument in W
