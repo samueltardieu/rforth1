@@ -9,18 +9,15 @@ forward key
 
 
 code nibble-to-hex
-    POSTDEC0 ,w ,a movf   \ Point onto LSB
-    0xf6 movlw   \ Add 246 so that C is set for A-F and not for 0-9
-    INDF0 ,f ,a addwf
-    0x3a movlw   \ This doesn't affect the C bit
+    0xf6 addlw   \ Add 246 so that C is set for A-F and not for 0-9
     C ,a btfsc   \ If C is set, we have a letter, add 7 more
     7 addlw
-    POSTDEC0 ,w ,a addwf   \ Add and finishing popping
+    0x3a addlw
     return
-;code outw
+;code inw outw
 
 
-: emit-4 ( n -- ) nibble-to-hex emit ;
+: emit-4 ( n -- ) w> nibble-to-hex emit ; inw
 : emit-8 ( n -- ) dup swapf-lsb 0xf and emit-4 0xf and emit-4 ;
 : . ( n -- ) 1>2 emit-8 emit-8 ;
 
