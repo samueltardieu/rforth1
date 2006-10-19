@@ -2396,7 +2396,7 @@ def main():
   parser = optparse.OptionParser(usage = '%prog [options] FILE')
   parser.add_option('-a', '--auto-inline', action = 'store_true',
                      default = False, dest = 'automatic_inlining',
-                     help = 'turn on automatic inlining(experimental)')
+                     help = 'turn on automatic inlining')
   parser.add_option('-c', '--compile', action = 'store_true',
                      default = False, dest = 'compile_only',
                      help = 'compile only, do not link')
