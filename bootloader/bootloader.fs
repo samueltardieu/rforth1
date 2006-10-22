@@ -323,9 +323,7 @@ cvariable led-blink-current
   flash-write cr
 ;
 
-: bootloader-execute ( -- )
-  0 STKPTR c!
-  read24 cr 0 PCLATU c! 1>2 PCLATH c! >w nop w> PCL c! ;
+: bootloader-execute ( -- ) read24 0 STKPTR c! execute ;
 
 : bootloader-relay ( -- )
   read4 read8 swap 2>1 can-target ! cr
@@ -484,11 +482,7 @@ variable timer-counter
   adcon-deconfigure
 ;
 
-code user-program
-    reset-ports rcall
-    STKPTR ,a clrf
-    USER_PROGRAM_ADDR goto
-;code
+: user-program ( -- ) 0 STKPTR c! USER_PROGRAM_ADDR execute ;
 
 \ ----------------------------------------------------------------------
 \ Main program
