@@ -1,3 +1,3 @@
 : foo ;
 
-: main ['] foo ;
+: main ['] foo execute ;

@@ -586,6 +586,14 @@ class AddressOf(Primitive):
   def run(self):
     compiler.push(compiler.find(compiler.parse_word()))
 
+class Execute(Primitive):
+  """Implement the execute word."""
+
+  def run(self):
+    compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
+    compiler.push(compiler['PCL'])
+    compiler['!'].run()
+
 class While(Primitive):
   """Implement the while word."""
 
@@ -1992,6 +2000,7 @@ class Compiler:
     self.add_primitive('endswitchw', EndSwitchW)
     self.add_primitive('and', LAnd)
     self.add_primitive("[']", AddressOf)
+    self.add_primitive("execute", Execute)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')
@@ -2363,7 +2372,14 @@ class Compiler:
   def tos_to_addr(self, addr):
     self.add_instruction('movff', [self['POSTDEC0'],
                                     Add(addr, Number(1))])
-    self.add_instruction('movff', [self['POSTDEC0'], addr])
+    # Using movff with PCL as a target is forbidden. This route will
+    # always be taken even if a constant has been push on the stack
+    # because PCLATU has been cleared in the meantime.
+    if addr.static_value() != self['PCL'].static_value():
+      self.add_instruction('movff', [self['POSTDEC0'], addr])
+    else:
+      self.add_instruction('movf', [self['POSTDEC0'], dst_w, access])
+      self.add_instruction('movwf', [addr, access])
 
   def push_byte(self, object):
     if object.static_value() == 0:
