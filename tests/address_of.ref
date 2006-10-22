@@ -46,7 +46,6 @@ main
 	movff POSTDEC0,(PCL+1)
 	movf POSTDEC0,0,0
 	movwf PCL,0
-	return
 
 ; foo: defined at tests/address_of.fs:1
 foo

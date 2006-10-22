@@ -1527,6 +1527,12 @@ class Word(Named, Literal):
                                                'return', 'retfie', 'reset']:
         new.append(self.opcodes[o])
         dead = True
+      elif not dead and self.opcodes[o][0] == 'movwf' and \
+               self.opcodes[o][1][0].static_value() == \
+               compiler['PCL'].static_value() and \
+               self.opcodes[o][1][1] == access:
+          new.append(self.opcodes[o])
+          dead = True
       elif not dead:
         new.append(self.opcodes[o])
       o += 1
