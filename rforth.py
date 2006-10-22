@@ -580,6 +580,12 @@ class EndSwitchW(Primitive):
     compiler.add_instruction('LABEL', [nlabel])
     compiler.add_instruction('LABEL', [label])
 
+class AddressOf(Primitive):
+  """Implement the ['] word."""
+
+  def run(self):
+    compiler.push(compiler.find(compiler.parse_word()))
+
 class While(Primitive):
   """Implement the while word."""
 
@@ -1365,7 +1371,7 @@ class Prefix(Primitive):
 class Postfix(Primitive):
   def run(self): PICIns.prefix = False
 
-class Word(Named):
+class Word(Named, Literal):
 
   def __init__(self, name):
     Named.__init__(self, name)
@@ -1776,6 +1782,9 @@ class Word(Named):
     else:
       raise Compiler.UNIMPLEMENTED, (name, params)
 
+  def static_value(self):
+    return None
+
 class Input:
 
   def __init__(self, name, lines):
@@ -1982,6 +1991,7 @@ class Compiler:
     self.add_primitive('casew', CaseW)
     self.add_primitive('endswitchw', EndSwitchW)
     self.add_primitive('and', LAnd)
+    self.add_primitive("[']", AddressOf)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')
