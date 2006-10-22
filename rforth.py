@@ -148,6 +148,7 @@ class Named:
     self.outz = False
     self.from_source = True
     self.referenced_by = 0
+    self.not_inlinable = False
 
   def reset_referenced_by(self):
     self.referenced_by = 0
@@ -586,7 +587,7 @@ class AddressOf(Primitive):
   def run(self):
     compiler.push(compiler.find(compiler.parse_word()))
 
-class Execute(Primitive):
+class Jump(Primitive):
   """Implement the execute word."""
 
   def run(self):
@@ -1220,6 +1221,12 @@ class Inline(Primitive):
   def run(self):
     compiler.current_object.inlined = True
 
+class NoInline(Primitive):
+  """Mark the latest defined word as not inlinable."""
+
+  def run(self):
+    compiler.current_object.not_inlineable = True
+
 class LowInterrupt(Primitive):
   """Mark the latest defined word as being the low-level interrupt."""
 
@@ -1406,6 +1413,7 @@ class Word(Named, Literal):
     else: return `self`
 
   def can_inline(self):
+    if self.not_inlinable: return False
     if self in [compiler.low_interrupt, compiler.high_interrupt]:
       return False
     for n, p in self.opcodes[:-1]:
@@ -1981,6 +1989,7 @@ class Compiler:
     self.add_primitive('bit-clr', BitClr)
     self.add_primitive('bit-toggle', BitToggle)
     self.add_primitive('inline', Inline)
+    self.add_primitive('no-inline', NoInline)
     self.add_primitive('low-interrupt', LowInterrupt)
     self.add_primitive('high-interrupt', HighInterrupt)
     self.add_primitive('fast', Fast)
@@ -2006,7 +2015,7 @@ class Compiler:
     self.add_primitive('endswitchw', EndSwitchW)
     self.add_primitive('and', LAnd)
     self.add_primitive("[']", AddressOf)
-    self.add_primitive("execute", Execute)
+    self.add_primitive("jump", Jump)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')

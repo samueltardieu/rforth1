@@ -253,3 +253,5 @@ code cr@
 : over >r dup r> swap ;
 
 : nip swap drop ;
+
+: execute jump ; no-inline

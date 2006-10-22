@@ -42,6 +42,9 @@ main
 	movwf PREINC0,0
 	movlw HIGH(foo)
 	movwf PREINC0,0
+
+; execute: defined at lib/primitives.fs:257
+execute
 	clrf PCLATU,0
 	movff POSTDEC0,(PCL+1)
 	movf POSTDEC0,0,0
