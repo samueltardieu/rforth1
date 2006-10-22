@@ -1,0 +1,33 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+; PREINC0: defined at lib/sfrnames.fs:26
+PREINC0 equ 0xfec
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+; init_runtime: defined at lib/primitives.fs:3
+init_runtime
+	movlb 1
+
+; main: defined at tests/address_of.fs:3
+main
+	movlw LOW(foo)
+	movwf PREINC0,0
+	movlw HIGH(foo)
+	movwf PREINC0,0
+	return
+
+; foo: defined at tests/address_of.fs:1
+foo
+	return
+
+END
