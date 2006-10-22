@@ -2373,7 +2373,7 @@ class Compiler:
     self.add_instruction('movff', [self['POSTDEC0'],
                                     Add(addr, Number(1))])
     # Using movff with PCL as a target is forbidden. This route will
-    # always be taken even if a constant has been pushed on the stack
+    # always be taken even if a constant has been pushed onto the stack
     # because PCLATU has been cleared in the meantime.
     if addr.static_value() != self['PCL'].static_value():
       self.add_instruction('movff', [self['POSTDEC0'], addr])
