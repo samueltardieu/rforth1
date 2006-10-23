@@ -34,7 +34,8 @@ class SQuote (Primitive):
     str = compiler.parse ('"')
     parsed = str.replace ('\\n', '\r\n')
     parsed = parsed.replace ('\\t', '\t')
-    data = FlashData ([ord (c) for c in parsed], str)
+    data = FlashData ([ord (c) for c in parsed], str,
+                      compiler.current_object.name + '_str_')
     compiler.push (Add (data, Number (0x8000, 16)))
     compiler.push (Number (len (parsed)))
 

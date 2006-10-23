@@ -306,8 +306,9 @@ class Label(NamedReference): pass
 
 class FlashData(NamedReference):
 
-  def __init__(self, data, original_data):
-    NamedReference.__init__(self, '_data_')
+  def __init__(self, data, original_data, basename = None):
+    if basename is None: basename = '_data_'
+    NamedReference.__init__(self, basename)
     self.data = data
     self.original_data = original_data
     self.section = 'static data'
