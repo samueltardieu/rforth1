@@ -15,10 +15,6 @@ port = sre.compile ("(\S+)\s+EQU\s+(\d)\s*;?\s*(.*)")
 all_regs = []
 all_bits = []
 
-def cleanup (line):
-    while line[-1:] in ['\r', '\n']: line = line[:-1]
-    return line
-
 def split (lines):
     before, lines = lines[:1], lines[1:]
     while True:
