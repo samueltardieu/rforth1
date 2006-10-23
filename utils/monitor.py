@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# Copyright (c) 2004-2005 Samuel Tardieu <sam@rfc1149.net>
+# Copyright (c) 2004-2006 Samuel Tardieu <sam@rfc1149.net>
 #
 # This file allows the loading of an hex file onto a PIC 18Fxx8 device
 # using a serial monitor.
@@ -170,10 +170,9 @@ def program_device (fd, options):
 def load_hex_file (file):
     """Load a hex file in memory."""
     print "Loading %s" % file
-    for l in open (file, 'r').readlines():
-        while l[-1:] in ['\r', '\n']: l = l[:-1]
+    for l in open (file, 'r'):
+        l = l.rstrip('\r\n')
         if l[:1] == ':': handle_hex_line (l)
-
 
 def open_port (options):
     print "Opening %s at %s bps" % (options.port, options.speed)
@@ -217,72 +216,68 @@ def action_program (options, args):
     finally:
         close_port (fd, options)
 
-
-
-
 def handle_client (client):
-	ACK="ok"
-	while 1:
-		l = client.recv(1024)
-		if not l:raise TransmissionWithServerFailed 	 
-		if l=="eof": break
-		while l[-1:] in ['\r', '\n']: 
-			l = l[:-1]
-        	if l[:1] == ':': 
-			handle_hex_line (l)
-		client.send(ACK)
-
+    ACK="ok"
+    while 1:
+        l = client.recv(1024)
+        if not l:raise TransmissionWithServerFailed 	 
+        if l=="eof": break
+        while l[-1:] in ['\r', '\n']: 
+            l = l[:-1]
+        if l[:1] == ':': 
+            handle_hex_line (l)
+        client.send(ACK)
 
 def action_client (options, args):
-	check_argv (args, 1)
-	try:
-            s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            host, port = options.server_addr, options.server_port
-            if host == 'auto': host = 'localhost'
-            s.connect((host, port))
-            print "Connected to", addr
-            print "Sending file %s" % args[0]	
-            for l in open (args[0],'r').readlines():
-                s.send(l)
-                data = s.recv(1024)
-                if data != "ok":
-                    raise TransmissionWithServerFailed 	
-            s.send("eof")
-            while 1:
-                data = s.recv(1024)
-                if not data:raise TransmissionWithServerFailed 	
-                if data == "bye": break
-                print data
-	finally:
-            s.close()
+    check_argv (args, 1)
+    try:
+        s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        host, port = options.server_addr, options.server_port
+        if host == 'auto': host = 'localhost'
+        s.connect((host, port))
+        print "Connected to", addr
+        print "Sending file %s" % args[0]	
+        for l in open (args[0],'r').readlines():
+            s.send(l)
+            data = s.recv(1024)
+            if data != "ok":
+                raise TransmissionWithServerFailed 	
+        s.send("eof")
+        while 1:
+            data = s.recv(1024)
+            if not data:raise TransmissionWithServerFailed 	
+            if data == "bye": break
+            print data
+    finally:
+        s.close()
 		
 def action_server (options, args):
-	check_argv (args, 0)
-	try:
-		s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		port = options.server_port
-		host=options.server_addr
-		if host == 'auto':
-                    host= ''
-		addr = (host, port)	
-		s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-		s.bind(addr)
-		s.listen(1)
-		print "Listening on ", addr
+    check_argv (args, 0)
+    try:
+        s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        port = options.server_port
+        host=options.server_addr
+        if host == 'auto':
+            host= ''
+        addr = (host, port)	
+        s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+        s.bind(addr)
+        s.listen(1)
+        print "Listening on ", addr
 
-		while 1:
-			client,addr = s.accept()
-			print "Connection from ", addr
-			handle_client (client)
-			client.send("Hex file loaded")
-			fd = open_port (options)
-			program_device (fd, options)
-			close_port (fd,options)
-			client.send("Device programmed")
-			client.send("bye")
-			client.close()
-	finally:
-		s.close()
+        while 1:
+            client,addr = s.accept()
+            print "Connection from ", addr
+            handle_client (client)
+            client.send("Hex file loaded")
+            fd = open_port (options)
+            program_device (fd, options)
+            close_port (fd,options)
+            client.send("Device programmed")
+            client.send("bye")
+            client.close()
+    finally:
+            s.close()
 			
 def main ():
     usage = '%prog [options] [hexfile]'

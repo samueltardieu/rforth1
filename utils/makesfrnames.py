@@ -86,7 +86,7 @@ def output (lines):
             output_bits (before)
 
 def main ():
-    lines = [cleanup (l) for l in sys.stdin.readlines ()]
+    lines = [l.rstrip('\r\n') for l in sys.stdin]
     output (lines)
 
 if __name__ == '__main__': main ()
