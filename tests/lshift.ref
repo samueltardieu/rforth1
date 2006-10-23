@@ -54,8 +54,8 @@ main
 	movwf PREINC0,0
 	movff a,PREINC0
 	movff (a+1),PREINC0
-	movff b,PREINC2
-	movf PREINC2,0,0
+	movf b,0,1
+	movwf PREINC2,0
 	bz _lbl___196
 _lbl___198
 	call _2_ST_

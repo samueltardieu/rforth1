@@ -508,10 +508,10 @@ class CFor(Primitive):
     if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
       compiler.rewind()
       addr = params[0]
-      compiler.add_instruction('movff', [addr, compiler['PREINC2']])
+      compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
       if name == 'OP_FETCH':
         compiler.warning('loop index may be larger than one byte')
-      compiler.add_instruction('movf', [compiler['PREINC2'], dst_w, access])
+      compiler.add_instruction('movwf', [compiler['PREINC2'], access])
       compiler.add_instruction('bz', [label_uncfor])
     else:
       bound_checks = True
