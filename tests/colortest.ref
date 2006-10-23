@@ -70,18 +70,18 @@ PIR1 equ 0xf9e
 ;---------------------------------------------------------
 
 disp0
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((disp0_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((disp0_str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
 	clrf PREINC0,0
 	clrf PREINC0,0
 
-an_DT_
+an_
 	call an
-	call _DT_
+	call _
 
 cr
 	movlw 0xa
@@ -89,24 +89,24 @@ cr
 	movlw 0xd
 	goto emit
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 
 emit
 	btfss PIR1,4,0
@@ -125,7 +125,7 @@ _2_ST_
 	rlcf INDF0,1,0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -136,7 +136,7 @@ table_MI_addr_EX_
 	return
 
 an
-	call select_MI_channel
+	call select_channel
 
 measure
 	bsf ADCON0,2,0
@@ -157,14 +157,14 @@ init_runtime
 	clrf FSR2H,0
 
 main
-	movlw LOW((_data___4+0x8000))
+	movlw LOW((main_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((main_str+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
 	call cr
-	call init_MI_adc
+	call init_adc
 _lbl___216
 	call key
 	call disp0
@@ -172,34 +172,34 @@ _lbl___216
 	call disp2
 	bra _lbl___216
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 disp1
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((disp1_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((disp1_str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
-	goto an_DT_
+	goto an_
 
 disp2
-	movlw LOW((_data___3+0x8000))
+	movlw LOW((disp2_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((disp2_str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
 	movlw 2
 	movwf PREINC0,0
 	clrf PREINC0,0
-	goto an_DT_
+	goto an_
 
 op_dup
 	movlw -1
@@ -235,25 +235,25 @@ _1_GT_2
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
@@ -287,7 +287,7 @@ key
 	movf RCREG,0,0
 	return
 
-select_MI_channel
+select_channel
 	call _8_ST_
 	movf ADCON0,0,0
 	andlw 0xc7
@@ -298,7 +298,7 @@ select_MI_channel
 	movff POSTDEC0,ADCON0
 	return
 
-init_MI_adc
+init_adc
 	movlw 0x81
 	movwf ADCON0,0
 	movlw 0xc2
@@ -315,19 +315,19 @@ temp_x1 equ 0x0
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+disp0_str
 	db 83,101,110,115,111,114,32,48
 	db 58,32
 
-_data___2
+disp1_str
 	db 83,101,110,115,111,114,32,49
 	db 58,32
 
-_data___3
+disp2_str
 	db 83,101,110,115,111,114,32,50
 	db 58,32
 
-_data___4
+main_str
 	db 87,101,108,99,111,109,101
 
 END

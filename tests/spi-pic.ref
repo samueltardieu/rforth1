@@ -71,11 +71,11 @@ TRISA equ 0xf92
 
 PORTA equ 0xf80
 
-write_MI_command equ 0x0
+write_command equ 0x0
 
-read_MI_command equ 0x1
+read_command equ 0x1
 
-bit_MI_change_MI_command equ 0x2
+bit_change_command equ 0x2
 
 ;---------------------------------------------------------
 ; Section: code
@@ -83,10 +83,10 @@ bit_MI_change_MI_command equ 0x2
 
 init_runtime
 	movlb 1
-	clrf current_MI_command,1
-	clrf current_MI_mode,1
-	clrf current_MI_address,1
-	clrf (current_MI_address+1),1
+	clrf current_command,1
+	clrf current_mode,1
+	clrf current_address,1
+	clrf (current_address+1),1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -95,13 +95,13 @@ init_runtime
 	clrf FSR2H,0
 
 main
-	call init_MI_spi
+	call init_spi
 
 mainloop
-	call handle_MI_command
+	call handle_command
 	bra mainloop
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -111,10 +111,10 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 op_dup
 	movlw -1
@@ -184,26 +184,26 @@ _1_GT_2
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
 eepromc_EX_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	movf POSTDEC0,0,0
 	movff POSTDEC0,EEDATA
 	bsf EECON1,2,0
@@ -219,7 +219,7 @@ _lbl___72
 	bcf PIR2,4,0
 	return
 
-init_MI_spi
+init_spi
 	bcf TRISC,5,0
 	bsf TRISC,3,0
 	bsf TRISA,5,0
@@ -229,16 +229,16 @@ init_MI_spi
 	movwf SSPCON1,0
 	return
 
-receive_MI_byte
+receive_byte
 	btfss PIR1,3,0
-	bra receive_MI_byte
+	bra receive_byte
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	return
 
-send_MI_bytes
-	movff current_MI_address,PREINC0
-	movff (current_MI_address+1),PREINC0
+send_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
 _lbl___201
 	call op_dup
 	call op_cfetch_tos
@@ -254,9 +254,9 @@ _lbl___202
 	incf INDF0,1,0
 	bra _lbl___201
 
-receive_MI_bytes
-	movff current_MI_address,PREINC0
-	movff (current_MI_address+1),PREINC0
+receive_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
 _lbl___206
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
@@ -281,9 +281,9 @@ _lbl___208
 	incf INDF0,1,0
 	bra _lbl___206
 
-receive_MI_masks_MI_bytes
-	movff current_MI_address,PREINC0
-	movff (current_MI_address+1),PREINC0
+receive_masks_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
 _lbl___211
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
@@ -328,24 +328,24 @@ _lbl___216
 	incf INDF0,1,0
 	bra _lbl___211
 
-handle_MI_command
-	call receive_MI_byte
-	call receive_MI_byte
+handle_command
+	call receive_byte
+	call receive_byte
 	movf POSTDEC0,0,0
-	movff POSTDEC0,current_MI_address
-	call receive_MI_byte
+	movff POSTDEC0,current_address
+	call receive_byte
 	movf POSTDEC0,0,0
-	movff POSTDEC0,(1+current_MI_address)
+	movff POSTDEC0,(1+current_address)
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___219
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto send_MI_bytes
+	goto send_bytes
 _lbl___219
 	call op_dup
-	movlw read_MI_command
+	movlw read_command
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -354,10 +354,10 @@ _lbl___219
 	bnz _lbl___221
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto receive_MI_bytes
+	goto receive_bytes
 _lbl___221
 	call op_dup
-	movlw bit_MI_change_MI_command
+	movlw bit_change_command
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -366,7 +366,7 @@ _lbl___221
 	bnz _lbl___223
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	call receive_MI_masks_MI_bytes
+	call receive_masks_bytes
 _lbl___223
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -378,10 +378,10 @@ _lbl___223
 
 temp_x1 equ 0x0
 
-current_MI_command equ 0x100
+current_command equ 0x100
 
-current_MI_mode equ 0x101
+current_mode equ 0x101
 
-current_MI_address equ 0x102
+current_address equ 0x102
 
 END

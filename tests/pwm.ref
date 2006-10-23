@@ -85,9 +85,9 @@ LATC equ 0xf8b
 
 LATA equ 0xf89
 
-main_MI_time equ -28000
+main_time equ -28000
 
-pulse_MI_max equ -6000
+pulse_max equ -6000
 
 delta equ 10
 
@@ -95,24 +95,24 @@ delta equ 10
 ; Section: code
 ;---------------------------------------------------------
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 
 emit
 	btfss PIR1,4,0
@@ -144,16 +144,16 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-tmr1_MI_wait
+tmr1_wait
 	btfsc PIR1,0,0
 	return
-	bra tmr1_MI_wait
+	bra tmr1_wait
 
 main
 	call greetings
-	call init_MI_pwm
+	call init_pwm
 
-main_MI_loop
+main_loop
 	movlw LOW(-6000)
 	movwf pulse0,1
 	movlw HIGH(-6000)
@@ -179,9 +179,9 @@ _lbl___217
 	call read16
 	movff POSTDEC0,(pulse0+1)
 	movff POSTDEC0,pulse0
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((main_loop_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((main_loop_str+0x8000))
 	movwf PREINC0,0
 	movlw 1
 	call type
@@ -197,9 +197,9 @@ _lbl___219
 	call read16
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((main_loop_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((main_loop_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 1
 	call type
@@ -212,25 +212,25 @@ _lbl___221
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___223
-	movlw LOW((_data___3+0x8000))
+	movlw LOW((main_loop_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((main_loop_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
 	movff pulse0,PREINC0
 	movff (pulse0+1),PREINC0
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___4+0x8000))
+	movlw LOW((main_loop_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((main_loop_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
-	call _DT_
+	call _
 	call cr
 _lbl___223
 	call op_dup
@@ -250,15 +250,15 @@ _lbl___223
 	addwfc INDF0,1,0
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
-	movlw LOW((_data___5+0x8000))
+	movlw LOW((main_loop_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
+	movlw HIGH((main_loop_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 1
 	call type
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
-	call _DT_
+	call _
 	call cr
 _lbl___225
 	call op_dup
@@ -278,15 +278,15 @@ _lbl___225
 	addwfc INDF0,1,0
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
-	movlw LOW((_data___6+0x8000))
+	movlw LOW((main_loop_str__5+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
+	movlw HIGH((main_loop_str__5+0x8000))
 	movwf PREINC0,0
 	movlw 1
 	call type
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
-	call _DT_
+	call _
 	call cr
 _lbl___227
 	movf POSTDEC0,0,0
@@ -308,7 +308,7 @@ or
 	iorwf INDF0,1,0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -319,9 +319,9 @@ table_MI_addr_EX_
 	return
 
 greetings
-	movlw LOW((_data___7+0x8000))
+	movlw LOW((greetings_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___7+0x8000))
+	movlw HIGH((greetings_str+0x8000))
 	movwf PREINC0,0
 	movlw 18
 
@@ -360,10 +360,10 @@ init_runtime
 	clrf FSR2H,0
 	goto main
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 cr
 	movlw 0xa
@@ -440,25 +440,25 @@ _2dupxor_GT_w
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
@@ -512,7 +512,7 @@ key
 	movf RCREG,0,0
 	return
 
-set_MI_tmr0_MI_wait
+set_tmr0_wait
 	call _1_GT_2
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR0H
@@ -524,7 +524,7 @@ _lbl___205
 	return
 	bra _lbl___205
 
-set_MI_tmr1
+set_tmr1
 	call _1_GT_2
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR1H
@@ -534,33 +534,33 @@ set_MI_tmr1
 	return
 
 pwm
-	movlw LOW(pulse_MI_max)
+	movlw LOW(pulse_max)
 	movwf PREINC0,0
-	movlw HIGH(pulse_MI_max)
+	movlw HIGH(pulse_max)
 	movwf PREINC0,0
-	call set_MI_tmr1
+	call set_tmr1
 	bsf LATA,2,0
 	movff pulse0,PREINC0
 	movff (pulse0+1),PREINC0
-	call set_MI_tmr0_MI_wait
+	call set_tmr0_wait
 	bcf LATA,2,0
-	call tmr1_MI_wait
-	movlw LOW(pulse_MI_max)
+	call tmr1_wait
+	movlw LOW(pulse_max)
 	movwf PREINC0,0
-	movlw HIGH(pulse_MI_max)
+	movlw HIGH(pulse_max)
 	movwf PREINC0,0
-	call set_MI_tmr1
+	call set_tmr1
 	bsf LATC,1,0
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
-	call set_MI_tmr0_MI_wait
+	call set_tmr0_wait
 	bcf LATC,1,0
-	call tmr1_MI_wait
-	movlw LOW(main_MI_time)
+	call tmr1_wait
+	movlw LOW(main_time)
 	movwf PREINC0,0
-	movlw HIGH(main_MI_time)
+	movlw HIGH(main_time)
 	movwf PREINC0,0
-	call set_MI_tmr1
+	call set_tmr1
 _lbl___213
 	btfsc PIR1,5,0
 	return
@@ -568,7 +568,7 @@ _lbl___213
 	bra pwm
 	bra _lbl___213
 
-init_MI_pwm
+init_pwm
 	movlw 7
 	movwf ADCON1,0
 	bcf TRISA,2,0
@@ -595,25 +595,25 @@ pulse1 equ 0x102
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+main_loop_str
 	db 48
 
-_data___2
+main_loop_str__1
 	db 49
 
-_data___3
+main_loop_str__2
 	db 80,87,77,32,48,32,58,32
 
-_data___4
+main_loop_str__3
 	db 80,87,77,32,49,32,58,32
 
-_data___5
+main_loop_str__4
 	db 43
 
-_data___6
+main_loop_str__5
 	db 45
 
-_data___7
+greetings_str
 	db 13,10,80,87,77,32,71,101
 	db 110,101,114,97,116,111,114,62
 	db 13,10

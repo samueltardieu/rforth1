@@ -68,18 +68,18 @@ bl equ 0x20
 ;---------------------------------------------------------
 
 test1
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((test1_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((test1_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
 
 h
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((h_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((h_str+0x8000))
 	movwf PREINC0,0
 	movlw 13
 	call type
@@ -119,24 +119,24 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 	goto emit
 
 init_runtime
@@ -151,23 +151,23 @@ init_runtime
 
 main
 	call cr
-	call _DT_s
+	call _s
 	call cr
 	call test1
-	call _DT_s
+	call _s
 	call cr
 	call test2
-	call _DT_s
+	call _s
 	call cr
 	call test3
-	call _DT_s
+	call _s
 	call cr
 	call test4
 	movlw 4
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call test5
-	call _DT_s
+	call _s
 	call cr
 	movlw 1
 	movwf PREINC0,0
@@ -176,28 +176,28 @@ main
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call test6
-	call _DT_s
+	call _s
 	call cr
 	clrf a,1
 	call test7
-	call _DT_s
+	call _s
 	call cr
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call test8
-	call _DT_s
+	call _s
 	call cr
 	movlw 4
 	movwf a,1
 	call test7
-	call _DT_s
+	call _s
 	call cr
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call test8
-	call _DT_s
+	call _s
 	goto cr
 
 pick
@@ -222,7 +222,7 @@ op_fetch_tos
 	movff INDF1,PREINC0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -232,10 +232,10 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 _space
 	movlw bl
@@ -331,14 +331,14 @@ depth
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
 flash_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
@@ -346,14 +346,14 @@ flash_AT_
 	movff TABLAT,INDF0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
@@ -377,7 +377,7 @@ eeprom_AT_
 	movwf INDF0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
@@ -405,12 +405,12 @@ _lbl___91
 	movf POSTDEC0,0,0
 	return
 
-_DT_s
+_s
 	movlw 60
 	call emit
 	call depth
 	call op_dup
-	call _DT_
+	call _
 	movlw 62
 	call emit
 	call op_dup
@@ -427,9 +427,9 @@ _DT_s
 	bz _lbl___96
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data_+0x8000))
+	movlw LOW((_s_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data_+0x8000))
+	movlw HIGH((_s_str+0x8000))
 	movwf PREINC0,0
 	movlw 4
 	call type
@@ -451,7 +451,7 @@ _lbl___99
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
 	call pick
-	call _DT_
+	call _
 	decfsz INDF2,1,0
 	bra _lbl___99
 _lbl___97
@@ -463,9 +463,9 @@ _lbl___95
 	return
 
 test2
-	movlw LOW((_data___3+0x8000))
+	movlw LOW((test2_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((test2_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -479,9 +479,9 @@ test2
 	return
 
 test3
-	movlw LOW((_data___4+0x8000))
+	movlw LOW((test3_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((test3_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -492,7 +492,7 @@ test3
 _lbl___219
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___219
@@ -500,9 +500,9 @@ _lbl___219
 	return
 
 test4
-	movlw LOW((_data___5+0x8000))
+	movlw LOW((test4_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
+	movlw HIGH((test4_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -516,7 +516,7 @@ test4
 _lbl___224
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___224
@@ -526,9 +526,9 @@ _lbl___224
 	return
 
 test5
-	movlw LOW((_data___6+0x8000))
+	movlw LOW((test5_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
+	movlw HIGH((test5_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -541,7 +541,7 @@ test5
 _lbl___229
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___229
@@ -550,9 +550,9 @@ _lbl___227
 	return
 
 test6
-	movlw LOW((_data___7+0x8000))
+	movlw LOW((test6_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___7+0x8000))
+	movlw HIGH((test6_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -565,7 +565,7 @@ test6
 _lbl___234
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___234
@@ -576,9 +576,9 @@ _lbl___232
 	return
 
 test7
-	movlw LOW((_data___8+0x8000))
+	movlw LOW((test7_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___8+0x8000))
+	movlw HIGH((test7_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -590,7 +590,7 @@ test7
 _lbl___239
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___239
@@ -599,9 +599,9 @@ _lbl___237
 	return
 
 test8
-	movlw LOW((_data___9+0x8000))
+	movlw LOW((test8_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___9+0x8000))
+	movlw HIGH((test8_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	movwf PREINC0,0
@@ -613,7 +613,7 @@ test8
 _lbl___244
 	movff INDF2,PREINC0
 	clrf PREINC0,0
-	call _DT_
+	call _
 	call cr
 	decfsz INDF2,1,0
 	bra _lbl___244
@@ -635,35 +635,35 @@ a equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-_data_
+_s_str
 	db 32,46,46,46
 
-_data___1
+h_str
 	db 82,117,110,110,105,110,103,32
 	db 116,101,115,116,32
 
-_data___2
+test1_str
 	db 116,101,115,116,49
 
-_data___3
+test2_str
 	db 116,101,115,116,50
 
-_data___4
+test3_str
 	db 116,101,115,116,51
 
-_data___5
+test4_str
 	db 116,101,115,116,52
 
-_data___6
+test5_str
 	db 116,101,115,116,53
 
-_data___7
+test6_str
 	db 116,101,115,116,54
 
-_data___8
+test7_str
 	db 116,101,115,116,55
 
-_data___9
+test8_str
 	db 116,101,115,116,56
 
 END

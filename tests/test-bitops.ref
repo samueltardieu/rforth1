@@ -78,14 +78,14 @@ init_runtime
 
 main
 	call cr
-	movlw LOW((_data___5+0x8000))
+	movlw LOW((main_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
+	movlw HIGH((main_str+0x8000))
 	movwf PREINC0,0
 	movlw 15
 	call type
 	call depth
-	call _DT_
+	call _
 	call cr
 	bsf x,3,1
 	bcf x,5,1
@@ -95,7 +95,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -103,7 +103,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -111,7 +111,7 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -119,7 +119,7 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -141,7 +141,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -149,7 +149,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -157,7 +157,7 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -165,7 +165,7 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -187,7 +187,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -195,7 +195,7 @@ main
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -203,7 +203,7 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_set
+	call test_set
 	call _space
 	clrf PREINC0,0
 	movlw HIGH(x)
@@ -211,16 +211,16 @@ main
 	movlw 5
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_clr
+	call test_clr
 	call cr
-	movlw LOW((_data___6+0x8000))
+	movlw LOW((main_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
+	movlw HIGH((main_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 15
 	call type
 	call depth
-	call _DT_
+	call _
 
 cr
 	movlw 0xa
@@ -233,21 +233,21 @@ emit
 	movwf TXREG,0
 	return
 
-test_MI_set
+test_set
 	call op_bit_set_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___205
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((test_set_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((test_set_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
 _lbl___205
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((test_set_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((test_set_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 7
 
@@ -272,27 +272,27 @@ _lbl___91
 	movf POSTDEC0,0,0
 	return
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 	goto emit
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -302,30 +302,30 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 _space
 	movlw bl
 	goto emit
 
-test_MI_clr
+test_clr
 	call op_bit_clr_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___208
-	movlw LOW((_data___3+0x8000))
+	movlw LOW((test_clr_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((test_clr_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
 _lbl___208
-	movlw LOW((_data___4+0x8000))
+	movlw LOW((test_clr_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((test_clr_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	goto type
@@ -437,25 +437,25 @@ depth
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
@@ -474,23 +474,23 @@ x equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+test_set_str
 	db 115,101,116
 
-_data___2
+test_set_str__1
 	db 110,111,116,32,115,101,116
 
-_data___3
+test_clr_str
 	db 99,108,114
 
-_data___4
+test_clr_str__1
 	db 110,111,116,32,99,108,114
 
-_data___5
+main_str
 	db 67,117,114,114,101,110,116,32
 	db 100,101,112,116,104,58,32
 
-_data___6
+main_str__1
 	db 67,117,114,114,101,110,116,32
 	db 100,101,112,116,104,58,32
 

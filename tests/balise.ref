@@ -77,8 +77,8 @@ LATC equ 0xf8b
 ; Section: code
 ;---------------------------------------------------------
 
-alt_MI_1
-	movff pattern_MI_1,PREINC0
+alt_1
+	movff pattern_1,PREINC0
 	clrf PREINC0,0
 
 alt_EX_
@@ -99,8 +99,8 @@ init_runtime
 	clrf (ondelay+1),1
 	clrf offdelay,1
 	clrf (offdelay+1),1
-	clrf pattern_MI_1,1
-	clrf pattern_MI_2,1
+	clrf pattern_1,1
+	clrf pattern_2,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -110,13 +110,13 @@ init_runtime
 
 main
 	movlw 3
-	movwf pattern_MI_1,1
+	movwf pattern_1,1
 	movlw 4
-	movwf pattern_MI_2,1
-	call init_MI_ports
+	movwf pattern_2,1
+	call init_ports
 	call greetings
 
-main_MI_loop
+main_loop
 	call prompt
 	call pwm
 	call key
@@ -131,7 +131,7 @@ main_MI_loop
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___229
-	call leds_MI_off
+	call leds_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
 	movff POSTDEC0,ondelay
@@ -147,13 +147,13 @@ _lbl___229
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___231
-	call leds_MI_off
+	call leds_off
 	call read4
 	movf POSTDEC0,0,0
-	movff POSTDEC0,pattern_MI_1
+	movff POSTDEC0,pattern_1
 	call read4
 	movf POSTDEC0,0,0
-	movff POSTDEC0,pattern_MI_2
+	movff POSTDEC0,pattern_2
 _lbl___231
 	call op_dup
 	movlw 83
@@ -163,7 +163,7 @@ _lbl___231
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___233
-	call leds_MI_off
+	call leds_off
 	movf T0CON,0,0
 	andlw 0xf0
 	movwf PREINC0,0
@@ -175,7 +175,7 @@ _lbl___231
 _lbl___233
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	bra main_MI_loop
+	bra main_loop
 
 type
 	movwf PREINC2,0
@@ -247,7 +247,7 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-timer_MI_set
+timer_set
 	clrf PREINC0,0
 	movlw HIGH(nexttimer)
 	movwf PREINC0,0
@@ -293,7 +293,7 @@ or
 	iorwf INDF0,1,0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -303,33 +303,33 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
-alt_MI_2
-	movff pattern_MI_2,PREINC0
+alt_2
+	movff pattern_2,PREINC0
 	clrf PREINC0,0
 	goto alt_EX_
 
-leds_MI_off
+leds_off
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto alt_EX_
 
 prompt
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((prompt_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((prompt_str+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	goto type
 
 greetings
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((greetings_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((greetings_str+0x8000))
 	movwf PREINC0,0
 	movlw 15
 	goto type
@@ -393,20 +393,20 @@ _2dupxor_GT_w
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
@@ -464,7 +464,7 @@ key
 	movf RCREG,0,0
 	return
 
-timer_MI_reached_QM_
+timer_reached_QM_
 	call diff
 	call op_dup
 	call neighbour_QM_
@@ -481,16 +481,16 @@ _lbl___210
 	clrf PREINC0,0
 	return
 
-timer_MI_wait
-	call timer_MI_set
+timer_wait
+	call timer_set
 _lbl___214
-	call timer_MI_reached_QM_
+	call timer_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___214
 	return
 
-timer_MI_reset
+timer_reset
 	clrf TMR0H,0
 	clrf TMR0L,0
 	clrf nexttimer,1
@@ -498,21 +498,21 @@ timer_MI_reset
 	return
 
 pwm
-	call timer_MI_reset
+	call timer_reset
 _lbl___222
-	call alt_MI_1
+	call alt_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
-	call timer_MI_wait
-	call alt_MI_2
+	call timer_wait
+	call alt_2
 	movff offdelay,PREINC0
 	movff (offdelay+1),PREINC0
-	call timer_MI_wait
+	call timer_wait
 	btfsc PIR1,5,0
 	return
 	bra _lbl___222
 
-init_MI_ports
+init_ports
 	movlw 0xb8
 	movwf TRISC,0
 	movlw 0x80
@@ -537,18 +537,18 @@ ondelay equ 0x102
 
 offdelay equ 0x104
 
-pattern_MI_1 equ 0x106
+pattern_1 equ 0x106
 
-pattern_MI_2 equ 0x107
+pattern_2 equ 0x107
 
 ;---------------------------------------------------------
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+prompt_str
 	db 13,10,79,75,62
 
-_data___2
+greetings_str
 	db 13,10,67,111,100,101,32,98
 	db 97,108,105,115,101,13,10
 

@@ -35,17 +35,17 @@ init_runtime
 main
 	return
 
-handle_MI_high
+handle_high
 	return
 
-handle_MI_low
+handle_low
 	return
 
 _high
-	movwf high_MI_wtemp,0
-	movff FSR0L,high_MI_fsr0ltemp
-	movff FSR0H,high_MI_fsr0htemp
-	movlw secstack_MI_high
+	movwf high_wtemp,0
+	movff FSR0L,high_fsr0ltemp
+	movff FSR0H,high_fsr0htemp
+	movlw secstack_high
 	movwf FSR0L,0
 	clrf (FSR0L+1),0
 	movff STATUS,PREINC0
@@ -54,26 +54,26 @@ _high
 	movff (FSR1L+1),PREINC0
 	movff FSR2L,PREINC0
 	movff (FSR2L+1),PREINC0
-	movlw secrstack_MI_high
+	movlw secrstack_high
 	movwf FSR2L,0
 	clrf (FSR2L+1),0
-	call handle_MI_high
+	call handle_high
 	movff POSTDEC0,(FSR2L+1)
 	movff POSTDEC0,FSR2L
 	movff POSTDEC0,(FSR1L+1)
 	movff POSTDEC0,FSR1L
 	movf POSTDEC0,0,0
 	movff POSTDEC0,STATUS
-	movff high_MI_fsr0htemp,FSR0H
-	movff high_MI_fsr0ltemp,FSR0L
-	movf high_MI_wtemp,0,0
+	movff high_fsr0htemp,FSR0H
+	movff high_fsr0ltemp,FSR0L
+	movf high_wtemp,0,0
 	retfie 0
 
 _low
-	movwf low_MI_wtemp,0
-	movff FSR0L,low_MI_fsr0ltemp
-	movff FSR0H,low_MI_fsr0htemp
-	movlw secstack_MI_low
+	movwf low_wtemp,0
+	movff FSR0L,low_fsr0ltemp
+	movff FSR0H,low_fsr0htemp
+	movlw secstack_low
 	movwf FSR0L,0
 	clrf (FSR0L+1),0
 	movff STATUS,PREINC0
@@ -82,43 +82,43 @@ _low
 	movff (FSR1L+1),PREINC0
 	movff FSR2L,PREINC0
 	movff (FSR2L+1),PREINC0
-	movlw secrstack_MI_low
+	movlw secrstack_low
 	movwf FSR2L,0
 	clrf (FSR2L+1),0
-	call handle_MI_low
+	call handle_low
 	movff POSTDEC0,(FSR2L+1)
 	movff POSTDEC0,FSR2L
 	movff POSTDEC0,(FSR1L+1)
 	movff POSTDEC0,FSR1L
 	movf POSTDEC0,0,0
 	movff POSTDEC0,STATUS
-	movff low_MI_fsr0htemp,FSR0H
-	movff low_MI_fsr0ltemp,FSR0L
-	movf low_MI_wtemp,0,0
+	movff low_fsr0htemp,FSR0H
+	movff low_fsr0ltemp,FSR0L
+	movf low_wtemp,0,0
 	retfie 0
 
 ;---------------------------------------------------------
 ; Section: memory
 ;---------------------------------------------------------
 
-high_MI_wtemp equ 0x21
+high_wtemp equ 0x21
 
-high_MI_fsr0ltemp equ 0x22
+high_fsr0ltemp equ 0x22
 
-high_MI_fsr0htemp equ 0x23
+high_fsr0htemp equ 0x23
 
-secstack_MI_high equ 0x24
+secstack_high equ 0x24
 
-secrstack_MI_high equ 0x3a
+secrstack_high equ 0x3a
 
-low_MI_wtemp equ 0x40
+low_wtemp equ 0x40
 
-low_MI_fsr0ltemp equ 0x41
+low_fsr0ltemp equ 0x41
 
-low_MI_fsr0htemp equ 0x42
+low_fsr0htemp equ 0x42
 
-secstack_MI_low equ 0x43
+secstack_low equ 0x43
 
-secrstack_MI_low equ 0x59
+secrstack_low equ 0x59
 
 END

@@ -176,11 +176,12 @@ class Named:
     name = self.name
     if name not in Compiler.all_opcodes:
       for k,v in [('?', 'QM'), ('!', 'EX'), ('@', 'AT'), ('+', 'PL'),
-                 ('-', 'MI'), ('*', 'ST'), ('/', 'SL'), ('=', 'EQ'),
-                 ('<', 'LT'), ('>', 'GT'), ('$', 'DO'), ('.', 'DT'),
-                 ('"', 'QU'), ("'", 'QT'), (':', 'CL'), (';', 'SC'),
+                 ('-', '_'), ('*', 'ST'), ('/', 'SL'), ('=', 'EQ'),
+                 ('<', 'LT'), ('>', 'GT'), ('$', '_'), ('.', '_'),
+                 ('"', 'QU'), ("'", '_'), (':', 'CL'), (';', 'SC'),
                  ('(', 'OP'), (')', 'CP'), ('%', 'PC')]:
-        name = string.replace(name, k, "_%s_" % v)
+        if len(v) > 1: v = '_%s_' % v
+        name = string.replace(name, k, "%s" % v)
     if self.occurrence: suffix = '__%d' % self.occurrence
     else: suffix = ''
     if name[0] in string.digits: prefix = '_'

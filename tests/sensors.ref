@@ -157,25 +157,25 @@ BROWN equ 2
 
 WHITE equ 3
 
-COLORS_MI_ARBITRATION equ 0x44
+COLORS_ARBITRATION equ 0x44
 
-VALUES_MI_ARBITRATION equ 0x45
+VALUES_ARBITRATION equ 0x45
 
-SET_MI_CALIBRATION_MI_REQUEST equ 0x46
+SET_CALIBRATION_REQUEST equ 0x46
 
-CALIBRATION_MI_ARBITRATION equ 0x47
+CALIBRATION_ARBITRATION equ 0x47
 
-local_MI_addr equ 0x0
+local_addr equ 0x0
 
-addr_MI_mask equ 0x3e0
+addr_mask equ 0x3e0
 
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-can_MI_prepare_MI_buffer
-	call can_MI_choose_MI_buffer
-	movff can_MI_msg_MI_length,PREINC0
+can_prepare_buffer
+	call can_choose_buffer
+	movff can_msg_length,PREINC0
 	clrf PREINC0,0
 	movlw LOW(TXB0DLC)
 	movwf PREINC0,0
@@ -183,12 +183,12 @@ can_MI_prepare_MI_buffer
 	movwf PREINC0,0
 	call tx0_GT_txn
 	call op_cstore
-	movff can_MI_msg_MI_length,PREINC0
+	movff can_msg_length,PREINC0
 	clrf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___153
-	movlw can_MI_msg
+	movlw can_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movlw LOW(TXB0D0)
@@ -196,11 +196,11 @@ can_MI_prepare_MI_buffer
 	movlw HIGH(TXB0D0)
 	movwf PREINC0,0
 	call tx0_GT_txn
-	movf can_MI_msg_MI_length,0,0
+	movf can_msg_length,0,0
 	call memcpy
 _lbl___153
-	movff can_MI_arbitration,PREINC0
-	movff (can_MI_arbitration+1),PREINC0
+	movff can_arbitration,PREINC0
+	movff (can_arbitration+1),PREINC0
 	call _5_LT__LT_
 	call _1_GT_2
 	movlw LOW(TXB0SIDH)
@@ -224,12 +224,12 @@ op_cstore
 	movff POSTDEC0,INDF1
 	return
 
-can_MI_handle_MI_message
-	call can_MI_receive
-	movff can_MI_arbitration,PREINC0
-	movff (can_MI_arbitration+1),PREINC0
+can_handle_message
+	call can_receive
+	movff can_arbitration,PREINC0
+	movff (can_arbitration+1),PREINC0
 	call op_dup
-	movlw SET_MI_CALIBRATION_MI_REQUEST
+	movlw SET_CALIBRATION_REQUEST
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -238,16 +238,16 @@ can_MI_handle_MI_message
 	bnz _lbl___259
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto set_MI_thresholds
+	goto set_thresholds
 _lbl___259
-	btfsc can_MI_msg_MI_flags,0,0
+	btfsc can_msg_flags,0,0
 	bra _lbl___260
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto can_MI_unknown_MI_msg
+	goto can_unknown_msg
 _lbl___260
 	call op_dup
-	movlw COLORS_MI_ARBITRATION
+	movlw COLORS_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -256,10 +256,10 @@ _lbl___260
 	bnz _lbl___262
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto can_MI_send_MI_colors
+	goto can_send_colors
 _lbl___262
 	call op_dup
-	movlw VALUES_MI_ARBITRATION
+	movlw VALUES_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -268,10 +268,10 @@ _lbl___262
 	bnz _lbl___264
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto can_MI_send_MI_values
+	goto can_send_values
 _lbl___264
 	call op_dup
-	movlw CALIBRATION_MI_ARBITRATION
+	movlw CALIBRATION_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -280,35 +280,35 @@ _lbl___264
 	bnz _lbl___266
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto can_MI_send_MI_calibration
+	goto can_send_calibration
 _lbl___266
 
-can_MI_unknown_MI_msg
-	movlw LOW((_data___4+0x8000))
+can_unknown_msg
+	movlw LOW((can_unknown_msg_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((can_unknown_msg_str+0x8000))
 	movwf PREINC0,0
 	movlw 37
 	call type
-	call _DT_
-	movlw LOW((_data___5+0x8000))
+	call _
+	movlw LOW((can_unknown_msg_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
+	movlw HIGH((can_unknown_msg_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	call type
-	btfsc can_MI_msg_MI_flags,0,0
+	btfsc can_msg_flags,0,0
 	bra _lbl___256
-	movlw LOW((_data___6+0x8000))
+	movlw LOW((can_unknown_msg_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
+	movlw HIGH((can_unknown_msg_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	call type
 _lbl___256
-	movlw LOW((_data___7+0x8000))
+	movlw LOW((can_unknown_msg_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___7+0x8000))
+	movlw HIGH((can_unknown_msg_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	call type
@@ -324,10 +324,10 @@ emit
 	movwf TXREG,0
 	return
 
-can_MI_init
+can_init
 	bsf TRISB,3,0
 	bcf TRISB,2,0
-	call can_MI_config
+	call can_config
 	movlw 0x9
 	movwf BRGCON1,0
 	movlw 0x90
@@ -336,13 +336,13 @@ can_MI_init
 	movwf BRGCON3,0
 	movlw 0x40
 	movwf CIOCON,0
-	call can_MI_disable_MI_all_MI_filters
+	call can_disable_all_filters
 
-can_MI_normal
+can_normal
 	clrf PREINC0,0
 	clrf PREINC0,0
 
-can_MI_mode
+can_mode
 	call _5_LT__LT_
 	call op_dup
 	movf CANCON,0,0
@@ -366,26 +366,26 @@ _lbl___160
 	movf POSTDEC0,0,0
 	return
 
-can_MI_send_MI_values
-	movlw VALUES_MI_ARBITRATION
-	movwf can_MI_arbitration,0
-	clrf (can_MI_arbitration+1),0
+can_send_values
+	movlw VALUES_ARBITRATION
+	movwf can_arbitration,0
+	clrf (can_arbitration+1),0
 	movlw 8
-	movwf can_MI_msg_MI_length,0
-	movff (current_MI_value_MI_0+1),(can_MI_msg_MI_0+1)
-	movff current_MI_value_MI_0,can_MI_msg_MI_0
-	movff (current_MI_value_MI_1+1),(can_MI_msg_MI_2+1)
-	movff current_MI_value_MI_1,can_MI_msg_MI_2
-	movff (current_MI_value_MI_2+1),(can_MI_msg_MI_4+1)
-	movff current_MI_value_MI_2,can_MI_msg_MI_4
-	movff (current_MI_value_MI_3+1),(can_MI_msg_MI_6+1)
-	movff current_MI_value_MI_3,can_MI_msg_MI_6
+	movwf can_msg_length,0
+	movff (current_value_0+1),(can_msg_0+1)
+	movff current_value_0,can_msg_0
+	movff (current_value_1+1),(can_msg_2+1)
+	movff current_value_1,can_msg_2
+	movff (current_value_2+1),(can_msg_4+1)
+	movff current_value_2,can_msg_4
+	movff (current_value_3+1),(can_msg_6+1)
+	movff current_value_3,can_msg_6
 
-can_MI_transmit
-	call can_MI_prepare_MI_buffer
-	call can_MI_clr_MI_rtr
+can_transmit
+	call can_prepare_buffer
+	call can_clr_rtr
 
-can_MI_transmit_MI_buffer
+can_transmit_buffer
 	movlw LOW(TXB0CON)
 	movwf PREINC0,0
 	movlw HIGH(TXB0CON)
@@ -397,13 +397,13 @@ can_MI_transmit_MI_buffer
 	return
 
 step
-	call can_MI_msg_MI_present_QM_
+	call can_msg_present_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	btfss STATUS,2,0
-	call can_MI_handle_MI_message
-	call maybe_MI_send_MI_colors
-	call serial_MI_dump
+	call can_handle_message
+	call maybe_send_colors
+	call serial_dump
 	btfss PIR1,5,0
 	return
 	call key
@@ -418,12 +418,12 @@ step
 	btfss STATUS,2,0
 	return
 
-interactive_MI_mode
+interactive_mode
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call handle_MI_key
-	bra interactive_MI_mode
+	call handle_key
+	bra interactive_mode
 
 mainloop
 	call step
@@ -438,19 +438,19 @@ op_minus
 	subwfb INDF0,1,0
 	return
 
-color_MI_changed_QM_
+color_changed_QM_
 	call op_dup
-	movlw LOW(current_MI_colors)
+	movlw LOW(current_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(current_MI_colors)
+	movlw HIGH(current_colors)
 	addwfc INDF0,1,0
 	call op_cfetch_tos
 	call swap
-	movlw LOW(previous_MI_colors)
+	movlw LOW(previous_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(previous_MI_colors)
+	movlw HIGH(previous_colors)
 	addwfc INDF0,1,0
 	call op_cfetch_tos
 	call xor
@@ -488,24 +488,24 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 	goto emit
 
 _5_LT__LT_
@@ -541,41 +541,41 @@ _4_SL_
 	rrcf POSTINC0,1,0
 	return
 
-can_MI_choose_MI_buffer
+can_choose_buffer
 	lfsr 1,TXB0CON
 	btfsc INDF1,3,0
 	bra _lbl___148
 	clrf PREINC0,0
 	clrf PREINC0,0
-	goto can_MI_set_MI_buffer
+	goto can_set_buffer
 _lbl___148
-	btfsc can_MI_flags,0,0
-	bra can_MI_choose_MI_buffer
+	btfsc can_flags,0,0
+	bra can_choose_buffer
 	lfsr 1,TXB1CON
 	btfsc INDF1,3,0
 	bra _lbl___150
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
-	goto can_MI_set_MI_buffer
+	goto can_set_buffer
 _lbl___150
 	lfsr 1,TXB2CON
 	btfsc INDF1,3,0
-	bra can_MI_choose_MI_buffer
+	bra can_choose_buffer
 	movlw 2
 	movwf PREINC0,0
 	clrf PREINC0,0
 
-can_MI_set_MI_buffer
+can_set_buffer
 	movf POSTDEC0,0,0
-	movff POSTDEC0,can_MI_buffer
+	movff POSTDEC0,can_buffer
 
-compute_MI_can_MI_offset
-	movff can_MI_buffer,PREINC0
+compute_can_offset
+	movff can_buffer,PREINC0
 	clrf PREINC0,0
 	call _16_ST_
 	movf POSTDEC0,0,0
-	movff POSTDEC0,can_MI_offset
+	movff POSTDEC0,can_offset
 	return
 
 init
@@ -591,62 +591,62 @@ init
 	movwf T0CON,0
 	movlw 0x91
 	movwf T1CON,0
-	call read_MI_from_MI_eeprom
+	call read_from_eeprom
 	bsf LATB,0,0
 	bcf LATB,1,0
 
-can_MI_setup
-	call can_MI_init
-	call can_MI_config
-	movlw LOW(addr_MI_mask)
+can_setup
+	call can_init
+	call can_config
+	movlw LOW(addr_mask)
 	movwf PREINC0,0
-	movlw HIGH(addr_MI_mask)
+	movlw HIGH(addr_mask)
 	movwf PREINC0,0
 	movlw 0
-	call can_MI_set_MI_mask
+	call can_set_mask
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 0
-	call can_MI_set_MI_filter
+	call can_set_filter
 
-can_MI_loopback
+can_loopback
 	movlw 0x2
 	movwf PREINC0,0
 	clrf PREINC0,0
-	goto can_MI_mode
+	goto can_mode
 
-channel_MI_determine_MI_color
-	call channel_MI_measure
+channel_determine_color
+	call channel_measure
 
-determine_MI_color
+determine_color
 	call op_dup
-	movff brown_MI_cream_MI_threshold,PREINC0
-	movff (brown_MI_cream_MI_threshold+1),PREINC0
+	movff brown_cream_threshold,PREINC0
+	movff (brown_cream_threshold+1),PREINC0
 	call _LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___231
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto brown_MI_detected
+	goto brown_detected
 _lbl___231
-	movff cream_MI_white_MI_threshold,PREINC0
-	movff (cream_MI_white_MI_threshold+1),PREINC0
+	movff cream_white_threshold,PREINC0
+	movff (cream_white_threshold+1),PREINC0
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___232
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto white_MI_detected
+	goto white_detected
 _lbl___232
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 
-cream_MI_detected
-	movlw LOW((_data___3+0x8000))
+cream_detected
+	movlw LOW((cream_detected_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((cream_detected_str+0x8000))
 	movwf PREINC0,0
 	movlw 14
 	call type
@@ -656,34 +656,34 @@ cream_MI_detected
 	clrf PREINC0,0
 	return
 
-maybe_MI_send_MI_colors
+maybe_send_colors
 	btfss PIR1,0,0
 	return
-	call colors_MI_changed_QM_
+	call colors_changed_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	btfsc STATUS,2,0
 	return
 
-can_MI_send_MI_colors
-	movlw COLORS_MI_ARBITRATION
-	movwf can_MI_arbitration,0
-	clrf (can_MI_arbitration+1),0
+can_send_colors
+	movlw COLORS_ARBITRATION
+	movwf can_arbitration,0
+	clrf (can_arbitration+1),0
 	movlw 4
-	movwf can_MI_msg_MI_length,0
-	movff current_MI_color_MI_0,can_MI_msg_MI_0
-	movff current_MI_color_MI_1,can_MI_msg_MI_1
-	movff current_MI_color_MI_2,can_MI_msg_MI_2
-	movff current_MI_color_MI_3,can_MI_msg_MI_3
-	call can_MI_transmit
+	movwf can_msg_length,0
+	movff current_color_0,can_msg_0
+	movff current_color_1,can_msg_1
+	movff current_color_2,can_msg_2
+	movff current_color_3,can_msg_3
+	call can_transmit
 
-timer1_MI_reset
+timer1_reset
 	clrf TMR0L,0
 	clrf (TMR0L+1),0
 	bcf PIR1,0,0
 	return
 
-handle_MI_key
+handle_key
 	call op_dup
 	movlw 48
 	movwf PREINC0,0
@@ -692,17 +692,17 @@ handle_MI_key
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___284
-	movlw LOW((_data___32+0x8000))
+	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___32+0x8000))
+	movlw HIGH((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw 11
 	call type
 	call op_dup
-	call channel_MI_measure
-	call _DT_
-	call channel_MI_determine_MI_color
-	call _DT_
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
 	goto cr
 _lbl___284
 	call op_dup
@@ -713,17 +713,17 @@ _lbl___284
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___286
-	movlw LOW((_data___33+0x8000))
+	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___33+0x8000))
+	movlw HIGH((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 11
 	call type
 	call op_dup
-	call channel_MI_measure
-	call _DT_
-	call channel_MI_determine_MI_color
-	call _DT_
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
 	goto cr
 _lbl___286
 	call op_dup
@@ -734,17 +734,17 @@ _lbl___286
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___288
-	movlw LOW((_data___34+0x8000))
+	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___34+0x8000))
+	movlw HIGH((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 11
 	call type
 	call op_dup
-	call channel_MI_measure
-	call _DT_
-	call channel_MI_determine_MI_color
-	call _DT_
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
 	goto cr
 _lbl___288
 	call op_dup
@@ -755,17 +755,17 @@ _lbl___288
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___290
-	movlw LOW((_data___35+0x8000))
+	movlw LOW((handle_key_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___35+0x8000))
+	movlw HIGH((handle_key_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 11
 	call type
 	call op_dup
-	call channel_MI_measure
-	call _DT_
-	call channel_MI_determine_MI_color
-	call _DT_
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
 	goto cr
 _lbl___290
 	call op_dup
@@ -778,9 +778,9 @@ _lbl___290
 	bnz _lbl___292
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___36+0x8000))
+	movlw LOW((handle_key_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___36+0x8000))
+	movlw HIGH((handle_key_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 12
 	call type
@@ -796,14 +796,14 @@ _lbl___292
 	bnz _lbl___294
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___37+0x8000))
+	movlw LOW((handle_key_str__5+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___37+0x8000))
+	movlw HIGH((handle_key_str__5+0x8000))
 	movwf PREINC0,0
 	movlw 16
 	call type
 	call depth
-	call _DT_
+	call _
 	goto cr
 _lbl___294
 	call op_dup
@@ -816,8 +816,8 @@ _lbl___294
 	bnz _lbl___296
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	call print_MI_usage
-	call _DT_
+	call print_usage
+	call _
 	goto cr
 _lbl___296
 	call op_dup
@@ -830,14 +830,14 @@ _lbl___296
 	bnz _lbl___298
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___38+0x8000))
+	movlw LOW((handle_key_str__6+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___38+0x8000))
+	movlw HIGH((handle_key_str__6+0x8000))
 	movwf PREINC0,0
 	movlw 11
 	call type
 	call cr
-	goto can_MI_loopback
+	goto can_loopback
 _lbl___298
 	call op_dup
 	movlw 107
@@ -849,14 +849,14 @@ _lbl___298
 	bnz _lbl___300
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___39+0x8000))
+	movlw LOW((handle_key_str__7+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___39+0x8000))
+	movlw HIGH((handle_key_str__7+0x8000))
 	movwf PREINC0,0
 	movlw 12
 	call type
 	call cr
-	goto can_MI_normal
+	goto can_normal
 _lbl___300
 	call op_dup
 	movlw 115
@@ -881,9 +881,9 @@ _lbl___302
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	btg LATA,5,0
-	movlw LOW((_data___40+0x8000))
+	movlw LOW((handle_key_str__8+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___40+0x8000))
+	movlw HIGH((handle_key_str__8+0x8000))
 	movwf PREINC0,0
 	movlw 21
 	call type
@@ -892,73 +892,73 @@ _lbl___304
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 
-print_MI_usage
-	movlw LOW((_data___17+0x8000))
+print_usage
+	movlw LOW((print_usage_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___17+0x8000))
+	movlw HIGH((print_usage_str+0x8000))
 	movwf PREINC0,0
 	movlw 6
 	call type
 	call cr
-	movlw LOW((_data___18+0x8000))
+	movlw LOW((print_usage_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___18+0x8000))
+	movlw HIGH((print_usage_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 31
 	call type
 	call cr
-	movlw LOW((_data___19+0x8000))
+	movlw LOW((print_usage_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___19+0x8000))
+	movlw HIGH((print_usage_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 48
 	call type
 	call cr
-	movlw LOW((_data___20+0x8000))
+	movlw LOW((print_usage_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___20+0x8000))
+	movlw HIGH((print_usage_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 38
 	call type
 	call cr
-	movlw LOW((_data___21+0x8000))
+	movlw LOW((print_usage_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___21+0x8000))
+	movlw HIGH((print_usage_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 43
 	call type
 	call cr
-	movlw LOW((_data___22+0x8000))
+	movlw LOW((print_usage_str__5+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___22+0x8000))
+	movlw HIGH((print_usage_str__5+0x8000))
 	movwf PREINC0,0
 	movlw 39
 	call type
 	call cr
-	movlw LOW((_data___23+0x8000))
+	movlw LOW((print_usage_str__6+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___23+0x8000))
+	movlw HIGH((print_usage_str__6+0x8000))
 	movwf PREINC0,0
 	movlw 35
 	call type
 	call cr
-	movlw LOW((_data___24+0x8000))
+	movlw LOW((print_usage_str__7+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___24+0x8000))
+	movlw HIGH((print_usage_str__7+0x8000))
 	movwf PREINC0,0
 	movlw 55
 	call type
 	call cr
-	movlw LOW((_data___25+0x8000))
+	movlw LOW((print_usage_str__8+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___25+0x8000))
+	movlw HIGH((print_usage_str__8+0x8000))
 	movwf PREINC0,0
 	movlw 61
 	call type
 	call cr
-	movlw LOW((_data___26+0x8000))
+	movlw LOW((print_usage_str__9+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___26+0x8000))
+	movlw HIGH((print_usage_str__9+0x8000))
 	movwf PREINC0,0
 	movlw 22
 	call type
@@ -968,22 +968,22 @@ init_runtime
 	movlb 1
 	clrf calibrated_QM_,1
 	clrf (calibrated_QM_+1),1
-	clrf current_MI_value_MI_0,1
-	clrf (current_MI_value_MI_0+1),1
-	clrf current_MI_value_MI_1,1
-	clrf (current_MI_value_MI_1+1),1
-	clrf current_MI_value_MI_2,1
-	clrf (current_MI_value_MI_2+1),1
-	clrf current_MI_value_MI_3,1
-	clrf (current_MI_value_MI_3+1),1
-	clrf current_MI_color_MI_0,1
-	clrf current_MI_color_MI_1,1
-	clrf current_MI_color_MI_2,1
-	clrf current_MI_color_MI_3,1
-	clrf brown_MI_cream_MI_threshold,1
-	clrf (brown_MI_cream_MI_threshold+1),1
-	clrf cream_MI_white_MI_threshold,1
-	clrf (cream_MI_white_MI_threshold+1),1
+	clrf current_value_0,1
+	clrf (current_value_0+1),1
+	clrf current_value_1,1
+	clrf (current_value_1+1),1
+	clrf current_value_2,1
+	clrf (current_value_2+1),1
+	clrf current_value_3,1
+	clrf (current_value_3+1),1
+	clrf current_color_0,1
+	clrf current_color_1,1
+	clrf current_color_2,1
+	clrf current_color_3,1
+	clrf brown_cream_threshold,1
+	clrf (brown_cream_threshold+1),1
+	clrf cream_white_threshold,1
+	clrf (cream_white_threshold+1),1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -997,7 +997,7 @@ main
 	goto mainloop
 
 m0_GT_mn
-	movff can_MI_buffer,PREINC0
+	movff can_buffer,PREINC0
 	clrf PREINC0,0
 	call _4_ST_
 
@@ -1010,7 +1010,7 @@ op_plus
 	addwfc INDF0,1,0
 	return
 
-can_MI_msg_MI_present_QM_
+can_msg_present_QM_
 	movlw -1
 	btfss RXB0CON,7,0
 	addlw 1
@@ -1032,7 +1032,7 @@ or
 	iorwf INDF0,1,0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -1060,7 +1060,7 @@ eeprom_EX_
 	movf POSTDEC0,0,0
 
 eepromc_EX_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	movf POSTDEC0,0,0
 	movff POSTDEC0,EEDATA
 	bsf EECON1,2,0
@@ -1076,16 +1076,16 @@ _lbl___72
 	bcf PIR2,4,0
 	return
 
-print_MI_color
+print_color
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___268
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___8+0x8000))
+	movlw LOW((print_color_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___8+0x8000))
+	movlw HIGH((print_color_str+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	goto type
@@ -1100,9 +1100,9 @@ _lbl___268
 	bnz _lbl___270
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___9+0x8000))
+	movlw LOW((print_color_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___9+0x8000))
+	movlw HIGH((print_color_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	goto type
@@ -1117,9 +1117,9 @@ _lbl___270
 	bnz _lbl___272
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___10+0x8000))
+	movlw LOW((print_color_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___10+0x8000))
+	movlw HIGH((print_color_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	goto type
@@ -1134,18 +1134,18 @@ _lbl___272
 	bnz _lbl___274
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___11+0x8000))
+	movlw LOW((print_color_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___11+0x8000))
+	movlw HIGH((print_color_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 5
 	goto type
 _lbl___274
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data___12+0x8000))
+	movlw LOW((print_color_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___12+0x8000))
+	movlw HIGH((print_color_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 16
 
@@ -1170,19 +1170,19 @@ _lbl___91
 	movf POSTDEC0,0,0
 	return
 
-can_MI_receive
+can_receive
 	btfsc RXB0CON,7,0
-	goto can_MI_receive_MI_buffer0
+	goto can_receive_buffer0
 	lfsr 1,RXB1CON
 	btfss INDF1,7,0
-	bra can_MI_receive
+	bra can_receive
 
-can_MI_receive_MI_buffer1
+can_receive_buffer1
 	movff RXB1DLC,WREG
 	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movwf can_MI_msg_MI_length,0
+	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___129
@@ -1190,74 +1190,74 @@ can_MI_receive_MI_buffer1
 	movwf PREINC0,0
 	movlw HIGH(RXB1D0)
 	movwf PREINC0,0
-	movlw can_MI_msg
+	movlw can_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movf can_MI_msg_MI_length,0,0
+	movf can_msg_length,0,0
 	call memcpy
 _lbl___129
-	clrf can_MI_msg_MI_flags,0
+	clrf can_msg_flags,0
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0
-	bsf can_MI_msg_MI_flags,0,0
+	bsf can_msg_flags,0,0
 	movff RXB1SIDL,PREINC0
 	movff RXB1SIDH,PREINC0
 	call _5_GT__GT_
-	movff POSTDEC0,(can_MI_arbitration+1)
-	movff POSTDEC0,can_MI_arbitration
+	movff POSTDEC0,(can_arbitration+1)
+	movff POSTDEC0,can_arbitration
 	lfsr 1,RXB1CON
 	bcf INDF1,7,0
 	return
 
-set_MI_thresholds
-	movff can_MI_msg_MI_0,PREINC0
-	movff (can_MI_msg_MI_0+1),PREINC0
+set_thresholds
+	movff can_msg_0,PREINC0
+	movff (can_msg_0+1),PREINC0
 	clrf PREINC0,0
-	movlw HIGH(cream_MI_white_MI_threshold_MI_eeprom)
+	movlw HIGH(cream_white_threshold_eeprom)
 	movwf PREINC0,0
 	call op_store
-	movff can_MI_msg_MI_2,PREINC0
-	movff (can_MI_msg_MI_2+1),PREINC0
-	movlw LOW(brown_MI_cream_MI_threshold_MI_eeprom)
+	movff can_msg_2,PREINC0
+	movff (can_msg_2+1),PREINC0
+	movlw LOW(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
-	movlw HIGH(brown_MI_cream_MI_threshold_MI_eeprom)
+	movlw HIGH(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
 	call op_store
 
-read_MI_from_MI_eeprom
+read_from_eeprom
 	clrf PREINC0,0
-	movlw HIGH(cream_MI_white_MI_threshold_MI_eeprom)
+	movlw HIGH(cream_white_threshold_eeprom)
 	movwf PREINC0,0
 	call op_fetch_tos
-	movff POSTDEC0,(cream_MI_white_MI_threshold+1)
-	movff POSTDEC0,cream_MI_white_MI_threshold
-	movlw LOW(brown_MI_cream_MI_threshold_MI_eeprom)
+	movff POSTDEC0,(cream_white_threshold+1)
+	movff POSTDEC0,cream_white_threshold
+	movlw LOW(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
-	movlw HIGH(brown_MI_cream_MI_threshold_MI_eeprom)
+	movlw HIGH(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
 	call op_fetch_tos
-	movff POSTDEC0,(brown_MI_cream_MI_threshold+1)
-	movff POSTDEC0,brown_MI_cream_MI_threshold
+	movff POSTDEC0,(brown_cream_threshold+1)
+	movff POSTDEC0,brown_cream_threshold
 	return
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 tx0_GT_txn
-	movff can_MI_offset,PREINC0
+	movff can_offset,PREINC0
 	clrf PREINC0,0
 	goto op_minus
 
-can_MI_config
+can_config
 	movlw 0x4
 	movwf PREINC0,0
 	clrf PREINC0,0
-	goto can_MI_mode
+	goto can_mode
 
-can_MI_set_MI_filter
-	movwf can_MI_buffer,0
+can_set_filter
+	movwf can_buffer,0
 	call _5_LT__LT_
 	call _1_GT_2
 	clrf PREINC0,0
@@ -1272,8 +1272,8 @@ can_MI_set_MI_filter
 	call m0_GT_mn
 	goto op_cstore
 
-can_MI_set_MI_mask
-	movwf can_MI_buffer,0
+can_set_mask
+	movwf can_buffer,0
 	call _5_LT__LT_
 	call _1_GT_2
 	movlw LOW(RXM0SIDH)
@@ -1289,49 +1289,49 @@ can_MI_set_MI_mask
 	call m0_GT_mn
 	goto op_cstore
 
-channel_MI_measure
-	call select_MI_channel
+channel_measure
+	call select_channel
 	bsf LATA,5,0
-	call wait_MI_timer0
-	call _4_MI_measures
+	call wait_timer0
+	call _4_measures
 	bcf LATA,5,0
-	call wait_MI_timer0
-	call _4_MI_measures
+	call wait_timer0
+	call _4_measures
 	goto op_minus
 
-update_MI_color
+update_color
 	call op_dup
-	movlw LOW(current_MI_colors)
+	movlw LOW(current_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(current_MI_colors)
+	movlw HIGH(current_colors)
 	addwfc INDF0,1,0
 	call op_cfetch_tos
 	call swap
-	movlw LOW(previous_MI_colors)
+	movlw LOW(previous_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(previous_MI_colors)
+	movlw HIGH(previous_colors)
 	addwfc INDF0,1,0
 	call op_cfetch_tos
 	goto op_cstore
 
-can_MI_send_MI_calibration
-	movlw CALIBRATION_MI_ARBITRATION
-	movwf can_MI_arbitration,0
-	clrf (can_MI_arbitration+1),0
+can_send_calibration
+	movlw CALIBRATION_ARBITRATION
+	movwf can_arbitration,0
+	clrf (can_arbitration+1),0
 	movlw 4
-	movwf can_MI_msg_MI_length,0
-	movff (cream_MI_white_MI_threshold+1),(can_MI_msg_MI_0+1)
-	movff cream_MI_white_MI_threshold,can_MI_msg_MI_0
-	movff (brown_MI_cream_MI_threshold+1),(can_MI_msg_MI_2+1)
-	movff brown_MI_cream_MI_threshold,can_MI_msg_MI_2
-	goto can_MI_transmit
+	movwf can_msg_length,0
+	movff (cream_white_threshold+1),(can_msg_0+1)
+	movff cream_white_threshold,can_msg_0
+	movff (brown_cream_threshold+1),(can_msg_2+1)
+	movff brown_cream_threshold,can_msg_2
+	goto can_transmit
 
 greetings
-	movlw LOW((_data___41+0x8000))
+	movlw LOW((greetings_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___41+0x8000))
+	movlw HIGH((greetings_str+0x8000))
 	movwf PREINC0,0
 	movlw 30
 	call type
@@ -1432,14 +1432,14 @@ depth
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
 flash_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
@@ -1447,14 +1447,14 @@ flash_AT_
 	movff TABLAT,INDF0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
@@ -1478,7 +1478,7 @@ eeprom_AT_
 	movwf INDF0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
@@ -1500,12 +1500,12 @@ memcpy_loop
 	movff (temp_x2+1),FSR2H
 	return
 
-can_MI_receive_MI_buffer0
+can_receive_buffer0
 	movf RXB0DLC,0,0
 	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movwf can_MI_msg_MI_length,0
+	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___126
@@ -1513,24 +1513,24 @@ can_MI_receive_MI_buffer0
 	movwf PREINC0,0
 	movlw HIGH(RXB0D0)
 	movwf PREINC0,0
-	movlw can_MI_msg
+	movlw can_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movf can_MI_msg_MI_length,0,0
+	movf can_msg_length,0,0
 	call memcpy
 _lbl___126
-	clrf can_MI_msg_MI_flags,0
+	clrf can_msg_flags,0
 	btfsc RXB0DLC,6,0
-	bsf can_MI_msg_MI_flags,0,0
+	bsf can_msg_flags,0,0
 	movff RXB0SIDL,PREINC0
 	movff RXB0SIDH,PREINC0
 	call _5_GT__GT_
-	movff POSTDEC0,(can_MI_arbitration+1)
-	movff POSTDEC0,can_MI_arbitration
+	movff POSTDEC0,(can_arbitration+1)
+	movff POSTDEC0,can_arbitration
 	bcf RXB0CON,7,0
 	return
 
-can_MI_clr_MI_rtr
+can_clr_rtr
 	movlw LOW(TXB0DLC)
 	movwf PREINC0,0
 	movlw HIGH(TXB0DLC)
@@ -1541,19 +1541,19 @@ can_MI_clr_MI_rtr
 	bcf INDF1,6,0
 	return
 
-can_MI_disable_MI_all_MI_filters
+can_disable_all_filters
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
 	movwf PREINC0,0
 	movlw 0
-	call can_MI_set_MI_mask
+	call can_set_mask
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
 	movwf PREINC0,0
 	movlw 1
-	call can_MI_set_MI_mask
+	call can_set_mask
 	movlw 7
 	movwf PREINC2,0
 _lbl___177
@@ -1570,7 +1570,7 @@ _lbl___177
 	addwfc INDF0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	call can_MI_set_MI_filter
+	call can_set_filter
 	decfsz INDF2,1,0
 	bra _lbl___177
 	movf POSTDEC2,1,0
@@ -1582,7 +1582,7 @@ key
 	movf RCREG,0,0
 	return
 
-timer0_MI_reset
+timer0_reset
 	clrf PREINC0,0
 	movlw HIGH(0x400)
 	movwf PREINC0,0
@@ -1592,14 +1592,14 @@ timer0_MI_reset
 	bcf INTCON,2,0
 	return
 
-wait_MI_timer0
-	call timer0_MI_reset
+wait_timer0
+	call timer0_reset
 _lbl___210
 	btfsc INTCON,2,0
 	return
 	bra _lbl___210
 
-select_MI_channel
+select_channel
 	call _4_ST_
 	call _4_ST_
 	movf ADCON0,0,0
@@ -1620,7 +1620,7 @@ _lbl___217
 	movff (ADRESL+1),PREINC0
 	return
 
-_4_MI_measures
+_4_measures
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 4
@@ -1633,10 +1633,10 @@ _lbl___222
 	movf POSTDEC2,1,0
 	return
 
-brown_MI_detected
-	movlw LOW((_data___1+0x8000))
+brown_detected
+	movlw LOW((brown_detected_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((brown_detected_str+0x8000))
 	movwf PREINC0,0
 	movlw 14
 	call type
@@ -1646,10 +1646,10 @@ brown_MI_detected
 	clrf PREINC0,0
 	return
 
-white_MI_detected
-	movlw LOW((_data___2+0x8000))
+white_detected
+	movlw LOW((white_detected_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((white_detected_str+0x8000))
 	movwf PREINC0,0
 	movlw 14
 	call type
@@ -1659,7 +1659,7 @@ white_MI_detected
 	clrf PREINC0,0
 	return
 
-colors_MI_changed_QM_
+colors_changed_QM_
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 4
@@ -1672,7 +1672,7 @@ _lbl___244
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call color_MI_changed_QM_
+	call color_changed_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___245
@@ -1683,7 +1683,7 @@ _lbl___244
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call update_MI_color
+	call update_color
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
@@ -1693,13 +1693,13 @@ _lbl___245
 	movf POSTDEC2,1,0
 	return
 
-serial_MI_dump
+serial_dump
 	movlw 4
 	movwf PREINC2,0
 _lbl___278
-	movlw LOW((_data___13+0x8000))
+	movlw LOW((serial_dump_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___13+0x8000))
+	movlw HIGH((serial_dump_str+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -1710,10 +1710,10 @@ _lbl___278
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _DT_
-	movlw LOW((_data___14+0x8000))
+	call _
+	movlw LOW((serial_dump_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___14+0x8000))
+	movlw HIGH((serial_dump_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 2
 	call type
@@ -1724,16 +1724,16 @@ _lbl___278
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	movlw LOW(current_MI_colors)
+	movlw LOW(current_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(current_MI_colors)
+	movlw HIGH(current_colors)
 	addwfc INDF0,1,0
 	call op_cfetch_tos
-	call print_MI_color
-	movlw LOW((_data___15+0x8000))
+	call print_color
+	movlw LOW((serial_dump_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___15+0x8000))
+	movlw HIGH((serial_dump_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 2
 	call type
@@ -1744,16 +1744,16 @@ _lbl___278
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	movlw LOW(current_MI_values)
+	movlw LOW(current_values)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
-	movlw HIGH(current_MI_values)
+	movlw HIGH(current_values)
 	addwfc INDF0,1,0
 	call op_fetch_tos
-	call _DT_
-	movlw LOW((_data___16+0x8000))
+	call _
+	movlw LOW((serial_dump_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___16+0x8000))
+	movlw HIGH((serial_dump_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 1
 	call type
@@ -1764,20 +1764,9 @@ _lbl___278
 	return
 
 calibration
-	movlw LOW((_data___27+0x8000))
+	movlw LOW((calibration_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___27+0x8000))
-	movwf PREINC0,0
-	movlw 41
-	call type
-	call cr
-	call key
-	clrf PREINC0,0
-	clrf PREINC0,0
-	call channel_MI_measure
-	movlw LOW((_data___28+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___28+0x8000))
+	movlw HIGH((calibration_str+0x8000))
 	movwf PREINC0,0
 	movlw 41
 	call type
@@ -1785,11 +1774,22 @@ calibration
 	call key
 	clrf PREINC0,0
 	clrf PREINC0,0
-	call channel_MI_measure
+	call channel_measure
+	movlw LOW((calibration_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 41
+	call type
+	call cr
+	call key
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call channel_measure
 	call op_dup
-	movlw LOW((_data___29+0x8000))
+	movlw LOW((calibration_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___29+0x8000))
+	movlw HIGH((calibration_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 41
 	call type
@@ -1797,37 +1797,37 @@ calibration
 	call key
 	clrf PREINC0,0
 	clrf PREINC0,0
-	call channel_MI_measure
+	call channel_measure
 	call op_plus
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
 	call op_dup
-	movlw LOW((_data___30+0x8000))
+	movlw LOW((calibration_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___30+0x8000))
+	movlw HIGH((calibration_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 12
 	call type
-	call _DT_
+	call _
 	call cr
-	movff POSTDEC0,(cream_MI_white_MI_threshold+1)
-	movff POSTDEC0,cream_MI_white_MI_threshold
+	movff POSTDEC0,(cream_white_threshold+1)
+	movff POSTDEC0,cream_white_threshold
 	call op_plus
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
 	call op_dup
-	movlw LOW((_data___31+0x8000))
+	movlw LOW((calibration_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___31+0x8000))
+	movlw HIGH((calibration_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 12
 	call type
-	call _DT_
+	call _
 	call cr
-	movff POSTDEC0,(brown_MI_cream_MI_threshold+1)
-	movff POSTDEC0,brown_MI_cream_MI_threshold
+	movff POSTDEC0,(brown_cream_threshold+1)
+	movff POSTDEC0,brown_cream_threshold
 	return
 
 ;---------------------------------------------------------
@@ -1838,134 +1838,134 @@ temp_x1 equ 0x0
 
 temp_x2 equ 0x2
 
-can_MI_msg equ 0x12
+can_msg equ 0x12
 
-can_MI_msg_MI_0 equ 0x12
+can_msg_0 equ 0x12
 
-can_MI_msg_MI_1 equ 0x13
+can_msg_1 equ 0x13
 
-can_MI_msg_MI_2 equ 0x14
+can_msg_2 equ 0x14
 
-can_MI_msg_MI_3 equ 0x15
+can_msg_3 equ 0x15
 
-can_MI_msg_MI_4 equ 0x16
+can_msg_4 equ 0x16
 
-can_MI_msg_MI_6 equ 0x18
+can_msg_6 equ 0x18
 
-can_MI_msg_MI_length equ 0x1a
+can_msg_length equ 0x1a
 
-can_MI_msg_MI_flags equ 0x1b
+can_msg_flags equ 0x1b
 
-can_MI_buffer equ 0x1c
+can_buffer equ 0x1c
 
-can_MI_offset equ 0x1d
+can_offset equ 0x1d
 
-can_MI_arbitration equ 0x1e
+can_arbitration equ 0x1e
 
-can_MI_flags equ 0x20
+can_flags equ 0x20
 
 calibrated_QM_ equ 0x100
 
-current_MI_values equ 0x102
+current_values equ 0x102
 
-current_MI_value_MI_0 equ 0x102
+current_value_0 equ 0x102
 
-current_MI_value_MI_1 equ 0x104
+current_value_1 equ 0x104
 
-current_MI_value_MI_2 equ 0x106
+current_value_2 equ 0x106
 
-current_MI_value_MI_3 equ 0x108
+current_value_3 equ 0x108
 
-current_MI_colors equ 0x10a
+current_colors equ 0x10a
 
-current_MI_color_MI_0 equ 0x10a
+current_color_0 equ 0x10a
 
-current_MI_color_MI_1 equ 0x10b
+current_color_1 equ 0x10b
 
-current_MI_color_MI_2 equ 0x10c
+current_color_2 equ 0x10c
 
-current_MI_color_MI_3 equ 0x10d
+current_color_3 equ 0x10d
 
-previous_MI_colors equ 0x10e
+previous_colors equ 0x10e
 
-cream_MI_white_MI_threshold_MI_eeprom equ 0x1000
+cream_white_threshold_eeprom equ 0x1000
 
-brown_MI_cream_MI_threshold_MI_eeprom equ 0x1002
+brown_cream_threshold_eeprom equ 0x1002
 
-brown_MI_cream_MI_threshold equ 0x112
+brown_cream_threshold equ 0x112
 
-cream_MI_white_MI_threshold equ 0x114
+cream_white_threshold equ 0x114
 
 ;---------------------------------------------------------
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+brown_detected_str
 	db 98,114,111,119,110,32,100,101
 	db 116,101,99,116,101,100
 
-_data___2
+white_detected_str
 	db 119,104,105,116,101,32,100,101
 	db 116,101,99,116,101,100
 
-_data___3
+cream_detected_str
 	db 99,114,101,97,109,32,100,101
 	db 116,101,99,116,101,100
 
-_data___4
+can_unknown_msg_str
 	db 85,110,107,110,111,119,110,32
 	db 67,65,78,32,109,101,115,115
 	db 97,103,101,32,119,105,116,104
 	db 32,97,114,98,105,116,114,97
 	db 116,105,111,110,32
 
-_data___5
+can_unknown_msg_str__1
 	db 32,97,110,100,32
 
-_data___6
+can_unknown_msg_str__2
 	db 110,111,32
 
-_data___7
+can_unknown_msg_str__3
 	db 82,84,82
 
-_data___8
+print_color_str
 	db 117,110,107,110,111,119,110
 
-_data___9
+print_color_str__1
 	db 99,114,101,97,109
 
-_data___10
+print_color_str__2
 	db 98,114,111,119,110
 
-_data___11
+print_color_str__3
 	db 119,104,105,116,101
 
-_data___12
+print_color_str__4
 	db 60,105,110,116,101,114,110,97
 	db 108,32,101,114,114,111,114,62
 
-_data___13
+serial_dump_str
 	db 67,104,97,110,110,101,108,32
 
-_data___14
+serial_dump_str__1
 	db 58,32
 
-_data___15
+serial_dump_str__2
 	db 32,40
 
-_data___16
+serial_dump_str__3
 	db 41
 
-_data___17
+print_usage_str
 	db 85,115,97,103,101,58
 
-_data___18
+print_usage_str__1
 	db 32,32,32,115,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,101,120,101,99,117
 	db 116,101,32,115,116,101,112
 
-_data___19
+print_usage_str__2
 	db 32,32,32,48,46,46,46,51
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,112,114,105,110,116
@@ -1973,14 +1973,14 @@ _data___19
 	db 117,101,32,102,111,114,32,99
 	db 104,97,110,110,101,108,32,120
 
-_data___20
+print_usage_str__3
 	db 32,32,32,100,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,112,114,105,110,116
 	db 32,115,116,97,99,107,39,115
 	db 32,100,101,112,116,104
 
-_data___21
+print_usage_str__4
 	db 32,32,32,76,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,116,111,103,103,108
@@ -1988,21 +1988,21 @@ _data___21
 	db 110,115,111,114,115,39,32,108
 	db 101,100,115
 
-_data___22
+print_usage_str__5
 	db 32,32,32,108,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,67,65,78,32,108
 	db 111,111,112,98,97,99,107,32
 	db 109,111,100,101,32,111,110
 
-_data___23
+print_usage_str__6
 	db 32,32,32,107,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,67,65,78,32,108
 	db 111,111,112,98,97,99,107,32
 	db 111,102,102
 
-_data___24
+print_usage_str__7
 	db 32,32,32,114,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,83,101,110,100,32
@@ -2011,7 +2011,7 @@ _data___24
 	db 32,114,101,113,117,101,115,116
 	db 32,118,97,108,117,101,115
 
-_data___25
+print_usage_str__8
 	db 32,32,32,99,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,83,101,110,100,32
@@ -2021,12 +2021,12 @@ _data___25
 	db 32,99,111,108,111,114,32,118
 	db 97,108,117,101,115
 
-_data___26
+print_usage_str__9
 	db 32,32,32,113,32,32,32,32
 	db 32,32,32,82,101,99,97,108
 	db 105,98,114,97,116,101
 
-_data___27
+calibration_str
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,66,82,79,87,78
 	db 32,40,112,114,101,115,115,32
@@ -2034,7 +2034,7 @@ _data___27
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-_data___28
+calibration_str__1
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,67,82,69,65,77
 	db 32,40,112,114,101,115,115,32
@@ -2042,7 +2042,7 @@ _data___28
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-_data___29
+calibration_str__2
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,87,72,73,84,69
 	db 32,40,112,114,101,115,115,32
@@ -2050,52 +2050,52 @@ _data___29
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-_data___30
+calibration_str__3
 	db 99,114,101,97,109,45,119,104
 	db 105,116,101,61
 
-_data___31
+calibration_str__4
 	db 98,114,111,119,110,45,99,114
 	db 101,97,109,61
 
-_data___32
+handle_key_str
 	db 67,104,97,110,110,101,108,48
 	db 32,58,32
 
-_data___33
+handle_key_str__1
 	db 67,104,97,110,110,101,108,49
 	db 32,58,32
 
-_data___34
+handle_key_str__2
 	db 67,104,97,110,110,101,108,50
 	db 32,58,32
 
-_data___35
+handle_key_str__3
 	db 67,104,97,110,110,101,108,51
 	db 32,58,32
 
-_data___36
+handle_key_str__4
 	db 67,97,108,105,98,114,97,116
 	db 105,111,110,32
 
-_data___37
+handle_key_str__5
 	db 83,116,97,99,107,39,115,32
 	db 100,101,112,116,104,32,58,32
 
-_data___38
+handle_key_str__6
 	db 76,111,111,112,98,97,99,107
 	db 32,111,110
 
-_data___39
+handle_key_str__7
 	db 76,111,111,112,98,97,99,107
 	db 32,111,102,102
 
-_data___40
+handle_key_str__8
 	db 83,101,110,115,111,114,115,39
 	db 32,108,101,100,115,32,116,111
 	db 103,103,108,101,100
 
-_data___41
+greetings_str
 	db 87,101,108,99,111,109,101,32
 	db 116,111,32,116,104,101,32,115
 	db 101,110,115,111,114,115,32,112

@@ -84,51 +84,51 @@ init_runtime
 
 main
 	call greetings
-	call _DT_s
+	call _s
 	call cr
 	movlw 10
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_abs
+	call test_abs
 	movlw LOW(-10)
 	movwf PREINC0,0
 	movlw HIGH(-10)
 	movwf PREINC0,0
-	call test_MI_abs
+	call test_abs
 	clrf PREINC0,0
 	clrf PREINC0,0
-	call test_MI_abs
-	call _DT_s
+	call test_abs
+	call _s
 	call cr
-	call test_MI_plus
-	call _DT_s
+	call test_plus
+	call _s
 	call cr
-	call test_MI_minus
-	call _DT_s
+	call test_minus
+	call _s
 	call cr
-	call test_MI_plus_EX_
-	call _DT_s
+	call test_plus_EX_
+	call _s
 	call cr
-	call test_MI_minus_EX_
-	call _DT_s
+	call test_minus_EX_
+	call _s
 	call cr
-	call test_MI_bool
-	call _DT_s
+	call test_bool
+	call _s
 	call cr
-	call test_MI_swap
-	call _DT_s
+	call test_swap
+	call _s
 	call cr
-	call test_MI_2_ST_
-	call _DT_s
+	call test_2_ST_
+	call _s
 	call cr
-	call test_MI_2_SL_
-	call _DT_s
+	call test_2_SL_
+	call _s
 	call cr
-	call test_MI_mult
-	call _DT_s
+	call test_mult
+	call _s
 	call cr
-	call test_MI_div
-	call _DT_s
+	call test_div
+	call _s
 
 cr
 	movlw 0xa
@@ -142,9 +142,9 @@ emit
 	return
 
 greetings
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((greetings_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((greetings_str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 
@@ -170,8 +170,8 @@ _lbl___91
 	return
 
 _ST__SL_
-	bcf math_MI_flags,0,0
-	call normalize_MI_tos_MI_3
+	bcf math_flags,0,0
+	call normalize_tos_3
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,(temp_w+1)
@@ -187,8 +187,8 @@ _ST__SL_
 	movff temp_w,PREINC0
 	movff (temp_w+1),PREINC0
 
-apply_MI_sign
-	btfss math_MI_flags,0,0
+apply_sign
+	btfss math_flags,0,0
 	return
 
 negate
@@ -246,24 +246,24 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-_DT_
+_
 	call _1_GT_2
-	call emit_MI_8
+	call emit_8
 
-emit_MI_8
+emit_8
 	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
-	call emit_MI_4
+	call emit_4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 0xf
 
-emit_MI_4
-	call nibble_MI_to_MI_hex
+emit_4
+	call nibble_to_hex
 	goto emit
 
 op_normalize
@@ -300,7 +300,7 @@ op_fetch_tos
 	movff INDF1,PREINC0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -310,49 +310,49 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-normalize_MI_tos
+normalize_tos
 	call op_dup
 	call _0_LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	btfsc STATUS,2,0
 	return
-	btg math_MI_flags,0,0
+	btg math_flags,0,0
 	goto negate
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 _space
 	movlw bl
 	goto emit
 
-test_MI_abs
-	movlw LOW((_data___2+0x8000))
+test_abs
+	movlw LOW((test_abs_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((test_abs_str+0x8000))
 	movwf PREINC0,0
 	movlw 16
 	call type
 	call op_dup
-	call _DT_
-	movlw LOW((_data___3+0x8000))
+	call _
+	movlw LOW((test_abs_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((test_abs_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 2
 	call type
 	btfsc INDF0,7,0
 	call negate
-	call _DT_
+	call _
 	goto cr
 
-test_MI_plus
-	movlw LOW((_data___4+0x8000))
+test_plus
+	movlw LOW((test_plus_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___4+0x8000))
+	movlw HIGH((test_plus_str+0x8000))
 	movwf PREINC0,0
 	movlw 33
 	call type
@@ -360,13 +360,13 @@ test_MI_plus
 	movwf PREINC0,0
 	movlw HIGH((0x1234+0x103))
 	movwf PREINC0,0
-	call _DT_
+	call _
 	goto cr
 
-test_MI_minus
-	movlw LOW((_data___5+0x8000))
+test_minus
+	movlw LOW((test_minus_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___5+0x8000))
+	movlw HIGH((test_minus_str+0x8000))
 	movwf PREINC0,0
 	movlw 33
 	call type
@@ -374,13 +374,13 @@ test_MI_minus
 	movwf PREINC0,0
 	movlw HIGH((0x1337-0x1234))
 	movwf PREINC0,0
-	call _DT_
+	call _
 	goto cr
 
-test_MI_plus_EX_
-	movlw LOW((_data___6+0x8000))
+test_plus_EX_
+	movlw LOW((test_plus_EX__str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___6+0x8000))
+	movlw HIGH((test_plus_EX__str+0x8000))
 	movwf PREINC0,0
 	movlw 34
 	call type
@@ -398,13 +398,13 @@ test_MI_plus_EX_
 	call _PL__EX_
 	movff x,PREINC0
 	movff (x+1),PREINC0
-	call _DT_
+	call _
 	goto cr
 
-test_MI_minus_EX_
-	movlw LOW((_data___7+0x8000))
+test_minus_EX_
+	movlw LOW((test_minus_EX__str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___7+0x8000))
+	movlw HIGH((test_minus_EX__str+0x8000))
 	movwf PREINC0,0
 	movlw 41
 	call type
@@ -419,10 +419,10 @@ test_MI_minus_EX_
 	clrf PREINC0,0
 	movlw HIGH(x)
 	movwf PREINC0,0
-	call _MI__EX_
+	call __EX_
 	movff x,PREINC0
 	movff (x+1),PREINC0
-	call _DT_
+	call _
 	goto cr
 
 cf
@@ -431,9 +431,9 @@ cf
 	iorwf POSTDEC0,0,0
 	btfsc STATUS,2,0
 	return
-	movlw LOW((_data___8+0x8000))
+	movlw LOW((cf_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___8+0x8000))
+	movlw HIGH((cf_str+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	goto type
@@ -444,17 +444,17 @@ ct
 	iorwf POSTDEC0,0,0
 	btfss STATUS,2,0
 	return
-	movlw LOW((_data___9+0x8000))
+	movlw LOW((ct_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___9+0x8000))
+	movlw HIGH((ct_str+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	goto type
 
-test_MI_bool
-	movlw LOW((_data___10+0x8000))
+test_bool
+	movlw LOW((test_bool_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___10+0x8000))
+	movlw HIGH((test_bool_str+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -466,11 +466,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _LT_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___11+0x8000))
+	movlw LOW((test_bool_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___11+0x8000))
+	movlw HIGH((test_bool_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -482,11 +482,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _LT__EQ_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___12+0x8000))
+	movlw LOW((test_bool_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___12+0x8000))
+	movlw HIGH((test_bool_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -498,11 +498,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _GT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___13+0x8000))
+	movlw LOW((test_bool_str__3+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___13+0x8000))
+	movlw HIGH((test_bool_str__3+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -514,11 +514,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _GT__EQ_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___14+0x8000))
+	movlw LOW((test_bool_str__4+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___14+0x8000))
+	movlw HIGH((test_bool_str__4+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -531,11 +531,11 @@ test_MI_bool
 	call xor
 	call op_zeroeq
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___15+0x8000))
+	movlw LOW((test_bool_str__5+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___15+0x8000))
+	movlw HIGH((test_bool_str__5+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -548,11 +548,11 @@ test_MI_bool
 	call xor
 	call op_normalize
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___16+0x8000))
+	movlw LOW((test_bool_str__6+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___16+0x8000))
+	movlw HIGH((test_bool_str__6+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -564,11 +564,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _LT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___17+0x8000))
+	movlw LOW((test_bool_str__7+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___17+0x8000))
+	movlw HIGH((test_bool_str__7+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -580,11 +580,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _LT__EQ_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___18+0x8000))
+	movlw LOW((test_bool_str__8+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___18+0x8000))
+	movlw HIGH((test_bool_str__8+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -596,11 +596,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _GT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___19+0x8000))
+	movlw LOW((test_bool_str__9+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___19+0x8000))
+	movlw HIGH((test_bool_str__9+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -612,11 +612,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _GT__EQ_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___20+0x8000))
+	movlw LOW((test_bool_str__10+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___20+0x8000))
+	movlw HIGH((test_bool_str__10+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -629,11 +629,11 @@ test_MI_bool
 	call xor
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___21+0x8000))
+	movlw LOW((test_bool_str__11+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___21+0x8000))
+	movlw HIGH((test_bool_str__11+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -646,11 +646,11 @@ test_MI_bool
 	call xor
 	call op_normalize
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___22+0x8000))
+	movlw LOW((test_bool_str__12+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___22+0x8000))
+	movlw HIGH((test_bool_str__12+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -659,11 +659,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call op_zeroeq
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___23+0x8000))
+	movlw LOW((test_bool_str__13+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___23+0x8000))
+	movlw HIGH((test_bool_str__13+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -672,11 +672,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _0_LT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___24+0x8000))
+	movlw LOW((test_bool_str__14+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___24+0x8000))
+	movlw HIGH((test_bool_str__14+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -686,11 +686,11 @@ test_MI_bool
 	call negate
 	call _0_LT_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___25+0x8000))
+	movlw LOW((test_bool_str__15+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___25+0x8000))
+	movlw HIGH((test_bool_str__15+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -701,11 +701,11 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___26+0x8000))
+	movlw LOW((test_bool_str__16+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___26+0x8000))
+	movlw HIGH((test_bool_str__16+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -715,11 +715,11 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___27+0x8000))
+	movlw LOW((test_bool_str__17+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___27+0x8000))
+	movlw HIGH((test_bool_str__17+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -729,11 +729,11 @@ test_MI_bool
 	movwf PREINC0,0
 	call op_zeroeq
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___28+0x8000))
+	movlw LOW((test_bool_str__18+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___28+0x8000))
+	movlw HIGH((test_bool_str__18+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -743,11 +743,11 @@ test_MI_bool
 	movwf PREINC0,0
 	call _0_LT_
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___29+0x8000))
+	movlw LOW((test_bool_str__19+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___29+0x8000))
+	movlw HIGH((test_bool_str__19+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -758,11 +758,11 @@ test_MI_bool
 	call negate
 	call _0_LT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___30+0x8000))
+	movlw LOW((test_bool_str__20+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___30+0x8000))
+	movlw HIGH((test_bool_str__20+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -774,11 +774,11 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___31+0x8000))
+	movlw LOW((test_bool_str__21+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___31+0x8000))
+	movlw HIGH((test_bool_str__21+0x8000))
 	movwf PREINC0,0
 	movlw 9
 	call type
@@ -789,11 +789,11 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___32+0x8000))
+	movlw LOW((test_bool_str__22+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___32+0x8000))
+	movlw HIGH((test_bool_str__22+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -801,11 +801,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___33+0x8000))
+	movlw LOW((test_bool_str__23+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___33+0x8000))
+	movlw HIGH((test_bool_str__23+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -813,11 +813,11 @@ test_MI_bool
 	clrf PREINC0,0
 	call _0_LT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___34+0x8000))
+	movlw LOW((test_bool_str__24+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___34+0x8000))
+	movlw HIGH((test_bool_str__24+0x8000))
 	movwf PREINC0,0
 	movlw 7
 	call type
@@ -826,11 +826,11 @@ test_MI_bool
 	call negate
 	call _0_LT_
 	call cf
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___35+0x8000))
+	movlw LOW((test_bool_str__25+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___35+0x8000))
+	movlw HIGH((test_bool_str__25+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -840,11 +840,11 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___36+0x8000))
+	movlw LOW((test_bool_str__26+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___36+0x8000))
+	movlw HIGH((test_bool_str__26+0x8000))
 	movwf PREINC0,0
 	movlw 8
 	call type
@@ -853,13 +853,13 @@ test_MI_bool
 	call _0_LT_
 	call op_zeroeq
 	call ct
-	call _DT_
+	call _
 	goto cr
 
-test_MI_swap
-	movlw LOW((_data___37+0x8000))
+test_swap
+	movlw LOW((test_swap_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___37+0x8000))
+	movlw HIGH((test_swap_str+0x8000))
 	movwf PREINC0,0
 	movlw 24
 	call type
@@ -872,15 +872,15 @@ test_MI_swap
 	movlw HIGH(0x5678)
 	movwf PREINC0,0
 	call swap
-	call _DT_
+	call _
 	call _space
-	call _DT_
+	call _
 	goto cr
 
-test_MI_2_ST_
-	movlw LOW((_data___38+0x8000))
+test_2_ST_
+	movlw LOW((test_2_ST__str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___38+0x8000))
+	movlw HIGH((test_2_ST__str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
@@ -889,13 +889,13 @@ test_MI_2_ST_
 	movlw HIGH(0x1234)
 	movwf PREINC0,0
 	call _2_ST_
-	call _DT_
+	call _
 	goto cr
 
-test_MI_2_SL_
-	movlw LOW((_data___39+0x8000))
+test_2_SL_
+	movlw LOW((test_2_SL__str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___39+0x8000))
+	movlw HIGH((test_2_SL__str+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
@@ -906,11 +906,11 @@ test_MI_2_SL_
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
-	call _DT_
+	call _
 	call cr
-	movlw LOW((_data___40+0x8000))
+	movlw LOW((test_2_SL__str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___40+0x8000))
+	movlw HIGH((test_2_SL__str__1+0x8000))
 	movwf PREINC0,0
 	movlw 10
 	call type
@@ -921,13 +921,13 @@ test_MI_2_SL_
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
-	call _DT_
+	call _
 	goto cr
 
-test_MI_mult
-	movlw LOW((_data___41+0x8000))
+test_mult
+	movlw LOW((test_mult_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___41+0x8000))
+	movlw HIGH((test_mult_str+0x8000))
 	movwf PREINC0,0
 	movlw 16
 	call type
@@ -938,13 +938,13 @@ test_MI_mult
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call _ST_
-	call _DT_
+	call _
 	goto cr
 
-test_MI_div
-	movlw LOW((_data___42+0x8000))
+test_div
+	movlw LOW((test_div_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___42+0x8000))
+	movlw HIGH((test_div_str+0x8000))
 	movwf PREINC0,0
 	movlw 18
 	call type
@@ -960,7 +960,7 @@ test_MI_div
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call _ST__SL_
-	call _DT_
+	call _
 	goto cr
 
 op_dup
@@ -1020,7 +1020,7 @@ op_minus
 	subwfb INDF0,1,0
 	return
 
-_MI__EX_
+__EX_
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
 	movf POSTDEC0,0,0
@@ -1168,33 +1168,33 @@ div326
 	movwf temp_e,0
 	return
 
-normalize_MI_tos_MI_2
-	call normalize_MI_tos
+normalize_tos_2
+	call normalize_tos
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-	call normalize_MI_tos
+	call normalize_tos
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
 	return
 
-normalize_MI_tos_MI_3
-	call normalize_MI_tos
+normalize_tos_3
+	call normalize_tos
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-	call normalize_MI_tos_MI_2
+	call normalize_tos_2
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
 flash_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
@@ -1202,14 +1202,14 @@ flash_AT_
 	movff TABLAT,INDF0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
@@ -1233,19 +1233,19 @@ eeprom_AT_
 	movwf INDF0,0
 	return
 
-nibble_MI_to_MI_hex
+nibble_to_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
 	addlw 0x3a
 	return
 
-_DT_s
+_s
 	movlw 60
 	call emit
 	call depth
 	call op_dup
-	call _DT_
+	call _
 	movlw 62
 	call emit
 	call op_dup
@@ -1262,9 +1262,9 @@ _DT_s
 	bz _lbl___96
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	movlw LOW((_data_+0x8000))
+	movlw LOW((_s_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data_+0x8000))
+	movlw HIGH((_s_str+0x8000))
 	movwf PREINC0,0
 	movlw 4
 	call type
@@ -1286,7 +1286,7 @@ _lbl___99
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
 	call pick
-	call _DT_
+	call _
 	decfsz INDF2,1,0
 	bra _lbl___99
 _lbl___97
@@ -1321,7 +1321,7 @@ temp_c2 equ 0xf
 
 temp_c3 equ 0x10
 
-math_MI_flags equ 0x11
+math_flags equ 0x11
 
 x equ 0x100
 
@@ -1329,42 +1329,42 @@ x equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-_data_
+_s_str
 	db 32,46,46,46
 
-_data___1
+greetings_str
 	db 83,116,97,114,116,105,110,103
 	db 13,10
 
-_data___2
+test_abs_str
 	db 84,101,115,116,105,110,103,32
 	db 97,98,115,32,102,111,114,32
 
-_data___3
+test_abs_str__1
 	db 58,32
 
-_data___4
+test_plus_str
 	db 84,101,115,116,105,110,103,32
 	db 48,120,49,48,51,32,43,32
 	db 48,120,49,50,51,52,32,40
 	db 48,120,49,51,51,55,41,58
 	db 32
 
-_data___5
+test_minus_str
 	db 84,101,115,116,105,110,103,32
 	db 48,120,49,51,51,55,32,45
 	db 32,48,120,49,50,51,52,32
 	db 40,48,120,49,48,51,41,58
 	db 32
 
-_data___6
+test_plus_EX__str
 	db 65,100,100,105,110,103,32,48
 	db 120,49,50,51,52,32,116,111
 	db 32,48,120,49,48,51,32,105
 	db 110,32,109,101,109,111,114,121
 	db 58,32
 
-_data___7
+test_minus_EX__str
 	db 83,117,98,116,114,97,116,105
 	db 110,103,32,48,120,49,50,51
 	db 52,32,102,114,111,109,32,48
@@ -1372,125 +1372,125 @@ _data___7
 	db 32,109,101,109,111,114,121,58
 	db 32
 
-_data___8
+cf_str
 	db 32,45,45,32,69,82,82,79
 	db 82
 
-_data___9
+ct_str
 	db 32,45,45,32,69,82,82,79
 	db 82
 
-_data___10
+test_bool_str
 	db 49,32,50,32,60,32,58,32
 
-_data___11
+test_bool_str__1
 	db 49,32,50,32,60,61,32,58
 	db 32
 
-_data___12
+test_bool_str__2
 	db 49,32,50,32,62,32,58,32
 
-_data___13
+test_bool_str__3
 	db 49,32,50,32,62,61,32,58
 	db 32
 
-_data___14
+test_bool_str__4
 	db 49,32,50,32,61,32,58,32
 
-_data___15
+test_bool_str__5
 	db 49,32,50,32,60,62,32,58
 	db 32
 
-_data___16
+test_bool_str__6
 	db 49,32,49,32,60,32,58,32
 
-_data___17
+test_bool_str__7
 	db 49,32,49,32,60,61,32,58
 	db 32
 
-_data___18
+test_bool_str__8
 	db 49,32,49,32,62,32,58,32
 
-_data___19
+test_bool_str__9
 	db 49,32,49,32,62,61,32,58
 	db 32
 
-_data___20
+test_bool_str__10
 	db 49,32,49,32,61,32,58,32
 
-_data___21
+test_bool_str__11
 	db 49,32,49,32,60,62,32,58
 	db 32
 
-_data___22
+test_bool_str__12
 	db 49,32,48,61,32,58,32
 
-_data___23
+test_bool_str__13
 	db 49,32,48,60,32,58,32
 
-_data___24
+test_bool_str__14
 	db 49,32,48,62,32,58,32
 
-_data___25
+test_bool_str__15
 	db 49,32,48,60,61,32,58,32
 
-_data___26
+test_bool_str__16
 	db 49,32,48,62,61,32,58,32
 
-_data___27
+test_bool_str__17
 	db 45,49,32,48,61,32,58,32
 
-_data___28
+test_bool_str__18
 	db 45,49,32,48,60,32,58,32
 
-_data___29
+test_bool_str__19
 	db 45,49,32,48,62,32,58,32
 
-_data___30
+test_bool_str__20
 	db 45,49,32,48,60,61,32,58
 	db 32
 
-_data___31
+test_bool_str__21
 	db 45,49,32,48,62,61,32,58
 	db 32
 
-_data___32
+test_bool_str__22
 	db 48,32,48,61,32,58,32
 
-_data___33
+test_bool_str__23
 	db 48,32,48,60,32,58,32
 
-_data___34
+test_bool_str__24
 	db 48,32,48,62,32,58,32
 
-_data___35
+test_bool_str__25
 	db 48,32,48,60,61,32,58,32
 
-_data___36
+test_bool_str__26
 	db 48,32,48,62,61,32,58,32
 
-_data___37
+test_swap_str
 	db 83,104,111,117,108,100,32,112
 	db 114,105,110,116,32,49,50,51
 	db 52,32,53,54,55,56,58,32
 
-_data___38
+test_2_ST__str
 	db 49,50,51,52,32,50,42,32
 	db 58,32
 
-_data___39
+test_2_SL__str
 	db 50,52,54,56,32,50,47,32
 	db 58,32
 
-_data___40
+test_2_SL__str__1
 	db 70,70,70,48,32,50,47,32
 	db 58,32
 
-_data___41
+test_mult_str
 	db 55,53,32,51,65,32,42,32
 	db 40,49,65,56,50,41,58,32
 
-_data___42
+test_div_str
 	db 49,48,48,48,32,80,73,32
 	db 42,32,40,48,67,52,53,41
 	db 58,32

@@ -78,7 +78,7 @@ main
 	call read4
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	call handle_MI_key
+	call handle_key
 	bra main
 
 op_zeroeq
@@ -93,7 +93,7 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-table_MI_addr_EX_
+table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
 	movf POSTDEC0,0,0
@@ -103,21 +103,21 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-handle_MI_key
+handle_key
 	xorlw 0
 	bnz _lbl___206
-	movlw LOW((_data___1+0x8000))
+	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
+	movlw HIGH((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
 _lbl___206
 	xorlw 1
 	bnz _lbl___207
-	movlw LOW((_data___2+0x8000))
+	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
+	movlw HIGH((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
@@ -125,9 +125,9 @@ _lbl___207
 	xorlw 3
 	btfss STATUS,2,0
 	return
-	movlw LOW((_data___3+0x8000))
+	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
-	movlw HIGH((_data___3+0x8000))
+	movlw HIGH((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
 
@@ -165,10 +165,10 @@ _lbl___25
 	call _0_LT_
 	goto op_zeroeq
 
-flash_MI_addr_EX_
+flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
-	bra table_MI_addr_EX_
+	bra table_addr_EX_
 
 op_dup
 	movlw -1
@@ -219,20 +219,20 @@ _2dupxor_GT_w
 	return
 
 flashc_AT_
-	call flash_MI_addr_EX_
+	call flash_addr_EX_
 	tblrd*+
 	movff TABLAT,PREINC0
 	clrf PREINC0,0
 	return
 
-eeprom_MI_addr_EX_
+eeprom_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
 eepromc_AT_
-	call eeprom_MI_addr_EX_
+	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
@@ -291,13 +291,13 @@ temp_x1 equ 0x0
 ; Section: static data
 ;---------------------------------------------------------
 
-_data___1
+handle_key_str
 	db 48,48,48
 
-_data___2
+handle_key_str__1
 	db 49,49,49
 
-_data___3
+handle_key_str__2
 	db 50,50,50
 
 END
