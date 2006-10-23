@@ -137,9 +137,7 @@ cvariable next-to-write
   can-receive
   can-arbitration @ .
   can-msg-rtr bit-set? if ."  (rtr)" then
-  can-msg-length c@ if
-    can-msg-length c@ cfor space can-msg-0 cr@ + c@ . cnext
-  then
+  can-msg-length c@ cfor space can-msg-0 ci + c@ . cnext
   cr
 ;
 
@@ -199,18 +197,15 @@ end-configuration ram-configuration - constant configuration-length
   0 led-lat ! 1 led-conf c! ( XXXXX )
   led-active-high bit-set
   0 button-port !
-  ( 115200 at 40MHz )
+  ( 115200 at 40MHz, 57600 at 20MHz or 28800 at 10MHz )
   21 latest-SPBRG c!
   latest-BRGH bit-set
-  ( XXXXX 57600 at 20MHz )
-  ( 21 latest-SPBRG c! )
-  ( latest-BRGH bit-set )
   use-serial bit-set
   use-can bit-set
-  40 frequency c!  ( XXXXX )
+  40 frequency c!  ( pure guess )
   0 can-addr !
   0 card-id c!
-  500 wait-delay ! ( 0xffff wait-delay ! ) ( XXXXX )
+  500 wait-delay ! ( 0xffff wait-delay ! ) ( if the frequency is correct )
   save-configuration
 ;
 
@@ -336,7 +331,7 @@ cvariable led-blink-current
 
 : bootloader-version ( -- )
   cr
-  ." rforth1 bootloader version: " version @ . cr
+  ." rforth1 bootloader version: 0x" version @ . cr
   led-disabled? if
     ." No led configured" cr
   else
@@ -354,19 +349,19 @@ cvariable led-blink-current
   then
   use-serial bit-set? if
     ." Serial port enabled" cr
-    ."   SPBRG: " latest-SPBRG c@ . cr
-    ."   BRGH: " latest-BRGH bit-set? negate . cr
+    ."   SPBRG: " latest-SPBRG c@ .10 cr
+    ."   BRGH: " latest-BRGH bit-clr? if ." un" then ." set" cr
   else
     ." Serial port disabled"
   then
   use-can bit-set? if
     ." CAN enabled" cr
-    ."   CAN arbitration: " can-addr @ . cr
+    ."   CAN arbitration: 0x" can-addr @ . cr
   else
     ." CAN disabled" cr
   then
-  ." Frequency in MHz: " frequency c@ . cr
-  ." Wait delay (in 10ms increments): " wait-delay @ . cr
+  ." Frequency in MHz: " frequency c@ .10 cr
+  ." Wait delay (in 10ms increments): " wait-delay @ .10 cr
 ;
 
 : bootloader-command ( -- )
