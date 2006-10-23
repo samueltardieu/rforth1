@@ -2244,8 +2244,8 @@ class Compiler:
                                  for x in to_inline]))
         outfd.close()
         compiler = Compiler(self.processor, self.start, self.main,
-                             self.automatic_inlining, self.infile,
-                             self.asmfile)
+                             self.automatic_inlining, self.no_comments,
+                            self.infile, self.asmfile)
         compiler.inline_list = self.inline_list + [`x` for x in to_inline]
         if self.use_interrupts: compiler.enable_interrupts()
         compiler.process()
