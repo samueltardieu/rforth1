@@ -18,13 +18,11 @@ FLAGS = ${OPTS} --start ${STARTADDR}
 
 PYTHON ?= python
 
-tests: never
-	${MAKE} ${TESTCASES} OPTS="--no-comments"
+tests: ${TESTCASES}
 
 never::
 
-update-tests: never
-	${MAKE} ${TESTCASES:.cmp=.newref} OPTS="--no-comments"
+update-tests: ${TESTCASES:.cmp=.newref}
 
 clean:
 	${RM} *.asm tests/*.asm examples/*.asm examples/engines/*.asm
@@ -36,10 +34,14 @@ clean:
 %.asm %.hex %.lst %.map %.cod: %.fs ${COMPILER} ${PREDEFINED}
 	${PYTHON} ${COMPILER} ${FLAGS} $<
 
-%.cmp: %.asm %.ref
+%.cmp: %.ref never
+	${RM} ${@:.cmp=.asm}
+	${MAKE} ${@:.cmp=.asm} OPTS="--no-comments" 2> /dev/null
 	diff -u ${@:.cmp=.ref} ${@:.cmp=.asm}
 
-%.newref: %.asm
+%.newref: never
+	${RM} ${@:.newref=.asm}
+	${MAKE} ${@:.newref=.asm} OPTS="--no-comments" 2> /dev/null
 	cp -p ${@:.newref=.asm} ${@:.newref=.ref}
 
 %.load: %.hex
