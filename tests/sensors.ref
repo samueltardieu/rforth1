@@ -228,7 +228,7 @@ can_MI_handle_MI_message
 	call can_MI_receive
 	movff can_MI_arbitration,PREINC0
 	movff (can_MI_arbitration+1),PREINC0
-	call op_dup,0
+	call op_dup
 	movlw SET_MI_CALIBRATION_MI_REQUEST
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -246,7 +246,7 @@ _lbl___259
 	movf POSTDEC0,0,0
 	goto can_MI_unknown_MI_msg
 _lbl___260
-	call op_dup,0
+	call op_dup
 	movlw COLORS_MI_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -258,7 +258,7 @@ _lbl___260
 	movf POSTDEC0,0,0
 	goto can_MI_send_MI_colors
 _lbl___262
-	call op_dup,0
+	call op_dup
 	movlw VALUES_MI_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -270,7 +270,7 @@ _lbl___262
 	movf POSTDEC0,0,0
 	goto can_MI_send_MI_values
 _lbl___264
-	call op_dup,0
+	call op_dup
 	movlw CALIBRATION_MI_ARBITRATION
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -344,7 +344,7 @@ can_MI_normal
 
 can_MI_mode
 	call _5_LT__LT_
-	call op_dup,0
+	call op_dup
 	movf CANCON,0,0
 	andlw 0x1f
 	movwf PREINC0,0
@@ -353,7 +353,7 @@ can_MI_mode
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
 _lbl___160
-	call op_dup,0
+	call op_dup
 	movf CANSTAT,0,0
 	andlw 0xe0
 	movwf PREINC0,0
@@ -439,7 +439,7 @@ op_minus
 	return
 
 color_MI_changed_QM_
-	call op_dup,0
+	call op_dup
 	movlw LOW(current_MI_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -493,7 +493,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -619,7 +619,7 @@ channel_MI_determine_MI_color
 	call channel_MI_measure
 
 determine_MI_color
-	call op_dup,0
+	call op_dup
 	movff brown_MI_cream_MI_threshold,PREINC0
 	movff (brown_MI_cream_MI_threshold+1),PREINC0
 	call _LT_
@@ -684,7 +684,7 @@ timer1_MI_reset
 	return
 
 handle_MI_key
-	call op_dup,0
+	call op_dup
 	movlw 48
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -698,14 +698,14 @@ handle_MI_key
 	movwf PREINC0,0
 	movlw 11
 	call type
-	call op_dup,0
+	call op_dup
 	call channel_MI_measure
 	call _DT_
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
 _lbl___284
-	call op_dup,0
+	call op_dup
 	movlw 49
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -719,14 +719,14 @@ _lbl___284
 	movwf PREINC0,0
 	movlw 11
 	call type
-	call op_dup,0
+	call op_dup
 	call channel_MI_measure
 	call _DT_
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
 _lbl___286
-	call op_dup,0
+	call op_dup
 	movlw 50
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -740,14 +740,14 @@ _lbl___286
 	movwf PREINC0,0
 	movlw 11
 	call type
-	call op_dup,0
+	call op_dup
 	call channel_MI_measure
 	call _DT_
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
 _lbl___288
-	call op_dup,0
+	call op_dup
 	movlw 51
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -761,14 +761,14 @@ _lbl___288
 	movwf PREINC0,0
 	movlw 11
 	call type
-	call op_dup,0
+	call op_dup
 	call channel_MI_measure
 	call _DT_
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
 _lbl___290
-	call op_dup,0
+	call op_dup
 	movlw 113
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -786,7 +786,7 @@ _lbl___290
 	call type
 	goto calibration
 _lbl___292
-	call op_dup,0
+	call op_dup
 	movlw 100
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -806,7 +806,7 @@ _lbl___292
 	call _DT_
 	goto cr
 _lbl___294
-	call op_dup,0
+	call op_dup
 	movlw 117
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -820,7 +820,7 @@ _lbl___294
 	call _DT_
 	goto cr
 _lbl___296
-	call op_dup,0
+	call op_dup
 	movlw 108
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -839,7 +839,7 @@ _lbl___296
 	call cr
 	goto can_MI_loopback
 _lbl___298
-	call op_dup,0
+	call op_dup
 	movlw 107
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -858,7 +858,7 @@ _lbl___298
 	call cr
 	goto can_MI_normal
 _lbl___300
-	call op_dup,0
+	call op_dup
 	movlw 115
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -870,7 +870,7 @@ _lbl___300
 	movf POSTDEC0,0,0
 	goto step
 _lbl___302
-	call op_dup,0
+	call op_dup
 	movlw 76
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -1077,7 +1077,7 @@ _lbl___72
 	return
 
 print_MI_color
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___268
@@ -1090,7 +1090,7 @@ print_MI_color
 	movlw 7
 	goto type
 _lbl___268
-	call op_dup,0
+	call op_dup
 	movlw CREAM
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -1107,7 +1107,7 @@ _lbl___268
 	movlw 5
 	goto type
 _lbl___270
-	call op_dup,0
+	call op_dup
 	movlw BROWN
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -1124,7 +1124,7 @@ _lbl___270
 	movlw 5
 	goto type
 _lbl___272
-	call op_dup,0
+	call op_dup
 	movlw WHITE
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -1154,7 +1154,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call op_dup,0
+	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -1300,7 +1300,7 @@ channel_MI_measure
 	goto op_minus
 
 update_MI_color
-	call op_dup,0
+	call op_dup
 	movlw LOW(current_MI_colors)
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -1786,7 +1786,7 @@ calibration
 	clrf PREINC0,0
 	clrf PREINC0,0
 	call channel_MI_measure
-	call op_dup,0
+	call op_dup
 	movlw LOW((_data___29+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___29+0x8000))
@@ -1802,7 +1802,7 @@ calibration
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
-	call op_dup,0
+	call op_dup
 	movlw LOW((_data___30+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___30+0x8000))
@@ -1817,7 +1817,7 @@ calibration
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
-	call op_dup,0
+	call op_dup
 	movlw LOW((_data___31+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___31+0x8000))

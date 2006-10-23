@@ -256,7 +256,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call op_dup,0
+	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -277,7 +277,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0

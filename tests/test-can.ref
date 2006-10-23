@@ -200,7 +200,7 @@ can_MI_normal
 
 can_MI_mode
 	call _5_LT__LT_
-	call op_dup,0
+	call op_dup
 	movf CANCON,0,0
 	andlw 0x1f
 	movwf PREINC0,0
@@ -209,7 +209,7 @@ can_MI_mode
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
 _lbl___160
-	call op_dup,0
+	call op_dup
 	movf CANSTAT,0,0
 	andlw 0xe0
 	movwf PREINC0,0
@@ -406,7 +406,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -811,7 +811,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call op_dup,0
+	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -831,15 +831,15 @@ _DT_s
 	movlw 60
 	call emit
 	call depth
-	call op_dup,0
+	call op_dup
 	call _DT_
 	movlw 62
 	call emit
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___95
-	call op_dup,0
+	call op_dup
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0

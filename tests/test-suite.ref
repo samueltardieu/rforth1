@@ -153,7 +153,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call op_dup,0
+	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -251,7 +251,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -311,7 +311,7 @@ table_MI_addr_EX_
 	return
 
 normalize_MI_tos
-	call op_dup,0
+	call op_dup
 	call _0_LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
@@ -336,7 +336,7 @@ test_MI_abs
 	movwf PREINC0,0
 	movlw 16
 	call type
-	call op_dup,0
+	call op_dup
 	call _DT_
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
@@ -426,7 +426,7 @@ test_MI_minus_EX_
 	goto cr
 
 cf
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	btfsc STATUS,2,0
@@ -439,7 +439,7 @@ cf
 	goto type
 
 ct
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	btfss STATUS,2,0
@@ -1244,15 +1244,15 @@ _DT_s
 	movlw 60
 	call emit
 	call depth
-	call op_dup,0
+	call op_dup
 	call _DT_
 	movlw 62
 	call emit
-	call op_dup,0
+	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___95
-	call op_dup,0
+	call op_dup
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0

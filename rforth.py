@@ -1853,7 +1853,7 @@ class Word(Named, Literal):
       append('movwf', compiler['PREINC0'], access)
       append('movwf', compiler['PREINC0'], access)
     elif name == 'OP_DUP':
-      append('call', compiler['op_dup'], access)
+      append('call', compiler['op_dup'], no_fast)
     elif name == 'OP_INTR_PROTECT':
       if compiler.use_interrupts:
         append('btfsc', compiler['INTCON'], Number(7), access)
