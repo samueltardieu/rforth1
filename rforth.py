@@ -618,7 +618,7 @@ class CaseW(Primitive):
     xored = compiler.ct_pop()
     label = compiler.ct_pop()
     nlabel = compiler.ct_pop()
-    if xored:
+    if nlabel is not None:
       compiler.add_instruction('bra', [label])
       compiler.add_instruction('LABEL', [nlabel])
     xored ^= params[0].static_value()
