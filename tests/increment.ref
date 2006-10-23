@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: code

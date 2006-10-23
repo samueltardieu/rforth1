@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -24,7 +28,6 @@ FSR0L equ 0xfe9
 ;---------------------------------------------------------
 
 init_runtime
-	movlb 1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0

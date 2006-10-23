@@ -1,7 +1,7 @@
 	processor pic18f248
 	radix dec
 	org 0x2000
-	goto init_runtime
+	goto main
 	org 0x2008
 	goto _high
 	org 0x2018
@@ -28,12 +28,6 @@ STATUS equ 0xfd8
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
-
-init_runtime
-	movlb 1
-
-main
-	return
 
 handle_high
 	return
@@ -96,6 +90,9 @@ _low
 	movff low_fsr0ltemp,FSR0L
 	movf low_wtemp,0,0
 	retfie 0
+
+main
+	return
 
 ;---------------------------------------------------------
 ; Section: memory

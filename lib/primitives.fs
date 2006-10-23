@@ -1,7 +1,6 @@
 \ init_runtime definition does not end with a return as it will be completed
 \ by other initializations
 code init_runtime
-     1 movlb
 ;code
 
 code init_stack

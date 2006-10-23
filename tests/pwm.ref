@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -148,6 +152,19 @@ tmr1_wait
 	btfsc PIR1,0,0
 	return
 	bra tmr1_wait
+
+init_runtime
+	movlb 1
+	clrf pulse0,1
+	clrf (pulse0+1),1
+	clrf pulse1,1
+	clrf (pulse1+1),1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
 
 main
 	call greetings
@@ -345,20 +362,6 @@ _lbl___91
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
-
-init_runtime
-	movlb 1
-	clrf pulse0,1
-	clrf (pulse0+1),1
-	clrf pulse1,1
-	clrf (pulse1+1),1
-	movlw 0x5f
-	movwf FSR0L,0
-	clrf FSR0H,0
-	movlw 0xbf
-	movwf FSR2L,0
-	clrf FSR2H,0
-	goto main
 
 flash_addr_EX_
 	bcf INDF0,7,0

@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -66,7 +70,6 @@ PIR1 equ 0xf9e
 ;---------------------------------------------------------
 
 init_runtime
-	movlb 1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -80,6 +83,18 @@ main
 	movf POSTDEC0,0,0
 	call handle_key
 	bra main
+
+_GT__EQ_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___25
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___25
+	call op_minus
+	call _0_LT_
 
 op_zeroeq
 	movf POSTDEC0,0,0
@@ -151,19 +166,6 @@ _lbl___91
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
-
-_GT__EQ_
-	call _2dupxor_GT_w
-	btfss WREG,7,0
-	bra _lbl___25
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	call _0_LT_
-	goto op_zeroeq
-_lbl___25
-	call op_minus
-	call _0_LT_
-	goto op_zeroeq
 
 flash_addr_EX_
 	bcf INDF0,7,0

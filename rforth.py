@@ -1380,7 +1380,7 @@ def is_external_jump(opcode):
   return opcode[0] == 'goto' and isinstance(opcode[1][0], (Label, Word))
 
 def is_jump(opcode):
-  return is_internal_jump(opcode) or is_external_jump(opcode)
+  return opcode[0] in ['goto', 'bra', 'return', 'retfie']
 
 def last_goto(x):
   """Check whether the last instruction of x is a real goto to somewhere
@@ -2348,6 +2348,9 @@ class Compiler:
         if self.use_interrupts: compiler.enable_interrupts()
         compiler.process()
         return
+    if compiler.here > 0x100:
+      compiler.current_object.opcodes = [('movlb', [Number(1)])] + \
+                                         compiler.current_object.opcodes
     if compiler['FSR0H'] in refs or compiler['FSR0L'] in refs \
        or compiler['POSTINC0'] in refs or compiler['POSTDEC0'] in refs \
        or compiler['PREINC0'] in refs:
@@ -2447,12 +2450,16 @@ class Compiler:
     outfd.write("\tradix dec\n")
     outfd.write("\torg %s\n" % self.start)
     outfd.write("\tgoto %s\n" % self['init_runtime'])
+    outfd.write("\torg %s\n" %(self.start + 8))
     if self.high_interrupt:
-      outfd.write("\torg %s\n" %(self.start + 8))
       outfd.write("\tgoto %s\n" % self.high_interrupt)
-    if self.low_interrupt:
-      outfd.write("\torg %s\n" %(self.start + 0x18))
+    else:
+      outfd.write("\treset\n")
+    outfd.write("\torg %s\n" %(self.start + 0x18))
+    if self.low_interrupt:      
       outfd.write("\tgoto %s\n" % self.low_interrupt)
+    else:
+      outfd.write("\treset\n")
 
   def output_epilogue(self, outfd):
     outfd.write("END\n")

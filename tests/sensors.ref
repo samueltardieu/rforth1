@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -425,9 +429,44 @@ interactive_mode
 	call handle_key
 	bra interactive_mode
 
+init_runtime
+	movlb 1
+	clrf calibrated_QM_,1
+	clrf (calibrated_QM_+1),1
+	clrf current_value_0,1
+	clrf (current_value_0+1),1
+	clrf current_value_1,1
+	clrf (current_value_1+1),1
+	clrf current_value_2,1
+	clrf (current_value_2+1),1
+	clrf current_value_3,1
+	clrf (current_value_3+1),1
+	clrf current_color_0,1
+	clrf current_color_1,1
+	clrf current_color_2,1
+	clrf current_color_3,1
+	clrf brown_cream_threshold,1
+	clrf (brown_cream_threshold+1),1
+	clrf cream_white_threshold,1
+	clrf (cream_white_threshold+1),1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	call init
+	call greetings
+
 mainloop
 	call step
 	bra mainloop
+
+tx0_GT_txn
+	movff can_offset,PREINC0
+	clrf PREINC0,0
 
 op_minus
 	movff POSTDEC0,temp_x1
@@ -964,38 +1003,6 @@ print_usage
 	call type
 	goto cr
 
-init_runtime
-	movlb 1
-	clrf calibrated_QM_,1
-	clrf (calibrated_QM_+1),1
-	clrf current_value_0,1
-	clrf (current_value_0+1),1
-	clrf current_value_1,1
-	clrf (current_value_1+1),1
-	clrf current_value_2,1
-	clrf (current_value_2+1),1
-	clrf current_value_3,1
-	clrf (current_value_3+1),1
-	clrf current_color_0,1
-	clrf current_color_1,1
-	clrf current_color_2,1
-	clrf current_color_3,1
-	clrf brown_cream_threshold,1
-	clrf (brown_cream_threshold+1),1
-	clrf cream_white_threshold,1
-	clrf (cream_white_threshold+1),1
-	movlw 0x5f
-	movwf FSR0L,0
-	clrf FSR0H,0
-	movlw 0xbf
-	movwf FSR2L,0
-	clrf FSR2H,0
-
-main
-	call init
-	call greetings
-	goto mainloop
-
 m0_GT_mn
 	movff can_buffer,PREINC0
 	clrf PREINC0,0
@@ -1244,11 +1251,6 @@ flash_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_addr_EX_
-
-tx0_GT_txn
-	movff can_offset,PREINC0
-	clrf PREINC0,0
-	goto op_minus
 
 can_config
 	movlw 0x4

@@ -2,6 +2,10 @@
 	radix dec
 	org 0x2000
 	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
 
 ;---------------------------------------------------------
 ; Section: constants
@@ -177,6 +181,13 @@ _lbl___233
 	movf POSTDEC0,0,0
 	bra main_loop
 
+prompt
+	movlw LOW((prompt_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((prompt_str+0x8000))
+	movwf PREINC0,0
+	movlw 5
+
 type
 	movwf PREINC2,0
 	iorlw 0
@@ -317,14 +328,6 @@ leds_off
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto alt_EX_
-
-prompt
-	movlw LOW((prompt_str+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((prompt_str+0x8000))
-	movwf PREINC0,0
-	movlw 5
-	goto type
 
 greetings
 	movlw LOW((greetings_str+0x8000))
