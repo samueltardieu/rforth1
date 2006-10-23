@@ -27,12 +27,21 @@ code +!
     return
 ;code
 
-code c+!
+code op_c+!
     POSTDEC0 FSR1H movff
     POSTDEC0 FSR1L movff
     POSTDEC0 ,w ,a movf
     POSTDEC0 ,w ,a movf
     INDF1 ,f ,a addwf
+    return
+;code
+
+code op_c-!
+    POSTDEC0 FSR1H movff
+    POSTDEC0 FSR1L movff
+    POSTDEC0 ,w ,a movf
+    POSTDEC0 ,w ,a movf
+    INDF1 ,f ,a subwf
     return
 ;code
 

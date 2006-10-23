@@ -923,6 +923,41 @@ class OnePlusStore(Primitive):
     compiler['swap'].run()
     compiler['!'].run()
 
+class CPlusStore(Primitive):
+
+  def run(self, negate = False):
+    name, params = compiler.last_instruction()
+    if is_static_push((name, params)):
+      compiler.rewind()
+      addr = params[0]
+      name, params = compiler.last_instruction()
+      if is_static_push((name, params)):
+        value = params[0]
+        svalue = value.static_value()
+        if negate: svalue = -svalue
+        if svalue == 0:
+          compiler.rewind()
+          return
+        elif svalue == 1:
+          compiler.rewind()
+          compiler.add_instruction('incf', [addr, dst_f, access_bit(addr)])
+          return
+        elif svalue == -1 or svalue == 255:
+          compiler.rewind()
+          compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
+          return
+      compiler['>w'].run()
+      compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
+    elif negate:
+      compiler['op_c-!'].run()
+    else:
+      compiler['op_c+!'].run()
+
+class CMinusStore(CPlusStore):
+
+  def run(self):
+    CPlusStore.run(self, negate = True)
+
 class LShift(Primitive):
 
   def run(self):
@@ -2072,6 +2107,8 @@ class Compiler:
     self.add_primitive('1+', OnePlus)
     self.add_primitive('1+!', OnePlusStore)
     self.add_primitive('1-', OneMinus)
+    self.add_primitive('c+!', CPlusStore)
+    self.add_primitive('c-!', CMinusStore)
     self.add_primitive('lshift', LShift)
     self.add_primitive('literal', Literal)
     self.add_primitive('[', OpeningBracket)
