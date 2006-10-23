@@ -464,16 +464,38 @@ class CFor(Primitive):
 
   def run(self):
     name, params = compiler.last_instruction()
+    label_uncfor = Label()
+    label_noloop = Label()
+    compiler.ct_push(label_noloop)
+    compiler.ct_push(label_uncfor)
     if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
       compiler.rewind()
       addr = params[0]
       compiler.add_instruction('movff', [addr, compiler['PREINC2']])
       if name == 'OP_FETCH':
         compiler.warning('loop index may be larger than one byte')
+      compiler.add_instruction('movf', [compiler['PREINC2'], dst_w, access])
+      compiler.add_instruction('bz', [label_uncfor])
     else:
+      bound_checks = True
+      if name == 'OP_PUSH':
+        value = params[0].static_value()
+        if value == 0:
+          compiler.rewind()
+          compiler.warning('empty loop will not execute')
+          compiler.add_instruction('bra', [label_noloop])
+        elif value < 0 or value >= 255:
+          compiler.warning('loop limit does not fit in a byte')
+        elif value is not None:
+          bound_checks = False
       compiler['>w'].run()
       compiler.add_instruction('movwf',
                                      [compiler['PREINC2'], access])
+      if bound_checks:
+        name, params = compiler.before_last_instruction()
+        if name != 'OP_POP_W':
+          compiler.add_instruction('iorlw', [Number(0)])
+        compiler.add_instruction('bz', [label_uncfor])
     compiler['begin'].run()
 
 class Ahead(Primitive):
@@ -619,8 +641,12 @@ class CNext(Primitive):
     compiler.add_instruction('decfsz',
                                    [compiler['INDF2'], dst_f, access])
     compiler['again'].run()
+    label = compiler.ct_pop()
+    compiler.add_instruction('LABEL', [label])
     compiler.add_instruction('movf',
                                    [compiler['POSTDEC2'], dst_f, access])
+    label = compiler.ct_pop()
+    compiler.add_instruction('LABEL', [label])
 
 class Else(Primitive):
   """Create and use a forward label the resolve a backward one."""

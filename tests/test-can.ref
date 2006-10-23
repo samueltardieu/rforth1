@@ -143,7 +143,7 @@ can_MI_prepare_MI_buffer
 	clrf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___146
+	bz _lbl___153
 	movlw can_MI_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -154,7 +154,7 @@ can_MI_prepare_MI_buffer
 	call tx0_GT_txn
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___146
+_lbl___153
 	movff can_MI_arbitration,PREINC0
 	movff (can_MI_arbitration+1),PREINC0
 	call _5_LT__LT_
@@ -208,7 +208,7 @@ can_MI_mode
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
-_lbl___153
+_lbl___160
 	call dup
 	movf CANSTAT,0,0
 	andlw 0xe0
@@ -217,7 +217,7 @@ _lbl___153
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___153
+	bnz _lbl___160
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
@@ -254,8 +254,6 @@ main
 	movlw HIGH((_data___1+0x8000))
 	movwf PREINC0,0
 	movlw 43
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call cr
 	movlw LOW(0x1234)
@@ -274,8 +272,6 @@ main
 	movlw HIGH((_data___2+0x8000))
 	movwf PREINC0,0
 	movlw 17
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call cr
 	call can_MI_receive_MI_1
@@ -286,8 +282,6 @@ main
 	movlw HIGH((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw 13
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call _DT_
 	call cr
@@ -296,8 +290,6 @@ main
 	movlw HIGH((_data___4+0x8000))
 	movwf PREINC0,0
 	movlw 13
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movlw -1
 	btfss can_MI_msg_MI_flags,0,0
@@ -311,8 +303,6 @@ main
 	movlw HIGH((_data___5+0x8000))
 	movwf PREINC0,0
 	movlw 13
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call _DT_
 	call cr
@@ -321,8 +311,6 @@ main
 	movlw HIGH((_data___6+0x8000))
 	movwf PREINC0,0
 	movlw 34
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call cr
 	movlw LOW(0x176)
@@ -340,8 +328,6 @@ main
 	movlw HIGH((_data___7+0x8000))
 	movwf PREINC0,0
 	movlw 13
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff can_MI_arbitration,PREINC0
 	movff (can_MI_arbitration+1),PREINC0
@@ -352,8 +338,6 @@ main
 	movlw HIGH((_data___8+0x8000))
 	movwf PREINC0,0
 	movlw 13
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movlw -1
 	btfss can_MI_msg_MI_flags,0,0
@@ -473,21 +457,21 @@ _4_SL_
 can_MI_choose_MI_buffer
 	lfsr 1,TXB0CON
 	btfsc INDF1,3,0
-	bra _lbl___141
+	bra _lbl___148
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_set_MI_buffer
-_lbl___141
+_lbl___148
 	btfsc can_MI_flags,0,0
 	bra can_MI_choose_MI_buffer
 	lfsr 1,TXB1CON
 	btfsc INDF1,3,0
-	bra _lbl___143
+	bra _lbl___150
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_set_MI_buffer
-_lbl___143
+_lbl___150
 	lfsr 1,TXB2CON
 	btfsc INDF1,3,0
 	bra can_MI_choose_MI_buffer
@@ -593,7 +577,7 @@ can_MI_receive_MI_buffer1
 	movff POSTDEC0,can_MI_msg_MI_length
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___122
+	bz _lbl___129
 	movlw LOW(RXB1D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB1D0)
@@ -603,7 +587,7 @@ can_MI_receive_MI_buffer1
 	clrf PREINC0,0
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___122
+_lbl___129
 	clrf can_MI_msg_MI_flags,0
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0
@@ -697,13 +681,6 @@ swap
 	movff (temp_x1+1),PREINC0
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
-	return
-
-_2drop
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
 	return
 
 or
@@ -834,15 +811,10 @@ nibble_MI_to_MI_hex
 	return
 
 type
-	call dup
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	btfsc STATUS,2,0
-	goto _2drop
-	movf POSTDEC0,0
-	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___88
+	iorlw 0
+	bz _lbl___91
+_lbl___93
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -852,7 +824,8 @@ _lbl___88
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___88
+	bra _lbl___93
+_lbl___91
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -869,7 +842,7 @@ _DT_s
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___90
+	bz _lbl___95
 	call dup
 	movlw 8
 	movwf PREINC0,0
@@ -877,7 +850,7 @@ _DT_s
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___91
+	bz _lbl___96
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data_+0x8000))
@@ -885,17 +858,16 @@ _DT_s
 	movlw HIGH((_data_+0x8000))
 	movwf PREINC0,0
 	movlw 4
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___91
+_lbl___96
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___92
+	bz _lbl___97
+_lbl___99
 	call _space
 	movff INDF2,PREINC0
 	clrf PREINC0,0
@@ -907,10 +879,11 @@ _lbl___92
 	call pick
 	call _DT_
 	decfsz INDF2,1,0
-	bra _lbl___92
+	bra _lbl___99
+_lbl___97
 	movf POSTDEC2,1,0
 	return
-_lbl___90
+_lbl___95
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
@@ -940,7 +913,7 @@ can_MI_receive_MI_buffer0
 	movff POSTDEC0,can_MI_msg_MI_length
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___119
+	bz _lbl___126
 	movlw LOW(RXB0D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB0D0)
@@ -950,7 +923,7 @@ can_MI_receive_MI_buffer0
 	clrf PREINC0,0
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___119
+_lbl___126
 	clrf can_MI_msg_MI_flags,0
 	btfsc RXB0DLC,6,0
 	bsf can_MI_msg_MI_flags,0,0
@@ -999,7 +972,7 @@ can_MI_disable_MI_all_MI_filters
 	call can_MI_set_MI_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___168
+_lbl___177
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -1015,7 +988,7 @@ _lbl___168
 	movf POSTDEC0,0
 	call can_MI_set_MI_filter
 	decfsz INDF2,1,0
-	bra _lbl___168
+	bra _lbl___177
 	movf POSTDEC2,1,0
 	return
 

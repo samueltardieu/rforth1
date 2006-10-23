@@ -103,8 +103,6 @@ test200_MI_
 	movlw HIGH((_data___9+0x8000))
 	movwf PREINC0,0
 	movlw 12
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -164,8 +162,6 @@ test1_PL_
 	movlw HIGH((_data___2+0x8000))
 	movwf PREINC0,0
 	movlw 9
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -181,8 +177,6 @@ test2_PL_
 	movlw HIGH((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw 10
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -200,8 +194,6 @@ test1_MI_
 	movlw HIGH((_data___4+0x8000))
 	movwf PREINC0,0
 	movlw 9
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -219,8 +211,6 @@ test2_MI_
 	movlw HIGH((_data___5+0x8000))
 	movwf PREINC0,0
 	movlw 10
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -238,8 +228,6 @@ test100_PL_
 	movlw HIGH((_data___6+0x8000))
 	movwf PREINC0,0
 	movlw 12
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -253,8 +241,6 @@ test200_PL_
 	movlw HIGH((_data___7+0x8000))
 	movwf PREINC0,0
 	movlw 12
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -269,8 +255,6 @@ test100_MI_
 	movlw HIGH((_data___8+0x8000))
 	movwf PREINC0,0
 	movlw 12
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	movff x,PREINC0
 	movff (x+1),PREINC0
@@ -293,13 +277,6 @@ op_cfetch_tos
 	movff POSTDEC0,FSR1L
 	movff INDF1,PREINC0
 	clrf PREINC0,0
-	return
-
-_2drop
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
 	return
 
 _1_GT_2
@@ -336,15 +313,10 @@ nibble_MI_to_MI_hex
 	return
 
 type
-	call dup
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	btfsc STATUS,2,0
-	goto _2drop
-	movf POSTDEC0,0
-	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___88
+	iorlw 0
+	bz _lbl___91
+_lbl___93
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -354,7 +326,8 @@ _lbl___88
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___88
+	bra _lbl___93
+_lbl___91
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -366,8 +339,6 @@ init
 	movlw HIGH((_data___1+0x8000))
 	movwf PREINC0,0
 	movlw 5
-	movwf PREINC0,0
-	clrf PREINC0,0
 	call type
 	call dup
 	call _DT_

@@ -129,7 +129,7 @@ main_MI_loop
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___220
+	bnz _lbl___229
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -137,7 +137,7 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___220
+_lbl___229
 	call dup
 	movlw 80
 	movwf PREINC0,0
@@ -145,7 +145,7 @@ _lbl___220
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___222
+	bnz _lbl___231
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -153,7 +153,7 @@ _lbl___220
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___222
+_lbl___231
 	call dup
 	movlw 83
 	movwf PREINC0,0
@@ -161,7 +161,7 @@ _lbl___222
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___224
+	bnz _lbl___233
 	call leds_MI_off
 	movf T0CON,0,0
 	andlw 0xf0
@@ -171,21 +171,16 @@ _lbl___222
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___224
+_lbl___233
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
 
 type
-	call dup
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	btfsc STATUS,2,0
-	goto _2drop
-	movf POSTDEC0,0
-	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___88
+	iorlw 0
+	bz _lbl___91
+_lbl___93
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -195,7 +190,8 @@ _lbl___88
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___88
+	bra _lbl___93
+_lbl___91
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -327,8 +323,6 @@ prompt
 	movlw HIGH((_data___1+0x8000))
 	movwf PREINC0,0
 	movlw 5
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto type
 
 greetings
@@ -337,8 +331,6 @@ greetings
 	movlw HIGH((_data___2+0x8000))
 	movwf PREINC0,0
 	movlw 15
-	movwf PREINC0,0
-	clrf PREINC0,0
 	goto type
 
 dup
@@ -367,13 +359,6 @@ swap
 	movff (temp_x1+1),PREINC0
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
-	return
-
-_2drop
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
 	return
 
 xor
@@ -436,7 +421,7 @@ read4
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___95
+	bz _lbl___102
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	andlw 223
@@ -448,7 +433,7 @@ read4
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___95
+_lbl___102
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -483,11 +468,11 @@ timer_MI_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___201
+	bz _lbl___210
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___201
+_lbl___210
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
@@ -496,11 +481,11 @@ _lbl___201
 
 timer_MI_wait
 	call timer_MI_set
-_lbl___205
+_lbl___214
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___205
+	bz _lbl___214
 	return
 
 timer_MI_reset
@@ -512,7 +497,7 @@ timer_MI_reset
 
 pwm
 	call timer_MI_reset
-_lbl___213
+_lbl___222
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -523,7 +508,7 @@ _lbl___213
 	call timer_MI_wait
 	btfsc PIR1,5,0
 	return
-	bra _lbl___213
+	bra _lbl___222
 
 init_MI_ports
 	movlw 0xb8

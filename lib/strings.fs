@@ -22,10 +22,9 @@ code nibble-to-hex
 : . ( n -- ) 1>2 emit-8 emit-8 ;
 
 : type ( a n -- )
-  dup 0= if 2drop exit then
-  cfor dup c@ emit 1+ cnext
+  w> cfor dup c@ emit 1+ cnext
   drop
-;
+; inw
 
 python
 
