@@ -618,7 +618,7 @@ class CaseW(Primitive):
     xored = compiler.ct_pop()
     label = compiler.ct_pop()
     nlabel = compiler.ct_pop()
-    if nlabel is not None:
+    if xored:
       compiler.add_instruction('bra', [label])
       compiler.add_instruction('LABEL', [nlabel])
     xored ^= params[0].static_value()
@@ -629,7 +629,7 @@ class CaseW(Primitive):
     compiler.add_instruction('bra', [nlabel])
     compiler.ct_push(nlabel)
     compiler.ct_push(label)
-    compiler.ct_push(xored)
+    compiler.ct_push(params[0].static_value())
 
 class EndSwitchW(Primitive):
 
