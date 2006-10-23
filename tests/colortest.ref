@@ -94,7 +94,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call dup
+	call op_dup,0
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -201,7 +201,7 @@ disp2
 	clrf PREINC0,0
 	goto an_DT_
 
-dup
+op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
@@ -265,7 +265,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call dup
+	call op_dup,0
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

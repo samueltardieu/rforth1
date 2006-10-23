@@ -100,7 +100,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call dup
+	call op_dup,0
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -167,7 +167,8 @@ _lbl___217
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movlw 48
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -185,7 +186,7 @@ _lbl___217
 	movlw 1
 	call type
 _lbl___219
-	call dup
+	call op_dup,0
 	movlw 49
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -203,7 +204,7 @@ _lbl___219
 	movlw 1
 	call type
 _lbl___221
-	call dup
+	call op_dup,0
 	movlw 112
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -232,7 +233,7 @@ _lbl___221
 	call _DT_
 	call cr
 _lbl___223
-	call dup
+	call op_dup,0
 	movlw 43
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -260,7 +261,7 @@ _lbl___223
 	call _DT_
 	call cr
 _lbl___225
-	call dup
+	call op_dup,0
 	movlw 45
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -329,7 +330,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call dup
+	call op_dup,0
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -370,7 +371,7 @@ cr
 	movlw 0xd
 	goto emit
 
-dup
+op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
@@ -468,7 +469,8 @@ read4
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movlw 65
 	movwf PREINC0,0
 	clrf PREINC0,0

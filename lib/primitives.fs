@@ -26,7 +26,7 @@ variable temp_x3
 \ Temporary variable to save GIE
 cvariable temp_gie
 
-code dup
+code op_dup
       -1 movlw
       PLUSW0 PREINC0 movff
       PLUSW0 PREINC0 movff

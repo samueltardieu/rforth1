@@ -431,17 +431,30 @@ class ToW(Primitive):
                                        [addr, dst_w, access_bit(addr)])
       else:
         compiler.add_instruction('movff', [addr, compiler['WREG']])
+    elif name == 'OP_DUP':
+      compiler.rewind()
+      compiler.add_instruction('movf', [compiler['INDF0'], dst_w, access])
     elif name == 'OP_PUSH_W':
       compiler.rewind()
     else:
       compiler.add_instruction('OP_POP_W', [])
+
+class Dup(Primitive):
+  """Duplicate top of stack"""
+
+  def run(self):
+    name, params = compiler.last_instruction()
+    if name in ['OP_PUSH', 'OP_PUSH_W']:
+      compiler.add_instruction(name, params)
+    else:
+      compiler.add_instruction('OP_DUP')
 
 class Drop(ToW):
   """Drop the top of stack"""
   
   def run(self):
     name, params = compiler.last_instruction()
-    if name == 'OP_PUSH':
+    if name in ['OP_PUSH', 'OP_DUP']:
       compiler.rewind()
     elif name == 'OP_FETCH' and ram_addr(params[0]) and \
          params[0].static_value() < 0xf60:
@@ -502,7 +515,7 @@ class CFor(Primitive):
           compiler.rewind()
           compiler.warning('empty loop will not execute')
           compiler.add_instruction('bra', [label_noloop])
-        elif value < 0 or value >= 255:
+        elif value < 0 or value > 255:
           compiler.warning('loop limit does not fit in a byte')
         elif value is not None:
           bound_checks = False
@@ -1798,6 +1811,8 @@ class Word(Named, Literal):
       append('addlw', Number(1))
       append('movwf', compiler['PREINC0'], access)
       append('movwf', compiler['PREINC0'], access)
+    elif name == 'OP_DUP':
+      append('call', compiler['op_dup'], access)
     elif name == 'OP_INTR_PROTECT':
       if compiler.use_interrupts:
         append('btfsc', compiler['INTCON'], Number(7), access)
@@ -2041,6 +2056,7 @@ class Compiler:
     self.add_primitive('>w', ToW)
     self.add_primitive('w>', FromW)
     self.add_primitive('drop', Drop)
+    self.add_primitive('dup', Dup)
     self.add_primitive('inw', InW)    
     self.add_primitive('outw', OutW)
     self.add_primitive('outz', OutZ)

@@ -122,7 +122,8 @@ main_MI_loop
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movlw 67
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -138,7 +139,7 @@ main_MI_loop
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
 _lbl___229
-	call dup
+	call op_dup,0
 	movlw 80
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -154,7 +155,7 @@ _lbl___229
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
 _lbl___231
-	call dup
+	call op_dup,0
 	movlw 83
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -181,7 +182,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call dup
+	call op_dup,0
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -333,7 +334,7 @@ greetings
 	movlw 15
 	goto type
 
-dup
+op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
@@ -414,7 +415,8 @@ read4
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movlw 65
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -464,7 +466,7 @@ key
 
 timer_MI_reached_QM_
 	call diff
-	call dup
+	call op_dup,0
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0

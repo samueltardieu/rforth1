@@ -116,7 +116,7 @@ flash_MI_addr_EX_
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
 
-dup
+op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
@@ -240,7 +240,7 @@ send_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
 _lbl___201
-	call dup
+	call op_dup,0
 	call op_cfetch_tos
 _lbl___202
 	btfsc PORTA,5,0
@@ -336,7 +336,7 @@ handle_MI_command
 	call receive_MI_byte
 	movf POSTDEC0,0,0
 	movff POSTDEC0,(1+current_MI_address)
-	call dup
+	call op_dup,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___219
@@ -344,7 +344,7 @@ handle_MI_command
 	movf POSTDEC0,0,0
 	goto send_MI_bytes
 _lbl___219
-	call dup
+	call op_dup,0
 	movlw read_MI_command
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -356,7 +356,7 @@ _lbl___219
 	movf POSTDEC0,0,0
 	goto receive_MI_bytes
 _lbl___221
-	call dup
+	call op_dup,0
 	movlw bit_MI_change_MI_command
 	movwf PREINC0,0
 	clrf PREINC0,0

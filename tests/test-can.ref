@@ -200,7 +200,7 @@ can_MI_normal
 
 can_MI_mode
 	call _5_LT__LT_
-	call dup
+	call op_dup,0
 	movf CANCON,0,0
 	andlw 0x1f
 	movwf PREINC0,0
@@ -209,7 +209,7 @@ can_MI_mode
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
 _lbl___160
-	call dup
+	call op_dup,0
 	movf CANSTAT,0,0
 	andlw 0xe0
 	movwf PREINC0,0
@@ -406,7 +406,7 @@ _DT_
 	call emit_MI_8
 
 emit_MI_8
-	call dup
+	call op_dup,0
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	movf POSTDEC0,0,0
@@ -572,9 +572,7 @@ can_MI_receive_MI_buffer1
 	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
-	movf POSTDEC0,0,0
-	movff POSTDEC0,can_MI_msg_MI_length
+	movwf can_MI_msg_MI_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___129
@@ -655,7 +653,7 @@ can_MI_set_MI_mask
 	call m0_GT_mn
 	goto op_cstore
 
-dup
+op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
@@ -766,9 +764,7 @@ eepromc_AT_
 	return
 
 eeprom_AT_
-	call dup
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf INDF0,0,0
 	call eepromc_AT_
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -815,7 +811,7 @@ type
 	iorlw 0
 	bz _lbl___91
 _lbl___93
-	call dup
+	call op_dup,0
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -835,15 +831,15 @@ _DT_s
 	movlw 60
 	call emit
 	call depth
-	call dup
+	call op_dup,0
 	call _DT_
 	movlw 62
 	call emit
-	call dup
+	call op_dup,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___95
-	call dup
+	call op_dup,0
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -908,9 +904,7 @@ can_MI_receive_MI_buffer0
 	andlw 0xf
 	movwf PREINC0,0
 	clrf PREINC0,0
-	call dup
-	movf POSTDEC0,0,0
-	movff POSTDEC0,can_MI_msg_MI_length
+	movwf can_MI_msg_MI_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___126
