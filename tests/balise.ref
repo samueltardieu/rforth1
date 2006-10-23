@@ -129,7 +129,7 @@ main_MI_loop
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___221
+	bnz _lbl___220
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -137,7 +137,7 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___221
+_lbl___220
 	call dup
 	movlw 80
 	movwf PREINC0,0
@@ -145,7 +145,7 @@ _lbl___221
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___223
+	bnz _lbl___222
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -153,7 +153,7 @@ _lbl___221
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___223
+_lbl___222
 	call dup
 	movlw 83
 	movwf PREINC0,0
@@ -161,7 +161,7 @@ _lbl___223
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___225
+	bnz _lbl___224
 	call leds_MI_off
 	movf T0CON,0,0
 	andlw 0xf0
@@ -171,7 +171,7 @@ _lbl___223
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___225
+_lbl___224
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
@@ -185,7 +185,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___89
+_lbl___88
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -195,7 +195,7 @@ _lbl___89
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___89
+	bra _lbl___88
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -204,12 +204,12 @@ _lbl___89
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___26
+	bra _lbl___25
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___26
+_lbl___25
 	call op_minus
 	call _0_LT_
 
@@ -235,11 +235,11 @@ neighbour_QM_
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___22
+	bra _lbl___21
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto _0_LT_
-_lbl___22
+_lbl___21
 	call op_minus
 
 _0_LT_
@@ -436,7 +436,7 @@ read4
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___96
+	bz _lbl___95
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	andlw 223
@@ -448,7 +448,7 @@ read4
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___96
+_lbl___95
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -483,11 +483,11 @@ timer_MI_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___202
+	bz _lbl___201
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___202
+_lbl___201
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
@@ -496,11 +496,11 @@ _lbl___202
 
 timer_MI_wait
 	call timer_MI_set
-_lbl___206
+_lbl___205
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___206
+	bz _lbl___205
 	return
 
 timer_MI_reset
@@ -512,7 +512,7 @@ timer_MI_reset
 
 pwm
 	call timer_MI_reset
-_lbl___214
+_lbl___213
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -523,7 +523,7 @@ _lbl___214
 	call timer_MI_wait
 	btfsc PIR1,5,0
 	return
-	bra _lbl___214
+	bra _lbl___213
 
 init_MI_ports
 	movlw 0xb8

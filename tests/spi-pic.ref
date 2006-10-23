@@ -212,9 +212,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___73
+_lbl___72
 	btfsc EECON1,1,0
-	bra _lbl___73
+	bra _lbl___72
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
@@ -239,36 +239,36 @@ receive_MI_byte
 send_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___193
+_lbl___192
 	call dup
 	call op_cfetch_tos
-_lbl___194
+_lbl___193
 	btfsc PORTA,5,0
 	goto _2drop
 	btfsc PIR1,3,0
-	bra _lbl___194
+	bra _lbl___193
 	movf POSTDEC0,0,0
 	movff POSTDEC0,SSPBUF
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___193
+	bra _lbl___192
 
 receive_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
+_lbl___197
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
 _lbl___198
-	movff POSTDEC0,PREINC2
-	movff POSTDEC0,PREINC2
-_lbl___199
 	btfss PORTA,5,0
-	bra _lbl___200
+	bra _lbl___199
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___200
+_lbl___199
 	btfss PIR1,3,0
-	bra _lbl___199
+	bra _lbl___198
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
@@ -279,23 +279,23 @@ _lbl___200
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___198
+	bra _lbl___197
 
 receive_MI_masks_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
+_lbl___202
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
 _lbl___203
-	movff POSTDEC0,PREINC2
-	movff POSTDEC0,PREINC2
-_lbl___204
 	btfss PORTA,5,0
-	bra _lbl___205
+	bra _lbl___204
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___205
+_lbl___204
 	btfss PIR1,3,0
-	bra _lbl___204
+	bra _lbl___203
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	comf POSTDEC0,1,0
@@ -304,17 +304,17 @@ _lbl___205
 	movff POSTINC2,PREINC0
 	call op_cfetch_tos
 	call op_and
-_lbl___207
+_lbl___206
 	btfss PORTA,5,0
-	bra _lbl___208
+	bra _lbl___207
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
-_lbl___208
+_lbl___207
 	btfss PIR1,3,0
-	bra _lbl___207
+	bra _lbl___206
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	call or
@@ -326,7 +326,7 @@ _lbl___208
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___203
+	bra _lbl___202
 
 handle_MI_command
 	call receive_MI_byte
@@ -339,11 +339,11 @@ handle_MI_command
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___211
+	bnz _lbl___210
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto send_MI_bytes
-_lbl___211
+_lbl___210
 	call dup
 	movlw read_MI_command
 	movwf PREINC0,0
@@ -351,11 +351,11 @@ _lbl___211
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___213
+	bnz _lbl___212
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto receive_MI_bytes
-_lbl___213
+_lbl___212
 	call dup
 	movlw bit_MI_change_MI_command
 	movwf PREINC0,0
@@ -363,11 +363,11 @@ _lbl___213
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___215
+	bnz _lbl___214
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call receive_MI_masks_MI_bytes
-_lbl___215
+_lbl___214
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return

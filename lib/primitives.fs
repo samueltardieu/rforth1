@@ -236,7 +236,10 @@ code rdrop
     return
 ;code inline
 
-: i r@ ; inline 
+code ci
+    INDF2 ,w ,a movf
+    return
+;code inline outw
 
 : swap intr-protect temp_x1 ! >r temp_x1 @ intr-unprotect r> ;
 

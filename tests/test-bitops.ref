@@ -241,7 +241,7 @@ test_MI_set
 	call op_bit_set_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___197
+	bz _lbl___196
 	movlw LOW((_data___1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___1+0x8000))
@@ -250,7 +250,7 @@ test_MI_set
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___197
+_lbl___196
 	movlw LOW((_data___2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___2+0x8000))
@@ -268,7 +268,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___89
+_lbl___88
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -278,7 +278,7 @@ _lbl___89
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___89
+	bra _lbl___88
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -327,7 +327,7 @@ test_MI_clr
 	call op_bit_clr_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___200
+	bz _lbl___199
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___3+0x8000))
@@ -336,7 +336,7 @@ test_MI_clr
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___200
+_lbl___199
 	movlw LOW((_data___4+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___4+0x8000))

@@ -159,7 +159,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___89
+_lbl___88
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -169,7 +169,7 @@ _lbl___89
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___89
+	bra _lbl___88
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -210,12 +210,12 @@ _LT__EQ_
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___26
+	bra _lbl___25
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___26
+_lbl___25
 	call op_minus
 	call _0_LT_
 
@@ -237,11 +237,11 @@ _GT_
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___22
+	bra _lbl___21
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto _0_LT_
-_lbl___22
+_lbl___21
 	call op_minus
 
 _0_LT_
@@ -1348,7 +1348,7 @@ _DT_s
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___91
+	bz _lbl___90
 	call dup
 	movlw 8
 	movwf PREINC0,0
@@ -1356,7 +1356,7 @@ _DT_s
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___92
+	bz _lbl___91
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data_+0x8000))
@@ -1370,11 +1370,11 @@ _DT_s
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___92
+_lbl___91
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___93
+_lbl___92
 	call _space
 	movff INDF2,PREINC0
 	clrf PREINC0,0
@@ -1386,10 +1386,10 @@ _lbl___93
 	call pick
 	call _DT_
 	decfsz INDF2,1,0
-	bra _lbl___93
+	bra _lbl___92
 	movf POSTDEC2,1,0
 	return
-_lbl___91
+_lbl___90
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
