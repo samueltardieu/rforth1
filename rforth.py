@@ -196,7 +196,8 @@ class Named:
     if self != object: self.references.append(object)
 
   def output_header(self, outfd):
-    outfd.write('; %s: defined at %s\n' %(self.name, self.definition))
+    if not compiler.no_comments:
+      outfd.write('; %s: defined at %s\n' %(self.name, self.definition))
 
   def prepare(self): pass
 
@@ -1879,11 +1880,12 @@ class Compiler:
                       'udata_ovr', 'udata_shr', 'variable', 'while']
                       
   def __init__(self, processor, start, main, automatic_inlining,
-                infile, asmfile):
+               no_comments, infile, asmfile):
     self.processor = processor
     self.start = start
     self.main = main
     self.automatic_inlining = automatic_inlining
+    self.no_comments = no_comments
     self.infile = infile
     self.asmfile = asmfile
     self.dict = {}                  # Words as currently seen
@@ -2469,6 +2471,8 @@ def main():
   parser.add_option('-m', '--main', dest = 'root', metavar = 'WORD',
                      default = 'main',
                      help = 'main word [main]')
+  parser.add_option('-N', '--no-comments', dest = 'no_comments',
+                    default = False, action = 'store_true')
   parser.add_option('-o', '--output', metavar = 'FILE', dest = 'outfile',
                      help = 'set output file name', default = None)
   parser.add_option('-p', '--processor', metavar = 'MODEL',
@@ -2490,7 +2494,7 @@ def main():
     if opts.compile_only: asmfile = opts.outfile
     else: hexfile = opts.outfile
   compiler = Compiler(opts.processor, opts.start, opts.root,
-                       opts.automatic_inlining,
+                       opts.automatic_inlining, opts.no_comments,
                        infile, asmfile)
   if opts.enable_interrupts: compiler.enable_interrupts()
   compiler.process()
