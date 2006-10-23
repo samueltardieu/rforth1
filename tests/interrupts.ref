@@ -11,25 +11,21 @@
 ; Section: code
 ;---------------------------------------------------------
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 	clrf a,1
 	clrf (a+1),1
 	clrf w_save,1
 
-; main: defined at tests/interrupts.fs:6
 main
 	return
 
-; high: defined at tests/interrupts.fs:4
 _high
 	movlw 1
 	movwf a,1
 	clrf (a+1),1
 	retfie 1
 
-; low: defined at tests/interrupts.fs:5
 _low
 	movwf w_save,1
 	movlw 2
@@ -42,10 +38,8 @@ _low
 ; Section: memory
 ;---------------------------------------------------------
 
-; a: defined at tests/interrupts.fs:1
 a equ 0x100
 
-; w_save: defined at tests/interrupts.fs:2
 w_save equ 0x102
 
 END

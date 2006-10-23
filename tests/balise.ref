@@ -172,8 +172,8 @@ _lbl___231
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
 _lbl___233
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	bra main_MI_loop
 
 type
@@ -183,8 +183,8 @@ type
 _lbl___93
 	call dup
 	call op_cfetch_tos
-	movf POSTDEC0,0
-	movf POSTDEC0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -193,16 +193,16 @@ _lbl___93
 	bra _lbl___93
 _lbl___91
 	movf POSTDEC2,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	return
 
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
 	bra _lbl___25
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call _0_LT_
 	goto op_zeroeq
 _lbl___25
@@ -232,8 +232,8 @@ _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
 	bra _lbl___21
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	goto _0_LT_
 _lbl___21
 	call op_minus
@@ -422,8 +422,8 @@ read4
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bz _lbl___102
-	movf POSTDEC0,0
-	movf POSTDEC0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	andlw 223
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -473,8 +473,8 @@ timer_MI_reached_QM_
 	clrf PREINC0,0
 	goto _GT__EQ_
 _lbl___210
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	clrf PREINC0,0
 	clrf PREINC0,0
 	return

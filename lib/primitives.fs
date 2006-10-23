@@ -206,12 +206,6 @@ code op_cfetch_tos
     return
 ;code
 
-code drop
-    POSTDEC0 ,f ,a movf
-    POSTDEC0 ,f ,a movf
-    return
-;code inline
-
 code >r
     POSTDEC0 PREINC2 movff
     POSTDEC0 PREINC2 movff

@@ -412,19 +412,19 @@ class Literal(Primitive):
 class ToW(Primitive):
   """Move the top of stack into W."""
 
-  def run(self):
+  def run(self, warn = True):
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
       compiler.rewind()
       value = params[0]
       s = value.static_value()
-      if s is not None and(s < -128 or s > 127):
+      if warn and s is not None and(s < -128 or s > 127):
         compiler.warning('value will not fit in W register')
       compiler.add_instruction('movlw', [low(value)])
     elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
       compiler.rewind()
       addr = params[0]
-      if name == 'OP_FETCH':
+      if warn and name == 'OP_FETCH':
         compiler.warning('value may not fit in W register')
       if short_addr(addr):
         compiler.add_instruction('movf',
@@ -436,6 +436,20 @@ class ToW(Primitive):
     else:
       compiler.add_instruction('OP_POP_W', [])
 
+class Drop(ToW):
+  """Drop the top of stack"""
+  
+  def run(self):
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH':
+      compiler.rewind()
+    elif name == 'OP_FETCH' and ram_addr(params[0]) and \
+         params[0].static_value() < 0xf60:
+      # Regular memory read, can be safely removed
+      compiler.rewind()
+    else:
+      ToW.run(self, warn = False)
+
 class FromW(Primitive):
   """Move W onto the top of stack."""
 
@@ -443,6 +457,10 @@ class FromW(Primitive):
     name, params = compiler.last_instruction()
     if name == 'OP_POP_W':
       compiler.rewind()
+    elif name == 'movf' and params[1] == dst_w:
+      compiler.rewind()
+      compiler.push(params[0])
+      compiler['c@'].run()
     else:
       compiler.add_instruction('OP_PUSH_W', [])
 
@@ -1730,8 +1748,8 @@ class Word(Named, Literal):
       append('movwf', compiler['PREINC0'], access)
       append('clrf', compiler['PREINC0'], access)
     elif name == 'OP_POP_W':
-      append('movf', compiler['POSTDEC0'], access)
-      append('movf', compiler['POSTDEC0'], access)
+      append('movf', compiler['POSTDEC0'], dst_w, access)
+      append('movf', compiler['POSTDEC0'], dst_w, access)
     elif name == 'OP_PUSH':
       push_byte(low(params[0]))
       push_byte(high(params[0]))
@@ -2022,6 +2040,7 @@ class Compiler:
     self.add_primitive('fast', Fast)
     self.add_primitive('>w', ToW)
     self.add_primitive('w>', FromW)
+    self.add_primitive('drop', Drop)
     self.add_primitive('inw', InW)    
     self.add_primitive('outw', OutW)
     self.add_primitive('outz', OutZ)

@@ -143,10 +143,10 @@ op_cfetch_tos
 	return
 
 _2drop
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	return
 
 op_and
@@ -309,8 +309,8 @@ _lbl___215
 	bra _lbl___216
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	return
 _lbl___216
 	btfss PIR1,3,0
@@ -340,8 +340,8 @@ handle_MI_command
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___219
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	goto send_MI_bytes
 _lbl___219
 	call dup
@@ -352,8 +352,8 @@ _lbl___219
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___221
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	goto receive_MI_bytes
 _lbl___221
 	call dup
@@ -364,12 +364,12 @@ _lbl___221
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 	bnz _lbl___223
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call receive_MI_masks_MI_bytes
 _lbl___223
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	return
 
 ;---------------------------------------------------------

@@ -97,12 +97,12 @@ emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
-	movf POSTDEC0,0
-	movf POSTDEC0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	andlw 0xf
 	call emit_MI_4
-	movf POSTDEC0,0
-	movf POSTDEC0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	andlw 0xf
 
 emit_MI_4
@@ -167,10 +167,6 @@ main
 	call init_MI_adc
 _lbl___216
 	call key
-	movwf PREINC0,0
-	clrf PREINC0,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
 	call disp0
 	call disp1
 	call disp2
@@ -271,8 +267,8 @@ type
 _lbl___93
 	call dup
 	call op_cfetch_tos
-	movf POSTDEC0,0
-	movf POSTDEC0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call emit
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
@@ -281,8 +277,8 @@ _lbl___93
 	bra _lbl___93
 _lbl___91
 	movf POSTDEC2,1,0
-	movf POSTDEC0,1,0
-	movf POSTDEC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	return
 
 key

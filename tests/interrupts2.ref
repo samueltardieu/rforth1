@@ -11,48 +11,36 @@
 ; Section: constants
 ;---------------------------------------------------------
 
-; POSTDEC0: defined at lib/sfrnames.fs:25
 POSTDEC0 equ 0xfed
 
-; PREINC0: defined at lib/sfrnames.fs:26
 PREINC0 equ 0xfec
 
-; FSR0H: defined at lib/sfrnames.fs:28
 FSR0H equ 0xfea
 
-; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
 
-; FSR1L: defined at lib/sfrnames.fs:37
 FSR1L equ 0xfe1
 
-; FSR2L: defined at lib/sfrnames.fs:45
 FSR2L equ 0xfd9
 
-; STATUS: defined at lib/sfrnames.fs:46
 STATUS equ 0xfd8
 
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 
-; main: defined at tests/interrupts2.fs:16
 main
 	return
 
-; handle-high: defined at tests/interrupts2.fs:1
 handle_MI_high
 	return
 
-; handle-low: defined at tests/interrupts2.fs:2
 handle_MI_low
 	return
 
-; high: defined at tests/interrupts2.fs:4
 _high
 	movwf high_MI_wtemp,0
 	movff FSR0L,high_MI_fsr0ltemp
@@ -81,7 +69,6 @@ _high
 	movf high_MI_wtemp,0,0
 	retfie 0
 
-; low: defined at tests/interrupts2.fs:10
 _low
 	movwf low_MI_wtemp,0
 	movff FSR0L,low_MI_fsr0ltemp
@@ -114,34 +101,24 @@ _low
 ; Section: memory
 ;---------------------------------------------------------
 
-; high-wtemp: defined at lib/interrupts.fs:1
 high_MI_wtemp equ 0x21
 
-; high-fsr0ltemp: defined at lib/interrupts.fs:2
 high_MI_fsr0ltemp equ 0x22
 
-; high-fsr0htemp: defined at lib/interrupts.fs:3
 high_MI_fsr0htemp equ 0x23
 
-; secstack-high: defined at lib/interrupts.fs:5
 secstack_MI_high equ 0x24
 
-; secrstack-high: defined at lib/interrupts.fs:6
 secrstack_MI_high equ 0x3a
 
-; low-wtemp: defined at lib/interrupts.fs:28
 low_MI_wtemp equ 0x40
 
-; low-fsr0ltemp: defined at lib/interrupts.fs:29
 low_MI_fsr0ltemp equ 0x41
 
-; low-fsr0htemp: defined at lib/interrupts.fs:30
 low_MI_fsr0htemp equ 0x42
 
-; secstack-low: defined at lib/interrupts.fs:32
 secstack_MI_low equ 0x43
 
-; secrstack-low: defined at lib/interrupts.fs:33
 secrstack_MI_low equ 0x59
 
 END
