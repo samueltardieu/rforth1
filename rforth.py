@@ -1620,8 +1620,26 @@ class Word(Named, Literal):
     o = 0
     while o < len(self.opcodes):
       if self.opcodes[o][0] == 'LABEL':
-        dead = False
-        new.append(self.opcodes[o])
+        if dead:
+          # We have hit a label while we are dead. Check whether it gets
+          # a forward reference.
+          label = self.opcodes[o][1][0]
+          for no in new:
+            if no[1] and no[1][0] == label:
+              dead = False
+              break
+          else:
+            # We have found no forward reference. Look for a backward
+            # reference found after another label (otherwise, the backward
+            # reference belongs to the same execution block).
+            hit_label = False
+            for oo in self.opcodes[o+1:]:
+              if oo[0] == 'LABEL':
+                hit_label = True
+              elif hit_label and oo[1] and oo[1][0] == label:
+                dead = False
+                exit
+        if not dead: new.append(self.opcodes[o])
       elif not dead and \
                self.opcodes[o][0] in ['btfss', 'btfsc', 'decfsz', 'dcfsnz',
                                       'incfsz', 'infsnz',

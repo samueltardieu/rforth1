@@ -67,6 +67,78 @@ bl equ 0x20
 ; Section: code
 ;---------------------------------------------------------
 
+test1
+	movlw LOW((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___2+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+h
+	movlw LOW((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_data___1+0x8000))
+	movwf PREINC0,0
+	movlw 13
+	call type
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call type
+
+cr
+	movlw 0xa
+	call emit
+	movlw 0xd
+
+emit
+	btfss PIR1,4,0
+	bra emit
+	movwf TXREG,0
+	return
+
+_GT_
+	call swap
+
+_LT_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___21
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto _0_LT_
+_lbl___21
+	call op_minus
+
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+_DT_
+	call _1_GT_2
+	call emit_MI_8
+
+emit_MI_8
+	call op_dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	call emit_MI_4
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+
+emit_MI_4
+	call nibble_MI_to_MI_hex
+	goto emit
+
 init_runtime
 	movlb 1
 	clrf a,1
@@ -126,58 +198,7 @@ main
 	clrf PREINC0,0
 	call test8
 	call _DT_s
-
-cr
-	movlw 0xa
-	call emit
-	movlw 0xd
-
-emit
-	btfss PIR1,4,0
-	bra emit
-	movwf TXREG,0
-	return
-
-_GT_
-	call swap
-
-_LT_
-	call _2dupxor_GT_w
-	btfss WREG,7,0
-	bra _lbl___21
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	goto _0_LT_
-_lbl___21
-	call op_minus
-
-_0_LT_
-	movlw -1
-	btfss POSTDEC0,7,0
-	movlw 0
-	movwf POSTINC0,0
-	movwf INDF0,0
-	return
-
-_DT_
-	call _1_GT_2
-	call emit_MI_8
-
-emit_MI_8
-	call op_dup
-	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	andlw 0xf
-	call emit_MI_4
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	andlw 0xf
-
-emit_MI_4
-	call nibble_MI_to_MI_hex
-	goto emit
+	goto cr
 
 pick
 	call negate
@@ -219,18 +240,6 @@ flash_MI_addr_EX_
 _space
 	movlw bl
 	goto emit
-
-h
-	movlw LOW((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___1+0x8000))
-	movwf PREINC0,0
-	movlw 13
-	call type
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	call type
-	goto cr
 
 op_dup
 	movlw -1
@@ -453,25 +462,6 @@ _lbl___95
 	movf POSTDEC0,0,0
 	return
 
-test1
-	movlw LOW((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw HIGH((_data___2+0x8000))
-	movwf PREINC0,0
-	movlw 5
-	movwf PREINC0,0
-	clrf PREINC0,0
-	goto h
-_lbl___209
-	movff INDF2,PREINC0
-	clrf PREINC0,0
-	call _DT_
-	call cr
-	decfsz INDF2,1,0
-	bra _lbl___209
-	movf POSTDEC2,1,0
-	return
-
 test2
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
@@ -484,16 +474,6 @@ test2
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
-	bra _lbl___213
-_lbl___214
-	movff INDF2,PREINC0
-	clrf PREINC0,0
-	call _DT_
-	call cr
-	decfsz INDF2,1,0
-	bra _lbl___214
-	movf POSTDEC2,1,0
-_lbl___213
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
