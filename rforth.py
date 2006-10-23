@@ -418,7 +418,7 @@ class ToW(Primitive):
       compiler.rewind()
       value = params[0]
       s = value.static_value()
-      if warn and s is not None and(s < -128 or s > 127):
+      if warn and s is not None and(s < -128 or s > 255):
         compiler.warning('value will not fit in W register')
       compiler.add_instruction('movlw', [low(value)])
     elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
@@ -446,6 +446,12 @@ class Dup(Primitive):
     name, params = compiler.last_instruction()
     if name in ['OP_PUSH', 'OP_PUSH_W']:
       compiler.add_instruction(name, params)
+    elif name in ['OP_CFETCH']:
+      compiler.rewind()
+      addr = params[0]
+      compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
+      compiler.add_instruction('OP_PUSH_W')
+      compiler.add_instruction('OP_PUSH_W')
     else:
       compiler.add_instruction('OP_DUP')
 
