@@ -13,12 +13,17 @@ PREDEFINED = lib/core.fs lib/sfrnames.fs lib/primitives.fs lib/arithmetic.fs \
 STARTADDR ?= 0x2000
 PORT ?= /dev/ttyS0
 SPEED ?= 115200
+FLAGS = ${OPTS} --start ${STARTADDR}
 
 PYTHON ?= python
 
-tests: ${TESTCASES}
+tests: never
+	${MAKE} ${TESTCASES} OPTS="--no-comments"
 
-update-tests: ${TESTCASES:.cmp=.newref}
+never::
+
+update-tests: never
+	${MAKE} ${TESTCASES:.cmp=.newref} OPTS="--no-comments"
 
 clean:
 	${RM} *.asm tests/*.asm examples/*.asm examples/engines/*.asm
@@ -28,7 +33,7 @@ clean:
 	${RM} *.cod tests/*.cod examples/*.cod examples/engines/*.cod
 
 %.asm %.hex %.lst %.map %.cod: %.fs ${COMPILER} ${PREDEFINED}
-	${PYTHON} ${COMPILER} -s ${STARTADDR} $<
+	${PYTHON} ${COMPILER} ${FLAGS} $<
 
 %.cmp: %.asm %.ref
 	diff -u ${@:.cmp=.ref} ${@:.cmp=.asm}
@@ -40,7 +45,7 @@ clean:
 	${PYTHON} utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
 
 tests/interrupts.asm: tests/interrupts.fs
-	${PYTHON} ${COMPILER} -i -s ${STARTADDR} tests/interrupts.fs
+	${PYTHON} ${COMPILER} -i ${FLAGS} tests/interrupts.fs
 
 tests/interrupts2.asm: tests/interrupts2.fs
-	${PYTHON} ${COMPILER} -i -s ${STARTADDR} tests/interrupts2.fs
+	${PYTHON} ${COMPILER} -i ${FLAGS} tests/interrupts2.fs

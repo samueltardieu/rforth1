@@ -7,7 +7,6 @@
 ; Section: code
 ;---------------------------------------------------------
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 	clrf a,1
@@ -15,7 +14,6 @@ init_runtime
 	clrf b,1
 	clrf (b+1),1
 
-; main: defined at tests/increment.fs:4
 main
 	infsnz a,1
 	incf (a+1),1
@@ -27,10 +25,8 @@ main
 ; Section: memory
 ;---------------------------------------------------------
 
-; a: defined at tests/increment.fs:1
 a equ 0x100
 
-; b: defined at tests/increment.fs:2
 b equ 0x102
 
 END

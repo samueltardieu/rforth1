@@ -7,254 +7,172 @@
 ; Section: constants
 ;---------------------------------------------------------
 
-; TBLPTRU: defined at lib/sfrnames.fs:13
 TBLPTRU equ 0xff8
 
-; TBLPTRH: defined at lib/sfrnames.fs:14
 TBLPTRH equ 0xff7
 
-; TBLPTRL: defined at lib/sfrnames.fs:15
 TBLPTRL equ 0xff6
 
-; TABLAT: defined at lib/sfrnames.fs:16
 TABLAT equ 0xff5
 
-; INTCON: defined at lib/sfrnames.fs:19
 INTCON equ 0xff2
 
-; INDF0: defined at lib/sfrnames.fs:23
 INDF0 equ 0xfef
 
-; POSTINC0: defined at lib/sfrnames.fs:24
 POSTINC0 equ 0xfee
 
-; POSTDEC0: defined at lib/sfrnames.fs:25
 POSTDEC0 equ 0xfed
 
-; PREINC0: defined at lib/sfrnames.fs:26
 PREINC0 equ 0xfec
 
-; PLUSW0: defined at lib/sfrnames.fs:27
 PLUSW0 equ 0xfeb
 
-; FSR0H: defined at lib/sfrnames.fs:28
 FSR0H equ 0xfea
 
-; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
 
-; WREG: defined at lib/sfrnames.fs:30
 WREG equ 0xfe8
 
-; INDF1: defined at lib/sfrnames.fs:31
 INDF1 equ 0xfe7
 
-; POSTINC1: defined at lib/sfrnames.fs:32
 POSTINC1 equ 0xfe6
 
-; POSTDEC1: defined at lib/sfrnames.fs:33
 POSTDEC1 equ 0xfe5
 
-; PREINC1: defined at lib/sfrnames.fs:34
 PREINC1 equ 0xfe4
 
-; FSR1H: defined at lib/sfrnames.fs:36
 FSR1H equ 0xfe2
 
-; FSR1L: defined at lib/sfrnames.fs:37
 FSR1L equ 0xfe1
 
-; INDF2: defined at lib/sfrnames.fs:39
 INDF2 equ 0xfdf
 
-; POSTINC2: defined at lib/sfrnames.fs:40
 POSTINC2 equ 0xfde
 
-; POSTDEC2: defined at lib/sfrnames.fs:41
 POSTDEC2 equ 0xfdd
 
-; PREINC2: defined at lib/sfrnames.fs:42
 PREINC2 equ 0xfdc
 
-; FSR2H: defined at lib/sfrnames.fs:44
 FSR2H equ 0xfda
 
-; FSR2L: defined at lib/sfrnames.fs:45
 FSR2L equ 0xfd9
 
-; STATUS: defined at lib/sfrnames.fs:46
 STATUS equ 0xfd8
 
-; TMR0L: defined at lib/sfrnames.fs:48
 TMR0L equ 0xfd6
 
-; T0CON: defined at lib/sfrnames.fs:49
 T0CON equ 0xfd5
 
-; T1CON: defined at lib/sfrnames.fs:57
 T1CON equ 0xfcd
 
-; ADRESL: defined at lib/sfrnames.fs:67
 ADRESL equ 0xfc3
 
-; ADCON0: defined at lib/sfrnames.fs:68
 ADCON0 equ 0xfc2
 
-; ADCON1: defined at lib/sfrnames.fs:69
 ADCON1 equ 0xfc1
 
-; RCREG: defined at lib/sfrnames.fs:85
 RCREG equ 0xfae
 
-; TXREG: defined at lib/sfrnames.fs:86
 TXREG equ 0xfad
 
-; EEADR: defined at lib/sfrnames.fs:89
 EEADR equ 0xfa9
 
-; EEDATA: defined at lib/sfrnames.fs:90
 EEDATA equ 0xfa8
 
-; EECON2: defined at lib/sfrnames.fs:91
 EECON2 equ 0xfa7
 
-; EECON1: defined at lib/sfrnames.fs:92
 EECON1 equ 0xfa6
 
-; PIR2: defined at lib/sfrnames.fs:97
 PIR2 equ 0xfa1
 
-; PIR1: defined at lib/sfrnames.fs:100
 PIR1 equ 0xf9e
 
-; TRISB: defined at lib/sfrnames.fs:105
 TRISB equ 0xf93
 
-; TRISA: defined at lib/sfrnames.fs:106
 TRISA equ 0xf92
 
-; LATB: defined at lib/sfrnames.fs:110
 LATB equ 0xf8a
 
-; LATA: defined at lib/sfrnames.fs:111
 LATA equ 0xf89
 
-; CIOCON: defined at lib/sfrnames.fs:120
 CIOCON equ 0xf73
 
-; BRGCON3: defined at lib/sfrnames.fs:121
 BRGCON3 equ 0xf72
 
-; BRGCON2: defined at lib/sfrnames.fs:122
 BRGCON2 equ 0xf71
 
-; BRGCON1: defined at lib/sfrnames.fs:123
 BRGCON1 equ 0xf70
 
-; CANCON: defined at lib/sfrnames.fs:124
 CANCON equ 0xf6f
 
-; CANSTAT: defined at lib/sfrnames.fs:125
 CANSTAT equ 0xf6e
 
-; RXB0D0: defined at lib/sfrnames.fs:133
 RXB0D0 equ 0xf66
 
-; RXB0DLC: defined at lib/sfrnames.fs:134
 RXB0DLC equ 0xf65
 
-; RXB0SIDL: defined at lib/sfrnames.fs:137
 RXB0SIDL equ 0xf62
 
-; RXB0SIDH: defined at lib/sfrnames.fs:138
 RXB0SIDH equ 0xf61
 
-; RXB0CON: defined at lib/sfrnames.fs:139
 RXB0CON equ 0xf60
 
-; RXB1D0: defined at lib/sfrnames.fs:148
 RXB1D0 equ 0xf56
 
-; RXB1DLC: defined at lib/sfrnames.fs:149
 RXB1DLC equ 0xf55
 
-; RXB1SIDL: defined at lib/sfrnames.fs:152
 RXB1SIDL equ 0xf52
 
-; RXB1SIDH: defined at lib/sfrnames.fs:153
 RXB1SIDH equ 0xf51
 
-; RXB1CON: defined at lib/sfrnames.fs:154
 RXB1CON equ 0xf50
 
-; TXB0D0: defined at lib/sfrnames.fs:163
 TXB0D0 equ 0xf46
 
-; TXB0DLC: defined at lib/sfrnames.fs:164
 TXB0DLC equ 0xf45
 
-; TXB0SIDL: defined at lib/sfrnames.fs:167
 TXB0SIDL equ 0xf42
 
-; TXB0SIDH: defined at lib/sfrnames.fs:168
 TXB0SIDH equ 0xf41
 
-; TXB0CON: defined at lib/sfrnames.fs:169
 TXB0CON equ 0xf40
 
-; TXB1CON: defined at lib/sfrnames.fs:184
 TXB1CON equ 0xf30
 
-; TXB2CON: defined at lib/sfrnames.fs:199
 TXB2CON equ 0xf20
 
-; RXM0SIDL: defined at lib/sfrnames.fs:206
 RXM0SIDL equ 0xf19
 
-; RXM0SIDH: defined at lib/sfrnames.fs:207
 RXM0SIDH equ 0xf18
 
-; RXF0SIDL: defined at lib/sfrnames.fs:230
 RXF0SIDL equ 0xf01
 
-; RXF0SIDH: defined at lib/sfrnames.fs:231
 RXF0SIDH equ 0xf00
 
-; UNKNOWN: defined at tests/sensors.fs:18
 UNKNOWN equ 0
 
-; CREAM: defined at tests/sensors.fs:19
 CREAM equ 1
 
-; BROWN: defined at tests/sensors.fs:20
 BROWN equ 2
 
-; WHITE: defined at tests/sensors.fs:21
 WHITE equ 3
 
-; COLORS-ARBITRATION: defined at tests/sensors.fs:41
 COLORS_MI_ARBITRATION equ 0x44
 
-; VALUES-ARBITRATION: defined at tests/sensors.fs:42
 VALUES_MI_ARBITRATION equ 0x45
 
-; SET-CALIBRATION-REQUEST: defined at tests/sensors.fs:43
 SET_MI_CALIBRATION_MI_REQUEST equ 0x46
 
-; CALIBRATION-ARBITRATION: defined at tests/sensors.fs:44
 CALIBRATION_MI_ARBITRATION equ 0x47
 
-; local-addr: defined at tests/sensors.fs:49
 local_MI_addr equ 0x0
 
-; addr-mask: defined at tests/sensors.fs:51
 addr_MI_mask equ 0x3e0
 
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-; can-prepare-buffer: defined at lib/canlib.fs:82
 can_MI_prepare_MI_buffer
 	call can_MI_choose_MI_buffer
 	movff can_MI_msg_MI_length,PREINC0
@@ -269,7 +187,7 @@ can_MI_prepare_MI_buffer
 	clrf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___146
+	bz _lbl___147
 	movlw can_MI_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -280,7 +198,7 @@ can_MI_prepare_MI_buffer
 	call tx0_GT_txn
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___146
+_lbl___147
 	movff can_MI_arbitration,PREINC0
 	movff (can_MI_arbitration+1),PREINC0
 	call _5_LT__LT_
@@ -297,7 +215,6 @@ _lbl___146
 	movwf PREINC0,0
 	call tx0_GT_txn
 
-; op_cstore: defined at lib/primitives.fs:171
 op_cstore
 	btfsc INDF0,4,0
 	goto eepromc_EX_
@@ -307,7 +224,6 @@ op_cstore
 	movff POSTDEC0,INDF1
 	return
 
-; can-handle-message: defined at tests/sensors.fs:171
 can_MI_handle_MI_message
 	call can_MI_receive
 	movff can_MI_arbitration,PREINC0
@@ -319,17 +235,17 @@ can_MI_handle_MI_message
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___244
+	bnz _lbl___245
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto set_MI_thresholds
-_lbl___244
+_lbl___245
 	btfsc can_MI_msg_MI_flags,0,0
-	bra _lbl___245
+	bra _lbl___246
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto can_MI_unknown_MI_msg
-_lbl___245
+_lbl___246
 	call dup
 	movlw COLORS_MI_ARBITRATION
 	movwf PREINC0,0
@@ -337,11 +253,11 @@ _lbl___245
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___247
+	bnz _lbl___248
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto can_MI_send_MI_colors
-_lbl___247
+_lbl___248
 	call dup
 	movlw VALUES_MI_ARBITRATION
 	movwf PREINC0,0
@@ -349,11 +265,11 @@ _lbl___247
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___249
+	bnz _lbl___250
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto can_MI_send_MI_values
-_lbl___249
+_lbl___250
 	call dup
 	movlw CALIBRATION_MI_ARBITRATION
 	movwf PREINC0,0
@@ -361,13 +277,12 @@ _lbl___249
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___251
+	bnz _lbl___252
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto can_MI_send_MI_calibration
-_lbl___251
+_lbl___252
 
-; can-unknown-msg: defined at tests/sensors.fs:166
 can_MI_unknown_MI_msg
 	movlw LOW((_data___4+0x8000))
 	movwf PREINC0,0
@@ -387,7 +302,7 @@ can_MI_unknown_MI_msg
 	clrf PREINC0,0
 	call type
 	btfsc can_MI_msg_MI_flags,0,0
-	bra _lbl___241
+	bra _lbl___242
 	movlw LOW((_data___6+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___6+0x8000))
@@ -396,7 +311,7 @@ can_MI_unknown_MI_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call type
-_lbl___241
+_lbl___242
 	movlw LOW((_data___7+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___7+0x8000))
@@ -406,20 +321,17 @@ _lbl___241
 	clrf PREINC0,0
 	call type
 
-; cr: defined at lib/strings.fs:8
 cr
 	movlw 0xa
 	call emit
 	movlw 0xd
 
-; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
 	movwf TXREG,0
 	return
 
-; can-init: defined at lib/canlib.fs:130
 can_MI_init
 	bsf TRISB,3,0
 	bcf TRISB,2,0
@@ -434,12 +346,10 @@ can_MI_init
 	movwf CIOCON,0
 	call can_MI_disable_MI_all_MI_filters
 
-; can-normal: defined at lib/canlib.fs:112
 can_MI_normal
 	clrf PREINC0,0
 	clrf PREINC0,0
 
-; can-mode: defined at lib/canlib.fs:98
 can_MI_mode
 	call _5_LT__LT_
 	call dup
@@ -450,7 +360,7 @@ can_MI_mode
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
-_lbl___153
+_lbl___154
 	call dup
 	movf CANSTAT,0,0
 	andlw 0xe0
@@ -459,12 +369,11 @@ _lbl___153
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___153
+	bnz _lbl___154
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
 
-; can-send-values: defined at tests/sensors.fs:134
 can_MI_send_MI_values
 	movlw VALUES_MI_ARBITRATION
 	movwf can_MI_arbitration,0
@@ -480,12 +389,10 @@ can_MI_send_MI_values
 	movff (current_MI_value_MI_3+1),(can_MI_msg_MI_6+1)
 	movff current_MI_value_MI_3,can_MI_msg_MI_6
 
-; can-transmit: defined at lib/canlib.fs:94
 can_MI_transmit
 	call can_MI_prepare_MI_buffer
 	call can_MI_clr_MI_rtr
 
-; can-transmit-buffer: defined at lib/canlib.fs:89
 can_MI_transmit_MI_buffer
 	movlw LOW(TXB0CON)
 	movwf PREINC0,0
@@ -497,7 +404,6 @@ can_MI_transmit_MI_buffer
 	bsf INDF1,3,0
 	return
 
-; step: defined at tests/sensors.fs:245
 step
 	call can_MI_msg_MI_present_QM_
 	movf POSTDEC0,0,0
@@ -520,7 +426,6 @@ step
 	btfss STATUS,2,0
 	return
 
-; interactive-mode: defined at tests/sensors.fs:243
 interactive_MI_mode
 	call key
 	movwf PREINC0,0
@@ -528,12 +433,10 @@ interactive_MI_mode
 	call handle_MI_key
 	bra interactive_MI_mode
 
-; mainloop: defined at tests/sensors.fs:252
 mainloop
 	call step
 	bra mainloop
 
-; op_minus: defined at lib/arithmetic.fs:39
 op_minus
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -543,7 +446,6 @@ op_minus
 	subwfb INDF0,1,0
 	return
 
-; color-changed?: defined at tests/sensors.fs:115
 color_MI_changed_QM_
 	call dup
 	movlw LOW(current_MI_colors)
@@ -561,12 +463,10 @@ color_MI_changed_QM_
 	call op_cfetch_tos
 	call xor
 
-; op_normalize: defined at lib/primitives.fs:54
 op_normalize
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 
-; op_normalize_z: defined at lib/primitives.fs:45
 op_normalize_z
 	movlw -1
 	btfsc STATUS,2,0
@@ -575,22 +475,19 @@ op_normalize_z
 	movwf PREINC0,0
 	return
 
-; >: defined at lib/arithmetic.fs:183
 _GT_
 	call swap
 
-; <: defined at lib/arithmetic.fs:167
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___21
+	bra _lbl___22
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto _0_LT_
-_lbl___21
+_lbl___22
 	call op_minus
 
-; 0<: defined at lib/arithmetic.fs:140
 _0_LT_
 	movlw -1
 	btfss POSTDEC0,7,0
@@ -599,12 +496,10 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-; .: defined at lib/strings.fs:22
 _DT_
 	call _1_GT_2
 	call emit_MI_8
 
-; emit-8: defined at lib/strings.fs:21
 emit_MI_8
 	call dup
 	movf POSTDEC0,0,0
@@ -617,24 +512,19 @@ emit_MI_8
 	movf POSTDEC0,0
 	andlw 0xf
 
-; emit-4: defined at lib/strings.fs:20
 emit_MI_4
 	call nibble_MI_to_MI_hex
 	goto emit
 
-; 5<<: defined at lib/canlib.fs:21
 _5_LT__LT_
 	call _2_ST_
 
-; 16*: defined at lib/canlib.fs:20
 _16_ST_
 	call _4_ST_
 
-; 4*: defined at lib/canlib.fs:19
 _4_ST_
 	call _2_ST_
 
-; 2*: defined at lib/arithmetic.fs:196
 _2_ST_
 	bcf STATUS,0,0
 	movf POSTDEC0,0,0
@@ -642,17 +532,14 @@ _2_ST_
 	rlcf INDF0,1,0
 	return
 
-; 5>>: defined at lib/canlib.fs:25
 _5_GT__GT_
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
 	rrcf POSTINC0,1,0
 
-; 16/: defined at lib/canlib.fs:24
 _16_SL_
 	call _4_SL_
 
-; 4/: defined at lib/canlib.fs:23
 _4_SL_
 	rlcf INDF0,0,0
 	rrcf POSTDEC0,1,0
@@ -662,25 +549,24 @@ _4_SL_
 	rrcf POSTINC0,1,0
 	return
 
-; can-choose-buffer: defined at lib/canlib.fs:72
 can_MI_choose_MI_buffer
 	lfsr 1,TXB0CON
 	btfsc INDF1,3,0
-	bra _lbl___141
+	bra _lbl___142
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_set_MI_buffer
-_lbl___141
+_lbl___142
 	btfsc can_MI_flags,0,0
 	bra can_MI_choose_MI_buffer
 	lfsr 1,TXB1CON
 	btfsc INDF1,3,0
-	bra _lbl___143
+	bra _lbl___144
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_set_MI_buffer
-_lbl___143
+_lbl___144
 	lfsr 1,TXB2CON
 	btfsc INDF1,3,0
 	bra can_MI_choose_MI_buffer
@@ -688,12 +574,10 @@ _lbl___143
 	movwf PREINC0,0
 	clrf PREINC0,0
 
-; can-set-buffer: defined at lib/canlib.fs:62
 can_MI_set_MI_buffer
 	movf POSTDEC0,0,0
 	movff POSTDEC0,can_MI_buffer
 
-; compute-can-offset: defined at lib/canlib.fs:56
 compute_MI_can_MI_offset
 	movff can_MI_buffer,PREINC0
 	clrf PREINC0,0
@@ -702,7 +586,6 @@ compute_MI_can_MI_offset
 	movff POSTDEC0,can_MI_offset
 	return
 
-; init: defined at tests/sensors.fs:254
 init
 	movlw 0x81
 	movwf ADCON0,0
@@ -720,7 +603,6 @@ init
 	bsf LATB,0,0
 	bcf LATB,1,0
 
-; can-setup: defined at tests/sensors.fs:64
 can_MI_setup
 	call can_MI_init
 	call can_MI_config
@@ -735,18 +617,15 @@ can_MI_setup
 	movlw 0
 	call can_MI_set_MI_filter
 
-; can-loopback: defined at lib/canlib.fs:113
 can_MI_loopback
 	movlw 0x2
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_mode
 
-; channel-determine-color: defined at tests/sensors.fs:107
 channel_MI_determine_MI_color
 	call channel_MI_measure
 
-; determine-color: defined at tests/sensors.fs:101
 determine_MI_color
 	call dup
 	movff brown_MI_cream_MI_threshold,PREINC0
@@ -754,25 +633,24 @@ determine_MI_color
 	call _LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___220
+	bz _lbl___221
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto brown_MI_detected
-_lbl___220
+_lbl___221
 	movff cream_MI_white_MI_threshold,PREINC0
 	movff (cream_MI_white_MI_threshold+1),PREINC0
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___221
+	bz _lbl___222
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto white_MI_detected
-_lbl___221
+_lbl___222
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 
-; cream-detected: defined at tests/sensors.fs:99
 cream_MI_detected
 	movlw LOW((_data___3+0x8000))
 	movwf PREINC0,0
@@ -788,7 +666,6 @@ cream_MI_detected
 	clrf PREINC0,0
 	return
 
-; maybe-send-colors: defined at tests/sensors.fs:149
 maybe_MI_send_MI_colors
 	btfss PIR1,0,0
 	return
@@ -798,7 +675,6 @@ maybe_MI_send_MI_colors
 	btfsc STATUS,2,0
 	return
 
-; can-send-colors: defined at tests/sensors.fs:125
 can_MI_send_MI_colors
 	movlw COLORS_MI_ARBITRATION
 	movwf can_MI_arbitration,0
@@ -811,14 +687,12 @@ can_MI_send_MI_colors
 	movff current_MI_color_MI_3,can_MI_msg_MI_3
 	call can_MI_transmit
 
-; timer1-reset: defined at tests/sensors.fs:78
 timer1_MI_reset
 	clrf TMR0L,0
 	clrf (TMR0L+1),0
 	bcf PIR1,0,0
 	return
 
-; handle-key: defined at tests/sensors.fs:228
 handle_MI_key
 	call dup
 	movlw 48
@@ -827,7 +701,7 @@ handle_MI_key
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___267
+	bnz _lbl___268
 	movlw LOW((_data___32+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___32+0x8000))
@@ -842,7 +716,7 @@ handle_MI_key
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
-_lbl___267
+_lbl___268
 	call dup
 	movlw 49
 	movwf PREINC0,0
@@ -850,7 +724,7 @@ _lbl___267
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___269
+	bnz _lbl___270
 	movlw LOW((_data___33+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___33+0x8000))
@@ -865,7 +739,7 @@ _lbl___267
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
-_lbl___269
+_lbl___270
 	call dup
 	movlw 50
 	movwf PREINC0,0
@@ -873,7 +747,7 @@ _lbl___269
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___271
+	bnz _lbl___272
 	movlw LOW((_data___34+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___34+0x8000))
@@ -888,7 +762,7 @@ _lbl___269
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
-_lbl___271
+_lbl___272
 	call dup
 	movlw 51
 	movwf PREINC0,0
@@ -896,7 +770,7 @@ _lbl___271
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___273
+	bnz _lbl___274
 	movlw LOW((_data___35+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___35+0x8000))
@@ -911,7 +785,7 @@ _lbl___271
 	call channel_MI_determine_MI_color
 	call _DT_
 	goto cr
-_lbl___273
+_lbl___274
 	call dup
 	movlw 113
 	movwf PREINC0,0
@@ -919,7 +793,7 @@ _lbl___273
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___275
+	bnz _lbl___276
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___36+0x8000))
@@ -931,7 +805,7 @@ _lbl___273
 	clrf PREINC0,0
 	call type
 	goto calibration
-_lbl___275
+_lbl___276
 	call dup
 	movlw 100
 	movwf PREINC0,0
@@ -939,7 +813,7 @@ _lbl___275
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___277
+	bnz _lbl___278
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___37+0x8000))
@@ -953,7 +827,7 @@ _lbl___275
 	call depth
 	call _DT_
 	goto cr
-_lbl___277
+_lbl___278
 	call dup
 	movlw 117
 	movwf PREINC0,0
@@ -961,13 +835,13 @@ _lbl___277
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___279
+	bnz _lbl___280
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call print_MI_usage
 	call _DT_
 	goto cr
-_lbl___279
+_lbl___280
 	call dup
 	movlw 108
 	movwf PREINC0,0
@@ -975,7 +849,7 @@ _lbl___279
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___281
+	bnz _lbl___282
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___38+0x8000))
@@ -988,7 +862,7 @@ _lbl___279
 	call type
 	call cr
 	goto can_MI_loopback
-_lbl___281
+_lbl___282
 	call dup
 	movlw 107
 	movwf PREINC0,0
@@ -996,7 +870,7 @@ _lbl___281
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___283
+	bnz _lbl___284
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___39+0x8000))
@@ -1009,7 +883,7 @@ _lbl___281
 	call type
 	call cr
 	goto can_MI_normal
-_lbl___283
+_lbl___284
 	call dup
 	movlw 115
 	movwf PREINC0,0
@@ -1017,11 +891,11 @@ _lbl___283
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___285
+	bnz _lbl___286
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto step
-_lbl___285
+_lbl___286
 	call dup
 	movlw 76
 	movwf PREINC0,0
@@ -1029,7 +903,7 @@ _lbl___285
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___287
+	bnz _lbl___288
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	btg LATA,5,0
@@ -1042,11 +916,10 @@ _lbl___285
 	clrf PREINC0,0
 	call type
 	goto cr
-_lbl___287
+_lbl___288
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 
-; print-usage: defined at tests/sensors.fs:197
 print_MI_usage
 	movlw LOW((_data___17+0x8000))
 	movwf PREINC0,0
@@ -1139,7 +1012,6 @@ print_MI_usage
 	call type
 	goto cr
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 	clrf calibrated_QM_,1
@@ -1167,19 +1039,16 @@ init_runtime
 	movwf FSR2L,0
 	clrf FSR2H,0
 
-; main: defined at tests/sensors.fs:278
 main
 	call init
 	call greetings
 	goto mainloop
 
-; m0>mn: defined at lib/canlib.fs:60
 m0_GT_mn
 	movff can_MI_buffer,PREINC0
 	clrf PREINC0,0
 	call _4_ST_
 
-; op_plus: defined at lib/arithmetic.fs:6
 op_plus
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -1189,7 +1058,6 @@ op_plus
 	addwfc INDF0,1,0
 	return
 
-; can-msg-present?: defined at lib/canlib.fs:29
 can_MI_msg_MI_present_QM_
 	movlw -1
 	btfss RXB0CON,7,0
@@ -1203,7 +1071,6 @@ can_MI_msg_MI_present_QM_
 	movwf PREINC0,0
 	movwf PREINC0,0
 
-; or: defined at lib/arithmetic.fs:75
 or
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -1213,7 +1080,6 @@ or
 	iorwf INDF0,1,0
 	return
 
-; table-addr!: defined at lib/tables.fs:1
 table_MI_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -1224,7 +1090,6 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-; eeprom!: defined at lib/tables.fs:31
 eeprom_EX_
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
@@ -1242,7 +1107,6 @@ eeprom_EX_
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 
-; eepromc!: defined at lib/tables.fs:23
 eepromc_EX_
 	call eeprom_MI_addr_EX_
 	movf POSTDEC0,0,0
@@ -1253,19 +1117,18 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___72
+_lbl___73
 	btfsc EECON1,1,0
-	bra _lbl___72
+	bra _lbl___73
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
 
-; print-color: defined at tests/sensors.fs:182
 print_MI_color
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___253
+	bnz _lbl___254
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___8+0x8000))
@@ -1276,7 +1139,7 @@ print_MI_color
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___253
+_lbl___254
 	call dup
 	movlw CREAM
 	movwf PREINC0,0
@@ -1284,7 +1147,7 @@ _lbl___253
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___255
+	bnz _lbl___256
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___9+0x8000))
@@ -1295,7 +1158,7 @@ _lbl___253
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___255
+_lbl___256
 	call dup
 	movlw BROWN
 	movwf PREINC0,0
@@ -1303,7 +1166,7 @@ _lbl___255
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___257
+	bnz _lbl___258
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___10+0x8000))
@@ -1314,7 +1177,7 @@ _lbl___255
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___257
+_lbl___258
 	call dup
 	movlw WHITE
 	movwf PREINC0,0
@@ -1322,7 +1185,7 @@ _lbl___257
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___259
+	bnz _lbl___260
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___11+0x8000))
@@ -1333,7 +1196,7 @@ _lbl___257
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto type
-_lbl___259
+_lbl___260
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	movlw LOW((_data___12+0x8000))
@@ -1344,7 +1207,6 @@ _lbl___259
 	movwf PREINC0,0
 	clrf PREINC0,0
 
-; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -1354,7 +1216,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___88
+_lbl___89
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -1364,13 +1226,12 @@ _lbl___88
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___88
+	bra _lbl___89
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
 
-; can-receive: defined at lib/canlib.fs:49
 can_MI_receive
 	btfsc RXB0CON,7,0
 	goto can_MI_receive_MI_buffer0
@@ -1378,7 +1239,6 @@ can_MI_receive
 	btfss INDF1,7,0
 	bra can_MI_receive
 
-; can-receive-buffer1: defined at lib/canlib.fs:40
 can_MI_receive_MI_buffer1
 	movff RXB1DLC,WREG
 	andlw 0xf
@@ -1389,7 +1249,7 @@ can_MI_receive_MI_buffer1
 	movff POSTDEC0,can_MI_msg_MI_length
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___122
+	bz _lbl___123
 	movlw LOW(RXB1D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB1D0)
@@ -1399,7 +1259,7 @@ can_MI_receive_MI_buffer1
 	clrf PREINC0,0
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___122
+_lbl___123
 	clrf can_MI_msg_MI_flags,0
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0
@@ -1413,7 +1273,6 @@ _lbl___122
 	bcf INDF1,7,0
 	return
 
-; set-thresholds: defined at tests/sensors.fs:160
 set_MI_thresholds
 	movff can_MI_msg_MI_0,PREINC0
 	movff (can_MI_msg_MI_0+1),PREINC0
@@ -1429,7 +1288,6 @@ set_MI_thresholds
 	movwf PREINC0,0
 	call op_store
 
-; read-from-eeprom: defined at tests/sensors.fs:155
 read_MI_from_MI_eeprom
 	clrf PREINC0,0
 	movlw HIGH(cream_MI_white_MI_threshold_MI_eeprom)
@@ -1446,26 +1304,22 @@ read_MI_from_MI_eeprom
 	movff POSTDEC0,brown_MI_cream_MI_threshold
 	return
 
-; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
 
-; tx0>txn: defined at lib/canlib.fs:58
 tx0_GT_txn
 	movff can_MI_offset,PREINC0
 	clrf PREINC0,0
 	goto op_minus
 
-; can-config: defined at lib/canlib.fs:111
 can_MI_config
 	movlw 0x4
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_MI_mode
 
-; can-set-filter: defined at lib/canlib.fs:120
 can_MI_set_MI_filter
 	movwf can_MI_buffer,0
 	call _5_LT__LT_
@@ -1482,7 +1336,6 @@ can_MI_set_MI_filter
 	call m0_GT_mn
 	goto op_cstore
 
-; can-set-mask: defined at lib/canlib.fs:123
 can_MI_set_MI_mask
 	movwf can_MI_buffer,0
 	call _5_LT__LT_
@@ -1500,7 +1353,6 @@ can_MI_set_MI_mask
 	call m0_GT_mn
 	goto op_cstore
 
-; channel-measure: defined at tests/sensors.fs:89
 channel_MI_measure
 	call select_MI_channel
 	bsf LATA,5,0
@@ -1511,7 +1363,6 @@ channel_MI_measure
 	call _4_MI_measures
 	goto op_minus
 
-; update-color: defined at tests/sensors.fs:119
 update_MI_color
 	call dup
 	movlw LOW(current_MI_colors)
@@ -1529,7 +1380,6 @@ update_MI_color
 	call op_cfetch_tos
 	goto op_cstore
 
-; can-send-calibration: defined at tests/sensors.fs:142
 can_MI_send_MI_calibration
 	movlw CALIBRATION_MI_ARBITRATION
 	movwf can_MI_arbitration,0
@@ -1542,7 +1392,6 @@ can_MI_send_MI_calibration
 	movff brown_MI_cream_MI_threshold,can_MI_msg_MI_2
 	goto can_MI_transmit
 
-; greetings: defined at tests/sensors.fs:274
 greetings
 	movlw LOW((_data___41+0x8000))
 	movwf PREINC0,0
@@ -1554,14 +1403,12 @@ greetings
 	call type
 	goto cr
 
-; dup: defined at lib/primitives.fs:29
 dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
 	return
 
-; op_store: defined at lib/primitives.fs:159
 op_store
 	btfsc INDF0,4,0
 	goto eeprom_EX_
@@ -1572,7 +1419,6 @@ op_store
 	movff POSTDEC0,INDF1
 	return
 
-; op_fetch_tos: defined at lib/primitives.fs:183
 op_fetch_tos
 	btfsc INDF0,7,0
 	goto flash_AT_
@@ -1584,7 +1430,6 @@ op_fetch_tos
 	movff INDF1,PREINC0
 	return
 
-; op_cfetch_tos: defined at lib/primitives.fs:197
 op_cfetch_tos
 	btfsc INDF0,7,0
 	goto flashc_AT_
@@ -1596,7 +1441,6 @@ op_cfetch_tos
 	clrf PREINC0,0
 	return
 
-; swap: defined at lib/primitives.fs:241
 swap
 	movff POSTDEC0,(temp_x1+1)
 	movff POSTDEC0,temp_x1
@@ -1608,7 +1452,6 @@ swap
 	movff POSTDEC2,PREINC0
 	return
 
-; 2drop: defined at lib/primitives.fs:243
 _2drop
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -1616,7 +1459,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; xor: defined at lib/arithmetic.fs:87
 xor
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -1626,7 +1468,6 @@ xor
 	xorwf INDF0,1,0
 	return
 
-; 1>2: defined at lib/arithmetic.fs:106
 _1_GT_2
 	movf INDF0,0,0
 	clrf INDF0,0
@@ -1634,7 +1475,6 @@ _1_GT_2
 	clrf PREINC0,0
 	return
 
-; negate: defined at lib/arithmetic.fs:132
 negate
 	comf POSTDEC0,1,0
 	negf POSTINC0,0
@@ -1642,7 +1482,6 @@ negate
 	addwfc INDF0,1,0
 	return
 
-; 2dupxor>w: defined at lib/arithmetic.fs:159
 _2dupxor_GT_w
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -1650,7 +1489,6 @@ _2dupxor_GT_w
 	xorwf PREINC0,0,0
 	return
 
-; depth: defined at lib/arithmetic.fs:236
 depth
 	movff (FSR0L+1),(temp_x1+1)
 	movff FSR0L,temp_x1
@@ -1666,7 +1504,6 @@ depth
 	rrcf POSTINC0,1,0
 	return
 
-; flashc@: defined at lib/tables.fs:14
 flashc_AT_
 	call flash_MI_addr_EX_
 	tblrd*+
@@ -1674,7 +1511,6 @@ flashc_AT_
 	clrf PREINC0,0
 	return
 
-; flash@: defined at lib/tables.fs:15
 flash_AT_
 	call flash_MI_addr_EX_
 	tblrd*+
@@ -1684,21 +1520,18 @@ flash_AT_
 	movff TABLAT,INDF0
 	return
 
-; eeprom-addr!: defined at lib/tables.fs:17
 eeprom_MI_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
-; eepromc@: defined at lib/tables.fs:19
 eepromc_AT_
 	call eeprom_MI_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-; eeprom@: defined at lib/tables.fs:21
 eeprom_AT_
 	call dup
 	movf POSTDEC0,0
@@ -1720,7 +1553,6 @@ eeprom_AT_
 	movwf INDF0,0
 	return
 
-; nibble-to-hex: defined at lib/strings.fs:11
 nibble_MI_to_MI_hex
 	addlw 0xf6
 	btfsc STATUS,0,0
@@ -1728,7 +1560,6 @@ nibble_MI_to_MI_hex
 	addlw 0x3a
 	return
 
-; memcpy: defined at lib/memory.fs:4
 memcpy
 	movff FSR2L,temp_x2
 	movff FSR2H,(temp_x2+1)
@@ -1744,7 +1575,6 @@ memcpy_loop
 	movff (temp_x2+1),FSR2H
 	return
 
-; can-receive-buffer0: defined at lib/canlib.fs:31
 can_MI_receive_MI_buffer0
 	movf RXB0DLC,0,0
 	andlw 0xf
@@ -1755,7 +1585,7 @@ can_MI_receive_MI_buffer0
 	movff POSTDEC0,can_MI_msg_MI_length
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___119
+	bz _lbl___120
 	movlw LOW(RXB0D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB0D0)
@@ -1765,7 +1595,7 @@ can_MI_receive_MI_buffer0
 	clrf PREINC0,0
 	movf can_MI_msg_MI_length,0,0
 	call memcpy
-_lbl___119
+_lbl___120
 	clrf can_MI_msg_MI_flags,0
 	btfsc RXB0DLC,6,0
 	bsf can_MI_msg_MI_flags,0,0
@@ -1777,7 +1607,6 @@ _lbl___119
 	bcf RXB0CON,7,0
 	return
 
-; can-clr-rtr: defined at lib/canlib.fs:92
 can_MI_clr_MI_rtr
 	movlw LOW(TXB0DLC)
 	movwf PREINC0,0
@@ -1789,7 +1618,6 @@ can_MI_clr_MI_rtr
 	bcf INDF1,6,0
 	return
 
-; can-disable-all-filters: defined at lib/canlib.fs:126
 can_MI_disable_MI_all_MI_filters
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
@@ -1805,7 +1633,7 @@ can_MI_disable_MI_all_MI_filters
 	call can_MI_set_MI_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___168
+_lbl___169
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -1821,18 +1649,16 @@ _lbl___168
 	movf POSTDEC0,0
 	call can_MI_set_MI_filter
 	decfsz INDF2,1,0
-	bra _lbl___168
+	bra _lbl___169
 	movf POSTDEC2,1,0
 	return
 
-; key: defined at lib/tty-rs232.fs:6
 key
 	btfss PIR1,5,0
 	bra key
 	movf RCREG,0,0
 	return
 
-; timer0-reset: defined at tests/sensors.fs:75
 timer0_MI_reset
 	clrf PREINC0,0
 	movlw HIGH(0x400)
@@ -1843,15 +1669,13 @@ timer0_MI_reset
 	bcf INTCON,2,0
 	return
 
-; wait-timer0: defined at tests/sensors.fs:76
 wait_MI_timer0
 	call timer0_MI_reset
-_lbl___201
+_lbl___202
 	btfsc INTCON,2,0
 	return
-	bra _lbl___201
+	bra _lbl___202
 
-; select-channel: defined at tests/sensors.fs:81
 select_MI_channel
 	call _4_ST_
 	call _4_ST_
@@ -1864,31 +1688,28 @@ select_MI_channel
 	movff POSTDEC0,ADCON0
 	return
 
-; conversion: defined at tests/sensors.fs:83
 conversion
 	bsf ADCON0,2,0
-_lbl___208
+_lbl___209
 	btfsc ADCON0,2,0
-	bra _lbl___208
+	bra _lbl___209
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	return
 
-; 4-measures: defined at tests/sensors.fs:87
 _4_MI_measures
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___211
+_lbl___212
 	call conversion
 	call op_plus
 	decfsz INDF2,1,0
-	bra _lbl___211
+	bra _lbl___212
 	movf POSTDEC2,1,0
 	return
 
-; brown-detected: defined at tests/sensors.fs:97
 brown_MI_detected
 	movlw LOW((_data___1+0x8000))
 	movwf PREINC0,0
@@ -1904,7 +1725,6 @@ brown_MI_detected
 	clrf PREINC0,0
 	return
 
-; white-detected: defined at tests/sensors.fs:98
 white_MI_detected
 	movlw LOW((_data___2+0x8000))
 	movwf PREINC0,0
@@ -1920,13 +1740,12 @@ white_MI_detected
 	clrf PREINC0,0
 	return
 
-; colors-changed?: defined at tests/sensors.fs:122
 colors_MI_changed_QM_
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___229
+_lbl___230
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	movlw LOW((-1))
@@ -1937,7 +1756,7 @@ _lbl___229
 	call color_MI_changed_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___230
+	bz _lbl___231
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	movlw LOW((-1))
@@ -1949,17 +1768,16 @@ _lbl___229
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-_lbl___230
+_lbl___231
 	decfsz INDF2,1,0
-	bra _lbl___229
+	bra _lbl___230
 	movf POSTDEC2,1,0
 	return
 
-; serial-dump: defined at tests/sensors.fs:190
 serial_MI_dump
 	movlw 4
 	movwf PREINC2,0
-_lbl___261
+_lbl___262
 	movlw LOW((_data___13+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((_data___13+0x8000))
@@ -2030,11 +1848,10 @@ _lbl___261
 	call type
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___261
+	bra _lbl___262
 	movf POSTDEC2,1,0
 	return
 
-; pause: defined at tests/sensors.fs:210
 pause
 	call key
 	movwf PREINC0,0
@@ -2043,7 +1860,6 @@ pause
 	movf POSTDEC0,1,0
 	return
 
-; calibration: defined at tests/sensors.fs:211
 calibration
 	movlw LOW((_data___27+0x8000))
 	movwf PREINC0,0
@@ -2125,97 +1941,66 @@ calibration
 ; Section: memory
 ;---------------------------------------------------------
 
-; temp_x1: defined at lib/primitives.fs:22
 temp_x1 equ 0x0
 
-; temp_x2: defined at lib/primitives.fs:23
 temp_x2 equ 0x2
 
-; can-msg: defined at lib/canlib.fs:1
 can_MI_msg equ 0x12
 
-; can-msg-0: defined at lib/canlib.fs:2
 can_MI_msg_MI_0 equ 0x12
 
-; can-msg-1: defined at lib/canlib.fs:3
 can_MI_msg_MI_1 equ 0x13
 
-; can-msg-2: defined at lib/canlib.fs:4
 can_MI_msg_MI_2 equ 0x14
 
-; can-msg-3: defined at lib/canlib.fs:5
 can_MI_msg_MI_3 equ 0x15
 
-; can-msg-4: defined at lib/canlib.fs:6
 can_MI_msg_MI_4 equ 0x16
 
-; can-msg-6: defined at lib/canlib.fs:8
 can_MI_msg_MI_6 equ 0x18
 
-; can-msg-length: defined at lib/canlib.fs:10
 can_MI_msg_MI_length equ 0x1a
 
-; can-msg-flags: defined at lib/canlib.fs:11
 can_MI_msg_MI_flags equ 0x1b
 
-; can-buffer: defined at lib/canlib.fs:13
 can_MI_buffer equ 0x1c
 
-; can-offset: defined at lib/canlib.fs:14
 can_MI_offset equ 0x1d
 
-; can-arbitration: defined at lib/canlib.fs:15
 can_MI_arbitration equ 0x1e
 
-; can-flags: defined at lib/canlib.fs:16
 can_MI_flags equ 0x20
 
-; calibrated?: defined at tests/sensors.fs:15
 calibrated_QM_ equ 0x100
 
-; current-values: defined at tests/sensors.fs:24
 current_MI_values equ 0x102
 
-; current-value-0: defined at tests/sensors.fs:25
 current_MI_value_MI_0 equ 0x102
 
-; current-value-1: defined at tests/sensors.fs:26
 current_MI_value_MI_1 equ 0x104
 
-; current-value-2: defined at tests/sensors.fs:27
 current_MI_value_MI_2 equ 0x106
 
-; current-value-3: defined at tests/sensors.fs:28
 current_MI_value_MI_3 equ 0x108
 
-; current-colors: defined at tests/sensors.fs:29
 current_MI_colors equ 0x10a
 
-; current-color-0: defined at tests/sensors.fs:30
 current_MI_color_MI_0 equ 0x10a
 
-; current-color-1: defined at tests/sensors.fs:31
 current_MI_color_MI_1 equ 0x10b
 
-; current-color-2: defined at tests/sensors.fs:32
 current_MI_color_MI_2 equ 0x10c
 
-; current-color-3: defined at tests/sensors.fs:33
 current_MI_color_MI_3 equ 0x10d
 
-; previous-colors: defined at tests/sensors.fs:34
 previous_MI_colors equ 0x10e
 
-; cream-white-threshold-eeprom: defined at tests/sensors.fs:37
 cream_MI_white_MI_threshold_MI_eeprom equ 0x1000
 
-; brown-cream-threshold-eeprom: defined at tests/sensors.fs:38
 brown_MI_cream_MI_threshold_MI_eeprom equ 0x1002
 
-; brown-cream-threshold: defined at tests/sensors.fs:59
 brown_MI_cream_MI_threshold equ 0x112
 
-; cream-white-threshold: defined at tests/sensors.fs:60
 cream_MI_white_MI_threshold equ 0x114
 
 ;---------------------------------------------------------

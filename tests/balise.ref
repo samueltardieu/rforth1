@@ -7,115 +7,80 @@
 ; Section: constants
 ;---------------------------------------------------------
 
-; TBLPTRU: defined at lib/sfrnames.fs:13
 TBLPTRU equ 0xff8
 
-; TBLPTRH: defined at lib/sfrnames.fs:14
 TBLPTRH equ 0xff7
 
-; TBLPTRL: defined at lib/sfrnames.fs:15
 TBLPTRL equ 0xff6
 
-; TABLAT: defined at lib/sfrnames.fs:16
 TABLAT equ 0xff5
 
-; INDF0: defined at lib/sfrnames.fs:23
 INDF0 equ 0xfef
 
-; POSTINC0: defined at lib/sfrnames.fs:24
 POSTINC0 equ 0xfee
 
-; POSTDEC0: defined at lib/sfrnames.fs:25
 POSTDEC0 equ 0xfed
 
-; PREINC0: defined at lib/sfrnames.fs:26
 PREINC0 equ 0xfec
 
-; PLUSW0: defined at lib/sfrnames.fs:27
 PLUSW0 equ 0xfeb
 
-; FSR0H: defined at lib/sfrnames.fs:28
 FSR0H equ 0xfea
 
-; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
 
-; WREG: defined at lib/sfrnames.fs:30
 WREG equ 0xfe8
 
-; INDF1: defined at lib/sfrnames.fs:31
 INDF1 equ 0xfe7
 
-; POSTINC1: defined at lib/sfrnames.fs:32
 POSTINC1 equ 0xfe6
 
-; FSR1H: defined at lib/sfrnames.fs:36
 FSR1H equ 0xfe2
 
-; FSR1L: defined at lib/sfrnames.fs:37
 FSR1L equ 0xfe1
 
-; INDF2: defined at lib/sfrnames.fs:39
 INDF2 equ 0xfdf
 
-; POSTDEC2: defined at lib/sfrnames.fs:41
 POSTDEC2 equ 0xfdd
 
-; PREINC2: defined at lib/sfrnames.fs:42
 PREINC2 equ 0xfdc
 
-; FSR2H: defined at lib/sfrnames.fs:44
 FSR2H equ 0xfda
 
-; FSR2L: defined at lib/sfrnames.fs:45
 FSR2L equ 0xfd9
 
-; STATUS: defined at lib/sfrnames.fs:46
 STATUS equ 0xfd8
 
-; TMR0H: defined at lib/sfrnames.fs:47
 TMR0H equ 0xfd7
 
-; TMR0L: defined at lib/sfrnames.fs:48
 TMR0L equ 0xfd6
 
-; T0CON: defined at lib/sfrnames.fs:49
 T0CON equ 0xfd5
 
-; RCREG: defined at lib/sfrnames.fs:85
 RCREG equ 0xfae
 
-; TXREG: defined at lib/sfrnames.fs:86
 TXREG equ 0xfad
 
-; EEADR: defined at lib/sfrnames.fs:89
 EEADR equ 0xfa9
 
-; EEDATA: defined at lib/sfrnames.fs:90
 EEDATA equ 0xfa8
 
-; EECON1: defined at lib/sfrnames.fs:92
 EECON1 equ 0xfa6
 
-; PIR1: defined at lib/sfrnames.fs:100
 PIR1 equ 0xf9e
 
-; TRISC: defined at lib/sfrnames.fs:104
 TRISC equ 0xf94
 
-; LATC: defined at lib/sfrnames.fs:109
 LATC equ 0xf8b
 
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-; alt-1: defined at tests/balise.fs:33
 alt_MI_1
 	movff pattern_MI_1,PREINC0
 	clrf PREINC0,0
 
-; alt!: defined at tests/balise.fs:31
 alt_EX_
 	movf LATC,0,0
 	andlw 0xf8
@@ -126,7 +91,6 @@ alt_EX_
 	movff POSTDEC0,LATC
 	return
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 	clrf nexttimer,1
@@ -144,7 +108,6 @@ init_runtime
 	movwf FSR2L,0
 	clrf FSR2H,0
 
-; main: defined at tests/balise.fs:84
 main
 	movlw 3
 	movwf pattern_MI_1,1
@@ -153,7 +116,6 @@ main
 	call init_MI_ports
 	call greetings
 
-; main-loop: defined at tests/balise.fs:49
 main_MI_loop
 	call prompt
 	call pwm
@@ -167,7 +129,7 @@ main_MI_loop
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___220
+	bnz _lbl___221
 	call leds_MI_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -175,7 +137,7 @@ main_MI_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___220
+_lbl___221
 	call dup
 	movlw 80
 	movwf PREINC0,0
@@ -183,7 +145,7 @@ _lbl___220
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___222
+	bnz _lbl___223
 	call leds_MI_off
 	call read4
 	movf POSTDEC0,0,0
@@ -191,7 +153,7 @@ _lbl___220
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_MI_2
-_lbl___222
+_lbl___223
 	call dup
 	movlw 83
 	movwf PREINC0,0
@@ -199,7 +161,7 @@ _lbl___222
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___224
+	bnz _lbl___225
 	call leds_MI_off
 	movf T0CON,0,0
 	andlw 0xf0
@@ -209,12 +171,11 @@ _lbl___222
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___224
+_lbl___225
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	bra main_MI_loop
 
-; type: defined at lib/strings.fs:24
 type
 	call dup
 	movf POSTDEC0,0,0
@@ -224,7 +185,7 @@ type
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	movwf PREINC2,0
-_lbl___88
+_lbl___89
 	call dup
 	call op_cfetch_tos
 	movf POSTDEC0,0
@@ -234,31 +195,28 @@ _lbl___88
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___88
+	bra _lbl___89
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
 
-; >=: defined at lib/arithmetic.fs:175
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___25
+	bra _lbl___26
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___25
+_lbl___26
 	call op_minus
 	call _0_LT_
 
-; op_zeroeq: defined at lib/primitives.fs:70
 op_zeroeq
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
 
-; op_zeroeq_z: defined at lib/primitives.fs:61
 op_zeroeq_z
 	movlw -1
 	btfss STATUS,2,0
@@ -267,7 +225,6 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-; neighbour?: defined at tests/balise.fs:25
 neighbour_QM_
 	btfsc INDF0,7,0
 	call negate
@@ -275,18 +232,16 @@ neighbour_QM_
 	movlw HIGH(0x1000)
 	movwf PREINC0,0
 
-; <: defined at lib/arithmetic.fs:167
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___21
+	bra _lbl___22
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto _0_LT_
-_lbl___21
+_lbl___22
 	call op_minus
 
-; 0<: defined at lib/arithmetic.fs:140
 _0_LT_
 	movlw -1
 	btfss POSTDEC0,7,0
@@ -295,13 +250,11 @@ _0_LT_
 	movwf INDF0,0
 	return
 
-; timer-set: defined at tests/balise.fs:23
 timer_MI_set
 	clrf PREINC0,0
 	movlw HIGH(nexttimer)
 	movwf PREINC0,0
 
-; +!: defined at lib/arithmetic.fs:18
 _PL__EX_
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
@@ -313,14 +266,12 @@ _PL__EX_
 	movf POSTDEC0,0,0
 	return
 
-; diff: defined at tests/balise.fs:24
 diff
 	movff TMR0L,PREINC0
 	movff TMR0H,PREINC0
 	movff nexttimer,PREINC0
 	movff (nexttimer+1),PREINC0
 
-; op_minus: defined at lib/arithmetic.fs:39
 op_minus
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -330,14 +281,12 @@ op_minus
 	subwfb INDF0,1,0
 	return
 
-; read8: defined at lib/strings.fs:66
 read8
 	call read4
 	movf POSTDEC0,0,0
 	swapf POSTINC0,1,0
 	call read4
 
-; or: defined at lib/arithmetic.fs:75
 or
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -347,7 +296,6 @@ or
 	iorwf INDF0,1,0
 	return
 
-; table-addr!: defined at lib/tables.fs:1
 table_MI_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -358,25 +306,21 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
 
-; alt-2: defined at tests/balise.fs:34
 alt_MI_2
 	movff pattern_MI_2,PREINC0
 	clrf PREINC0,0
 	goto alt_EX_
 
-; leds-off: defined at tests/balise.fs:36
 leds_MI_off
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto alt_EX_
 
-; prompt: defined at tests/balise.fs:47
 prompt
 	movlw LOW((_data___1+0x8000))
 	movwf PREINC0,0
@@ -387,7 +331,6 @@ prompt
 	clrf PREINC0,0
 	goto type
 
-; greetings: defined at tests/balise.fs:71
 greetings
 	movlw LOW((_data___2+0x8000))
 	movwf PREINC0,0
@@ -398,14 +341,12 @@ greetings
 	clrf PREINC0,0
 	goto type
 
-; dup: defined at lib/primitives.fs:29
 dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
 	return
 
-; op_cfetch_tos: defined at lib/primitives.fs:197
 op_cfetch_tos
 	btfsc INDF0,7,0
 	goto flashc_AT_
@@ -417,7 +358,6 @@ op_cfetch_tos
 	clrf PREINC0,0
 	return
 
-; swap: defined at lib/primitives.fs:241
 swap
 	movff POSTDEC0,(temp_x1+1)
 	movff POSTDEC0,temp_x1
@@ -429,7 +369,6 @@ swap
 	movff POSTDEC2,PREINC0
 	return
 
-; 2drop: defined at lib/primitives.fs:243
 _2drop
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -437,7 +376,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; xor: defined at lib/arithmetic.fs:87
 xor
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -447,7 +385,6 @@ xor
 	xorwf INDF0,1,0
 	return
 
-; 1>2: defined at lib/arithmetic.fs:106
 _1_GT_2
 	movf INDF0,0,0
 	clrf INDF0,0
@@ -455,7 +392,6 @@ _1_GT_2
 	clrf PREINC0,0
 	return
 
-; negate: defined at lib/arithmetic.fs:132
 negate
 	comf POSTDEC0,1,0
 	negf POSTINC0,0
@@ -463,7 +399,6 @@ negate
 	addwfc INDF0,1,0
 	return
 
-; 2dupxor>w: defined at lib/arithmetic.fs:159
 _2dupxor_GT_w
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -471,7 +406,6 @@ _2dupxor_GT_w
 	xorwf PREINC0,0,0
 	return
 
-; flashc@: defined at lib/tables.fs:14
 flashc_AT_
 	call flash_MI_addr_EX_
 	tblrd*+
@@ -479,21 +413,18 @@ flashc_AT_
 	clrf PREINC0,0
 	return
 
-; eeprom-addr!: defined at lib/tables.fs:17
 eeprom_MI_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
-; eepromc@: defined at lib/tables.fs:19
 eepromc_AT_
 	call eeprom_MI_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-; read4: defined at lib/strings.fs:65
 read4
 	call key
 	movwf PREINC0,0
@@ -505,7 +436,7 @@ read4
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___95
+	bz _lbl___96
 	movf POSTDEC0,0
 	movf POSTDEC0,0
 	andlw 223
@@ -517,7 +448,7 @@ read4
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___95
+_lbl___96
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -525,7 +456,6 @@ _lbl___95
 	addwfc INDF0,1,0
 	return
 
-; read16: defined at lib/strings.fs:67
 read16
 	call read8
 	call read8
@@ -535,49 +465,44 @@ read16
 	movwf INDF0,0
 	return
 
-; emit: defined at lib/tty-rs232.fs:4
 emit
 	btfss PIR1,4,0
 	bra emit
 	movwf TXREG,0
 	return
 
-; key: defined at lib/tty-rs232.fs:6
 key
 	btfss PIR1,5,0
 	bra key
 	movf RCREG,0,0
 	return
 
-; timer-reached?: defined at tests/balise.fs:26
 timer_MI_reached_QM_
 	call diff
 	call dup
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___201
+	bz _lbl___202
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___201
+_lbl___202
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	clrf PREINC0,0
 	clrf PREINC0,0
 	return
 
-; timer-wait: defined at tests/balise.fs:28
 timer_MI_wait
 	call timer_MI_set
-_lbl___205
+_lbl___206
 	call timer_MI_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___205
+	bz _lbl___206
 	return
 
-; timer-reset: defined at tests/balise.fs:29
 timer_MI_reset
 	clrf TMR0H,0
 	clrf TMR0L,0
@@ -585,10 +510,9 @@ timer_MI_reset
 	clrf (nexttimer+1),1
 	return
 
-; pwm: defined at tests/balise.fs:38
 pwm
 	call timer_MI_reset
-_lbl___213
+_lbl___214
 	call alt_MI_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -599,9 +523,8 @@ _lbl___213
 	call timer_MI_wait
 	btfsc PIR1,5,0
 	return
-	bra _lbl___213
+	bra _lbl___214
 
-; init-ports: defined at tests/balise.fs:74
 init_MI_ports
 	movlw 0xb8
 	movwf TRISC,0
@@ -619,22 +542,16 @@ init_MI_ports
 ; Section: memory
 ;---------------------------------------------------------
 
-; temp_x1: defined at lib/primitives.fs:22
 temp_x1 equ 0x0
 
-; nexttimer: defined at tests/balise.fs:16
 nexttimer equ 0x100
 
-; ondelay: defined at tests/balise.fs:17
 ondelay equ 0x102
 
-; offdelay: defined at tests/balise.fs:18
 offdelay equ 0x104
 
-; pattern-1: defined at tests/balise.fs:20
 pattern_MI_1 equ 0x106
 
-; pattern-2: defined at tests/balise.fs:21
 pattern_MI_2 equ 0x107
 
 ;---------------------------------------------------------

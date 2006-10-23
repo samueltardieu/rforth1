@@ -7,116 +7,80 @@
 ; Section: constants
 ;---------------------------------------------------------
 
-; TBLPTRU: defined at lib/sfrnames.fs:13
 TBLPTRU equ 0xff8
 
-; TBLPTRH: defined at lib/sfrnames.fs:14
 TBLPTRH equ 0xff7
 
-; TBLPTRL: defined at lib/sfrnames.fs:15
 TBLPTRL equ 0xff6
 
-; TABLAT: defined at lib/sfrnames.fs:16
 TABLAT equ 0xff5
 
-; INDF0: defined at lib/sfrnames.fs:23
 INDF0 equ 0xfef
 
-; POSTINC0: defined at lib/sfrnames.fs:24
 POSTINC0 equ 0xfee
 
-; POSTDEC0: defined at lib/sfrnames.fs:25
 POSTDEC0 equ 0xfed
 
-; PREINC0: defined at lib/sfrnames.fs:26
 PREINC0 equ 0xfec
 
-; PLUSW0: defined at lib/sfrnames.fs:27
 PLUSW0 equ 0xfeb
 
-; FSR0H: defined at lib/sfrnames.fs:28
 FSR0H equ 0xfea
 
-; FSR0L: defined at lib/sfrnames.fs:29
 FSR0L equ 0xfe9
 
-; INDF1: defined at lib/sfrnames.fs:31
 INDF1 equ 0xfe7
 
-; FSR1H: defined at lib/sfrnames.fs:36
 FSR1H equ 0xfe2
 
-; FSR1L: defined at lib/sfrnames.fs:37
 FSR1L equ 0xfe1
 
-; POSTINC2: defined at lib/sfrnames.fs:40
 POSTINC2 equ 0xfde
 
-; POSTDEC2: defined at lib/sfrnames.fs:41
 POSTDEC2 equ 0xfdd
 
-; PREINC2: defined at lib/sfrnames.fs:42
 PREINC2 equ 0xfdc
 
-; FSR2H: defined at lib/sfrnames.fs:44
 FSR2H equ 0xfda
 
-; FSR2L: defined at lib/sfrnames.fs:45
 FSR2L equ 0xfd9
 
-; STATUS: defined at lib/sfrnames.fs:46
 STATUS equ 0xfd8
 
-; SSPBUF: defined at lib/sfrnames.fs:61
 SSPBUF equ 0xfc9
 
-; SSPSTAT: defined at lib/sfrnames.fs:63
 SSPSTAT equ 0xfc7
 
-; SSPCON1: defined at lib/sfrnames.fs:64
 SSPCON1 equ 0xfc6
 
-; EEADR: defined at lib/sfrnames.fs:89
 EEADR equ 0xfa9
 
-; EEDATA: defined at lib/sfrnames.fs:90
 EEDATA equ 0xfa8
 
-; EECON2: defined at lib/sfrnames.fs:91
 EECON2 equ 0xfa7
 
-; EECON1: defined at lib/sfrnames.fs:92
 EECON1 equ 0xfa6
 
-; PIR2: defined at lib/sfrnames.fs:97
 PIR2 equ 0xfa1
 
-; PIR1: defined at lib/sfrnames.fs:100
 PIR1 equ 0xf9e
 
-; TRISC: defined at lib/sfrnames.fs:104
 TRISC equ 0xf94
 
-; TRISA: defined at lib/sfrnames.fs:106
 TRISA equ 0xf92
 
-; PORTA: defined at lib/sfrnames.fs:116
 PORTA equ 0xf80
 
-; write-command: defined at tests/spi-pic.fs:19
 write_MI_command equ 0x0
 
-; read-command: defined at tests/spi-pic.fs:20
 read_MI_command equ 0x1
 
-; bit-change-command: defined at tests/spi-pic.fs:21
 bit_MI_change_MI_command equ 0x2
 
 ;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-; init_runtime: defined at lib/primitives.fs:3
 init_runtime
 	movlb 1
 	clrf current_MI_command,1
@@ -130,16 +94,13 @@ init_runtime
 	movwf FSR2L,0
 	clrf FSR2H,0
 
-; main: defined at tests/spi-pic.fs:87
 main
 	call init_MI_spi
 
-; mainloop: defined at tests/spi-pic.fs:84
 mainloop
 	call handle_MI_command
 	bra mainloop
 
-; table-addr!: defined at lib/tables.fs:1
 table_MI_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -150,20 +111,17 @@ table_MI_addr_EX_
 	bcf EECON1,6,0
 	return
 
-; flash-addr!: defined at lib/tables.fs:3
 flash_MI_addr_EX_
 	bcf INDF0,7,0
 	bsf EECON1,7,0
 	bra table_MI_addr_EX_
 
-; dup: defined at lib/primitives.fs:29
 dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
 	return
 
-; op_cstore: defined at lib/primitives.fs:171
 op_cstore
 	btfsc INDF0,4,0
 	goto eepromc_EX_
@@ -173,7 +131,6 @@ op_cstore
 	movff POSTDEC0,INDF1
 	return
 
-; op_cfetch_tos: defined at lib/primitives.fs:197
 op_cfetch_tos
 	btfsc INDF0,7,0
 	goto flashc_AT_
@@ -185,7 +142,6 @@ op_cfetch_tos
 	clrf PREINC0,0
 	return
 
-; 2drop: defined at lib/primitives.fs:243
 _2drop
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
@@ -193,7 +149,6 @@ _2drop
 	movf POSTDEC0,1,0
 	return
 
-; op_and: defined at lib/arithmetic.fs:63
 op_and
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -203,7 +158,6 @@ op_and
 	andwf INDF0,1,0
 	return
 
-; or: defined at lib/arithmetic.fs:75
 or
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -213,7 +167,6 @@ or
 	iorwf INDF0,1,0
 	return
 
-; xor: defined at lib/arithmetic.fs:87
 xor
 	movff POSTDEC0,temp_x1
 	movf POSTDEC0,0,0
@@ -223,7 +176,6 @@ xor
 	xorwf INDF0,1,0
 	return
 
-; 1>2: defined at lib/arithmetic.fs:106
 _1_GT_2
 	movf INDF0,0,0
 	clrf INDF0,0
@@ -231,7 +183,6 @@ _1_GT_2
 	clrf PREINC0,0
 	return
 
-; flashc@: defined at lib/tables.fs:14
 flashc_AT_
 	call flash_MI_addr_EX_
 	tblrd*+
@@ -239,21 +190,18 @@ flashc_AT_
 	clrf PREINC0,0
 	return
 
-; eeprom-addr!: defined at lib/tables.fs:17
 eeprom_MI_addr_EX_
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
 	return
 
-; eepromc@: defined at lib/tables.fs:19
 eepromc_AT_
 	call eeprom_MI_addr_EX_
 	bsf EECON1,0,0
 	movf EEDATA,0,0
 	return
 
-; eepromc!: defined at lib/tables.fs:23
 eepromc_EX_
 	call eeprom_MI_addr_EX_
 	movf POSTDEC0,0,0
@@ -264,14 +212,13 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___72
+_lbl___73
 	btfsc EECON1,1,0
-	bra _lbl___72
+	bra _lbl___73
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
 
-; init-spi: defined at tests/spi-pic.fs:28
 init_MI_spi
 	bcf TRISC,5,0
 	bsf TRISC,3,0
@@ -282,7 +229,6 @@ init_MI_spi
 	movwf SSPCON1,0
 	return
 
-; receive-byte: defined at tests/spi-pic.fs:36
 receive_MI_byte
 	btfss PIR1,3,0
 	bra receive_MI_byte
@@ -290,41 +236,39 @@ receive_MI_byte
 	clrf PREINC0,0
 	return
 
-; send-bytes: defined at tests/spi-pic.fs:39
 send_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___192
+_lbl___193
 	call dup
 	call op_cfetch_tos
-_lbl___193
+_lbl___194
 	btfsc PORTA,5,0
 	goto _2drop
 	btfsc PIR1,3,0
-	bra _lbl___193
+	bra _lbl___194
 	movf POSTDEC0,0,0
 	movff POSTDEC0,SSPBUF
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___192
+	bra _lbl___193
 
-; receive-bytes: defined at tests/spi-pic.fs:50
 receive_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___197
-	movff POSTDEC0,PREINC2
-	movff POSTDEC0,PREINC2
 _lbl___198
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+_lbl___199
 	btfss PORTA,5,0
-	bra _lbl___199
+	bra _lbl___200
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___199
+_lbl___200
 	btfss PIR1,3,0
-	bra _lbl___198
+	bra _lbl___199
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
@@ -335,24 +279,23 @@ _lbl___199
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___197
+	bra _lbl___198
 
-; receive-masks-bytes: defined at tests/spi-pic.fs:61
 receive_MI_masks_MI_bytes
 	movff current_MI_address,PREINC0
 	movff (current_MI_address+1),PREINC0
-_lbl___202
-	movff POSTDEC0,PREINC2
-	movff POSTDEC0,PREINC2
 _lbl___203
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+_lbl___204
 	btfss PORTA,5,0
-	bra _lbl___204
+	bra _lbl___205
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___204
+_lbl___205
 	btfss PIR1,3,0
-	bra _lbl___203
+	bra _lbl___204
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	comf POSTDEC0,1,0
@@ -361,17 +304,17 @@ _lbl___204
 	movff POSTINC2,PREINC0
 	call op_cfetch_tos
 	call op_and
-_lbl___206
+_lbl___207
 	btfss PORTA,5,0
-	bra _lbl___207
+	bra _lbl___208
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
-_lbl___207
+_lbl___208
 	btfss PIR1,3,0
-	bra _lbl___206
+	bra _lbl___207
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	call or
@@ -383,9 +326,8 @@ _lbl___207
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___202
+	bra _lbl___203
 
-; handle-command: defined at tests/spi-pic.fs:74
 handle_MI_command
 	call receive_MI_byte
 	call receive_MI_byte
@@ -397,11 +339,11 @@ handle_MI_command
 	call dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___210
+	bnz _lbl___211
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto send_MI_bytes
-_lbl___210
+_lbl___211
 	call dup
 	movlw read_MI_command
 	movwf PREINC0,0
@@ -409,11 +351,11 @@ _lbl___210
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___212
+	bnz _lbl___213
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	goto receive_MI_bytes
-_lbl___212
+_lbl___213
 	call dup
 	movlw bit_MI_change_MI_command
 	movwf PREINC0,0
@@ -421,11 +363,11 @@ _lbl___212
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___214
+	bnz _lbl___215
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	call receive_MI_masks_MI_bytes
-_lbl___214
+_lbl___215
 	movf POSTDEC0,1,0
 	movf POSTDEC0,1,0
 	return
@@ -434,16 +376,12 @@ _lbl___214
 ; Section: memory
 ;---------------------------------------------------------
 
-; temp_x1: defined at lib/primitives.fs:22
 temp_x1 equ 0x0
 
-; current-command: defined at tests/spi-pic.fs:23
 current_MI_command equ 0x100
 
-; current-mode: defined at tests/spi-pic.fs:24
 current_MI_mode equ 0x101
 
-; current-address: defined at tests/spi-pic.fs:26
 current_MI_address equ 0x102
 
 END
