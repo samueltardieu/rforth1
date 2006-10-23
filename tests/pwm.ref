@@ -618,38 +618,24 @@ pulse1 equ 0x102
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/pwm.fs:41 as:
-; 0
 _data___1
 	db 48
 
-; defined at tests/pwm.fs:45 as:
-; 1
 _data___2
 	db 49
 
-; defined at tests/pwm.fs:48 as:
-; PWM 0 : 
 _data___3
 	db 80,87,77,32,48,32,58,32
 
-; defined at tests/pwm.fs:49 as:
-; PWM 1 : 
 _data___4
 	db 80,87,77,32,49,32,58,32
 
-; defined at tests/pwm.fs:53 as:
-; +
 _data___5
 	db 43
 
-; defined at tests/pwm.fs:57 as:
-; -
 _data___6
 	db 45
 
-; defined at tests/pwm.fs:63 as:
-; \nPWM Generator>\n
 _data___7
 	db 13,10,80,87,77,32,71,101
 	db 110,101,114,97,116,111,114,62

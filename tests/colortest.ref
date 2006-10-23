@@ -338,26 +338,18 @@ temp_x1 equ 0x0
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/colortest.fs:9 as:
-; Sensor 0: 
 _data___1
 	db 83,101,110,115,111,114,32,48
 	db 58,32
 
-; defined at tests/colortest.fs:10 as:
-; Sensor 1: 
 _data___2
 	db 83,101,110,115,111,114,32,49
 	db 58,32
 
-; defined at tests/colortest.fs:11 as:
-; Sensor 2: 
 _data___3
 	db 83,101,110,115,111,114,32,50
 	db 58,32
 
-; defined at tests/colortest.fs:14 as:
-; Welcome
 _data___4
 	db 87,101,108,99,111,109,101
 

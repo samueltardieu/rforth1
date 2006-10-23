@@ -2007,26 +2007,18 @@ cream_MI_white_MI_threshold equ 0x114
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/sensors.fs:97 as:
-; brown detected
 _data___1
 	db 98,114,111,119,110,32,100,101
 	db 116,101,99,116,101,100
 
-; defined at tests/sensors.fs:98 as:
-; white detected
 _data___2
 	db 119,104,105,116,101,32,100,101
 	db 116,101,99,116,101,100
 
-; defined at tests/sensors.fs:99 as:
-; cream detected
 _data___3
 	db 99,114,101,97,109,32,100,101
 	db 116,101,99,116,101,100
 
-; defined at tests/sensors.fs:167 as:
-; Unknown CAN message with arbitration 
 _data___4
 	db 85,110,107,110,111,119,110,32
 	db 67,65,78,32,109,101,115,115
@@ -2034,82 +2026,52 @@ _data___4
 	db 32,97,114,98,105,116,114,97
 	db 116,105,111,110,32
 
-; defined at tests/sensors.fs:167 as:
-;  and 
 _data___5
 	db 32,97,110,100,32
 
-; defined at tests/sensors.fs:168 as:
-; no 
 _data___6
 	db 110,111,32
 
-; defined at tests/sensors.fs:168 as:
-; RTR
 _data___7
 	db 82,84,82
 
-; defined at tests/sensors.fs:183 as:
-; unknown
 _data___8
 	db 117,110,107,110,111,119,110
 
-; defined at tests/sensors.fs:184 as:
-; cream
 _data___9
 	db 99,114,101,97,109
 
-; defined at tests/sensors.fs:185 as:
-; brown
 _data___10
 	db 98,114,111,119,110
 
-; defined at tests/sensors.fs:186 as:
-; white
 _data___11
 	db 119,104,105,116,101
 
-; defined at tests/sensors.fs:187 as:
-; <internal error>
 _data___12
 	db 60,105,110,116,101,114,110,97
 	db 108,32,101,114,114,111,114,62
 
-; defined at tests/sensors.fs:192 as:
-; Channel 
 _data___13
 	db 67,104,97,110,110,101,108,32
 
-; defined at tests/sensors.fs:192 as:
-; : 
 _data___14
 	db 58,32
 
-; defined at tests/sensors.fs:193 as:
-;  (
 _data___15
 	db 32,40
 
-; defined at tests/sensors.fs:193 as:
-; )
 _data___16
 	db 41
 
-; defined at tests/sensors.fs:198 as:
-; Usage:
 _data___17
 	db 85,115,97,103,101,58
 
-; defined at tests/sensors.fs:199 as:
-;    s               execute step
 _data___18
 	db 32,32,32,115,32,32,32,32
 	db 32,32,32,32,32,32,32,32
 	db 32,32,32,101,120,101,99,117
 	db 116,101,32,115,116,101,112
 
-; defined at tests/sensors.fs:200 as:
-;    0...3           print A/D value for channel x
 _data___19
 	db 32,32,32,48,46,46,46,51
 	db 32,32,32,32,32,32,32,32
@@ -2118,8 +2080,6 @@ _data___19
 	db 117,101,32,102,111,114,32,99
 	db 104,97,110,110,101,108,32,120
 
-; defined at tests/sensors.fs:201 as:
-;    d               print stack's depth
 _data___20
 	db 32,32,32,100,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2127,8 +2087,6 @@ _data___20
 	db 32,115,116,97,99,107,39,115
 	db 32,100,101,112,116,104
 
-; defined at tests/sensors.fs:202 as:
-;    L               toggle the sensors' leds
 _data___21
 	db 32,32,32,76,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2137,8 +2095,6 @@ _data___21
 	db 110,115,111,114,115,39,32,108
 	db 101,100,115
 
-; defined at tests/sensors.fs:203 as:
-;    l               CAN loopback mode on
 _data___22
 	db 32,32,32,108,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2146,8 +2102,6 @@ _data___22
 	db 111,111,112,98,97,99,107,32
 	db 109,111,100,101,32,111,110
 
-; defined at tests/sensors.fs:204 as:
-;    k               CAN loopback off
 _data___23
 	db 32,32,32,107,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2155,8 +2109,6 @@ _data___23
 	db 111,111,112,98,97,99,107,32
 	db 111,102,102
 
-; defined at tests/sensors.fs:205 as:
-;    r               Send a CAN command to request values
 _data___24
 	db 32,32,32,114,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2166,8 +2118,6 @@ _data___24
 	db 32,114,101,113,117,101,115,116
 	db 32,118,97,108,117,101,115
 
-; defined at tests/sensors.fs:206 as:
-;    c               Send a CAN command to request color values
 _data___25
 	db 32,32,32,99,32,32,32,32
 	db 32,32,32,32,32,32,32,32
@@ -2178,15 +2128,11 @@ _data___25
 	db 32,99,111,108,111,114,32,118
 	db 97,108,117,101,115
 
-; defined at tests/sensors.fs:207 as:
-;    q       Recalibrate
 _data___26
 	db 32,32,32,113,32,32,32,32
 	db 32,32,32,82,101,99,97,108
 	db 105,98,114,97,116,101
 
-; defined at tests/sensors.fs:212 as:
-; Sensors on BROWN (press a key when ready)
 _data___27
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,66,82,79,87,78
@@ -2195,8 +2141,6 @@ _data___27
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-; defined at tests/sensors.fs:215 as:
-; Sensors on CREAM (press a key when ready)
 _data___28
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,67,82,69,65,77
@@ -2205,8 +2149,6 @@ _data___28
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-; defined at tests/sensors.fs:218 as:
-; Sensors on WHITE (press a key when ready)
 _data___29
 	db 83,101,110,115,111,114,115,32
 	db 111,110,32,87,72,73,84,69
@@ -2215,75 +2157,51 @@ _data___29
 	db 101,110,32,114,101,97,100,121
 	db 41
 
-; defined at tests/sensors.fs:223 as:
-; cream-white=
 _data___30
 	db 99,114,101,97,109,45,119,104
 	db 105,116,101,61
 
-; defined at tests/sensors.fs:224 as:
-; brown-cream=
 _data___31
 	db 98,114,111,119,110,45,99,114
 	db 101,97,109,61
 
-; defined at tests/sensors.fs:229 as:
-; Channel0 : 
 _data___32
 	db 67,104,97,110,110,101,108,48
 	db 32,58,32
 
-; defined at tests/sensors.fs:230 as:
-; Channel1 : 
 _data___33
 	db 67,104,97,110,110,101,108,49
 	db 32,58,32
 
-; defined at tests/sensors.fs:231 as:
-; Channel2 : 
 _data___34
 	db 67,104,97,110,110,101,108,50
 	db 32,58,32
 
-; defined at tests/sensors.fs:232 as:
-; Channel3 : 
 _data___35
 	db 67,104,97,110,110,101,108,51
 	db 32,58,32
 
-; defined at tests/sensors.fs:233 as:
-; Calibration 
 _data___36
 	db 67,97,108,105,98,114,97,116
 	db 105,111,110,32
 
-; defined at tests/sensors.fs:234 as:
-; Stack's depth : 
 _data___37
 	db 83,116,97,99,107,39,115,32
 	db 100,101,112,116,104,32,58,32
 
-; defined at tests/sensors.fs:236 as:
-; Loopback on
 _data___38
 	db 76,111,111,112,98,97,99,107
 	db 32,111,110
 
-; defined at tests/sensors.fs:237 as:
-; Loopback off
 _data___39
 	db 76,111,111,112,98,97,99,107
 	db 32,111,102,102
 
-; defined at tests/sensors.fs:239 as:
-; Sensors' leds toggled
 _data___40
 	db 83,101,110,115,111,114,115,39
 	db 32,108,101,100,115,32,116,111
 	db 103,103,108,101,100
 
-; defined at tests/sensors.fs:274 as:
-; Welcome to the sensors program
 _data___41
 	db 87,101,108,99,111,109,101,32
 	db 116,111,32,116,104,101,32,115

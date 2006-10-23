@@ -386,55 +386,37 @@ x equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/test-plusminus.fs:5 as:
-; x <- 
 _data___1
 	db 120,32,60,45,32
 
-; defined at tests/test-plusminus.fs:6 as:
-; x @ 1+ = 
 _data___2
 	db 120,32,64,32,49,43,32,61
 	db 32
 
-; defined at tests/test-plusminus.fs:7 as:
-; x @ 2 + = 
 _data___3
 	db 120,32,64,32,50,32,43,32
 	db 61,32
 
-; defined at tests/test-plusminus.fs:8 as:
-; x @ 1- = 
 _data___4
 	db 120,32,64,32,49,45,32,61
 	db 32
 
-; defined at tests/test-plusminus.fs:9 as:
-; x @ 2 - = 
 _data___5
 	db 120,32,64,32,50,32,45,32
 	db 61,32
 
-; defined at tests/test-plusminus.fs:10 as:
-; x @ 100 + = 
 _data___6
 	db 120,32,64,32,49,48,48,32
 	db 43,32,61,32
 
-; defined at tests/test-plusminus.fs:11 as:
-; x @ 200 + = 
 _data___7
 	db 120,32,64,32,50,48,48,32
 	db 43,32,61,32
 
-; defined at tests/test-plusminus.fs:12 as:
-; x @ 100 - = 
 _data___8
 	db 120,32,64,32,49,48,48,32
 	db 45,32,61,32
 
-; defined at tests/test-plusminus.fs:13 as:
-; x @ 200 - = 
 _data___9
 	db 120,32,64,32,50,48,48,32
 	db 45,32,61,32

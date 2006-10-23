@@ -1426,30 +1426,20 @@ x equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at lib/strings.fs:57 as:
-;  ...
 _data_
 	db 32,46,46,46
 
-; defined at tests/test-suite.fs:5 as:
-; Starting\n
 _data___1
 	db 83,116,97,114,116,105,110,103
 	db 13,10
 
-; defined at tests/test-suite.fs:8 as:
-; Testing abs for 
 _data___2
 	db 84,101,115,116,105,110,103,32
 	db 97,98,115,32,102,111,114,32
 
-; defined at tests/test-suite.fs:8 as:
-; : 
 _data___3
 	db 58,32
 
-; defined at tests/test-suite.fs:11 as:
-; Testing 0x103 + 0x1234 (0x1337): 
 _data___4
 	db 84,101,115,116,105,110,103,32
 	db 48,120,49,48,51,32,43,32
@@ -1457,8 +1447,6 @@ _data___4
 	db 48,120,49,51,51,55,41,58
 	db 32
 
-; defined at tests/test-suite.fs:14 as:
-; Testing 0x1337 - 0x1234 (0x103): 
 _data___5
 	db 84,101,115,116,105,110,103,32
 	db 48,120,49,51,51,55,32,45
@@ -1466,8 +1454,6 @@ _data___5
 	db 40,48,120,49,48,51,41,58
 	db 32
 
-; defined at tests/test-suite.fs:17 as:
-; Adding 0x1234 to 0x103 in memory: 
 _data___6
 	db 65,100,100,105,110,103,32,48
 	db 120,49,50,51,52,32,116,111
@@ -1475,8 +1461,6 @@ _data___6
 	db 110,32,109,101,109,111,114,121
 	db 58,32
 
-; defined at tests/test-suite.fs:20 as:
-; Subtrating 0x1234 from 0x1337 in memory: 
 _data___7
 	db 83,117,98,116,114,97,116,105
 	db 110,103,32,48,120,49,50,51
@@ -1485,194 +1469,124 @@ _data___7
 	db 32,109,101,109,111,114,121,58
 	db 32
 
-; defined at tests/test-suite.fs:23 as:
-;  -- ERROR
 _data___8
 	db 32,45,45,32,69,82,82,79
 	db 82
 
-; defined at tests/test-suite.fs:24 as:
-;  -- ERROR
 _data___9
 	db 32,45,45,32,69,82,82,79
 	db 82
 
-; defined at tests/test-suite.fs:27 as:
-; 1 2 < : 
 _data___10
 	db 49,32,50,32,60,32,58,32
 
-; defined at tests/test-suite.fs:28 as:
-; 1 2 <= : 
 _data___11
 	db 49,32,50,32,60,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:29 as:
-; 1 2 > : 
 _data___12
 	db 49,32,50,32,62,32,58,32
 
-; defined at tests/test-suite.fs:30 as:
-; 1 2 >= : 
 _data___13
 	db 49,32,50,32,62,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:31 as:
-; 1 2 = : 
 _data___14
 	db 49,32,50,32,61,32,58,32
 
-; defined at tests/test-suite.fs:32 as:
-; 1 2 <> : 
 _data___15
 	db 49,32,50,32,60,62,32,58
 	db 32
 
-; defined at tests/test-suite.fs:33 as:
-; 1 1 < : 
 _data___16
 	db 49,32,49,32,60,32,58,32
 
-; defined at tests/test-suite.fs:34 as:
-; 1 1 <= : 
 _data___17
 	db 49,32,49,32,60,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:35 as:
-; 1 1 > : 
 _data___18
 	db 49,32,49,32,62,32,58,32
 
-; defined at tests/test-suite.fs:36 as:
-; 1 1 >= : 
 _data___19
 	db 49,32,49,32,62,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:37 as:
-; 1 1 = : 
 _data___20
 	db 49,32,49,32,61,32,58,32
 
-; defined at tests/test-suite.fs:38 as:
-; 1 1 <> : 
 _data___21
 	db 49,32,49,32,60,62,32,58
 	db 32
 
-; defined at tests/test-suite.fs:39 as:
-; 1 0= : 
 _data___22
 	db 49,32,48,61,32,58,32
 
-; defined at tests/test-suite.fs:40 as:
-; 1 0< : 
 _data___23
 	db 49,32,48,60,32,58,32
 
-; defined at tests/test-suite.fs:41 as:
-; 1 0> : 
 _data___24
 	db 49,32,48,62,32,58,32
 
-; defined at tests/test-suite.fs:42 as:
-; 1 0<= : 
 _data___25
 	db 49,32,48,60,61,32,58,32
 
-; defined at tests/test-suite.fs:43 as:
-; 1 0>= : 
 _data___26
 	db 49,32,48,62,61,32,58,32
 
-; defined at tests/test-suite.fs:44 as:
-; -1 0= : 
 _data___27
 	db 45,49,32,48,61,32,58,32
 
-; defined at tests/test-suite.fs:45 as:
-; -1 0< : 
 _data___28
 	db 45,49,32,48,60,32,58,32
 
-; defined at tests/test-suite.fs:46 as:
-; -1 0> : 
 _data___29
 	db 45,49,32,48,62,32,58,32
 
-; defined at tests/test-suite.fs:47 as:
-; -1 0<= : 
 _data___30
 	db 45,49,32,48,60,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:48 as:
-; -1 0>= : 
 _data___31
 	db 45,49,32,48,62,61,32,58
 	db 32
 
-; defined at tests/test-suite.fs:49 as:
-; 0 0= : 
 _data___32
 	db 48,32,48,61,32,58,32
 
-; defined at tests/test-suite.fs:50 as:
-; 0 0< : 
 _data___33
 	db 48,32,48,60,32,58,32
 
-; defined at tests/test-suite.fs:51 as:
-; 0 0> : 
 _data___34
 	db 48,32,48,62,32,58,32
 
-; defined at tests/test-suite.fs:52 as:
-; 0 0<= : 
 _data___35
 	db 48,32,48,60,61,32,58,32
 
-; defined at tests/test-suite.fs:53 as:
-; 0 0>= : 
 _data___36
 	db 48,32,48,62,61,32,58,32
 
-; defined at tests/test-suite.fs:57 as:
-; Should print 1234 5678: 
 _data___37
 	db 83,104,111,117,108,100,32,112
 	db 114,105,110,116,32,49,50,51
 	db 52,32,53,54,55,56,58,32
 
-; defined at tests/test-suite.fs:60 as:
-; 1234 2* : 
 _data___38
 	db 49,50,51,52,32,50,42,32
 	db 58,32
 
-; defined at tests/test-suite.fs:63 as:
-; 2468 2/ : 
 _data___39
 	db 50,52,54,56,32,50,47,32
 	db 58,32
 
-; defined at tests/test-suite.fs:64 as:
-; FFF0 2/ : 
 _data___40
 	db 70,70,70,48,32,50,47,32
 	db 58,32
 
-; defined at tests/test-suite.fs:68 as:
-; 75 3A * (1A82): 
 _data___41
 	db 55,53,32,51,65,32,42,32
 	db 40,49,65,56,50,41,58,32
 
-; defined at tests/test-suite.fs:71 as:
-; 1000 PI * (0C45): 
 _data___42
 	db 49,48,48,48,32,80,73,32
 	db 42,32,40,48,67,52,53,41

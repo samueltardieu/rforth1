@@ -558,13 +558,9 @@ pattern_MI_2 equ 0x107
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/balise.fs:47 as:
-; \nOK>
 _data___1
 	db 13,10,79,75,62
 
-; defined at tests/balise.fs:72 as:
-; \nCode balise\n
 _data___2
 	db 13,10,67,111,100,101,32,98
 	db 97,108,105,115,101,13,10

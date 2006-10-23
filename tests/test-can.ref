@@ -1059,13 +1059,9 @@ can_MI_flags equ 0x20
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at lib/strings.fs:57 as:
-;  ...
 _data_
 	db 32,46,46,46
 
-; defined at tests/test-can.fs:10 as:
-; Sending a message 1234 with arbitration 378
 _data___1
 	db 83,101,110,100,105,110,103,32
 	db 97,32,109,101,115,115,97,103
@@ -1074,33 +1070,23 @@ _data___1
 	db 116,114,97,116,105,111,110,32
 	db 51,55,56
 
-; defined at tests/test-can.fs:13 as:
-; Receiving message
 _data___2
 	db 82,101,99,101,105,118,105,110
 	db 103,32,109,101,115,115,97,103
 	db 101
 
-; defined at tests/test-can.fs:16 as:
-; Arbitration: 
 _data___3
 	db 65,114,98,105,116,114,97,116
 	db 105,111,110,58,32
 
-; defined at tests/test-can.fs:17 as:
-; RTR:         
 _data___4
 	db 82,84,82,58,32,32,32,32
 	db 32,32,32,32,32
 
-; defined at tests/test-can.fs:18 as:
-; Data:        
 _data___5
 	db 68,97,116,97,58,32,32,32
 	db 32,32,32,32,32
 
-; defined at tests/test-can.fs:19 as:
-; Sending a RTR with arbitration 176
 _data___6
 	db 83,101,110,100,105,110,103,32
 	db 97,32,82,84,82,32,119,105
@@ -1108,14 +1094,10 @@ _data___6
 	db 114,97,116,105,111,110,32,49
 	db 55,54
 
-; defined at tests/test-can.fs:24 as:
-; Arbitration: 
 _data___7
 	db 65,114,98,105,116,114,97,116
 	db 105,111,110,58,32
 
-; defined at tests/test-can.fs:25 as:
-; RTR:         
 _data___8
 	db 82,84,82,58,32,32,32,32
 	db 32,32,32,32,32

@@ -196,8 +196,7 @@ class Named:
     if self != object: self.references.append(object)
 
   def output_header(self, outfd):
-    if not compiler.no_comments:
-      outfd.write('; %s: defined at %s\n' %(self.name, self.definition))
+    outfd.write('; %s: defined at %s\n' %(self.name, self.definition))
 
   def prepare(self): pass
 
@@ -2311,7 +2310,7 @@ class Compiler:
       for i in g:
         if i.section == s:
           outfd.write('\n')
-          i.output_header(outfd)
+          if not compiler.no_comments: i.output_header(outfd)
           i.output(outfd)
     outfd.write('\n')
 

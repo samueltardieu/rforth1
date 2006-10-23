@@ -497,34 +497,22 @@ x equ 0x100
 ; Section: static data
 ;---------------------------------------------------------
 
-; defined at tests/test-bitops.fs:7 as:
-; set
 _data___1
 	db 115,101,116
 
-; defined at tests/test-bitops.fs:7 as:
-; not set
 _data___2
 	db 110,111,116,32,115,101,116
 
-; defined at tests/test-bitops.fs:8 as:
-; clr
 _data___3
 	db 99,108,114
 
-; defined at tests/test-bitops.fs:8 as:
-; not clr
 _data___4
 	db 110,111,116,32,99,108,114
 
-; defined at tests/test-bitops.fs:16 as:
-; Current depth: 
 _data___5
 	db 67,117,114,114,101,110,116,32
 	db 100,101,112,116,104,58,32
 
-; defined at tests/test-bitops.fs:26 as:
-; Current depth: 
 _data___6
 	db 67,117,114,114,101,110,116,32
 	db 100,101,112,116,104,58,32
