@@ -2351,7 +2351,7 @@ class Compiler:
       to_inline = [x for x in refs if x in inlinable and x.should_inline()]
       if to_inline:
         stderror("Restarting with automatic inlining of:\n   %s" %
-                  "\n   ".join(["%s(%s)" %(x.name, x.definition)
+                  "\n   ".join(["%s (%s)" %(x.name, x.definition)
                                  for x in to_inline]))
         outfd.close()
         compiler = Compiler(self.processor, self.start, self.main,
