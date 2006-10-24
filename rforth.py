@@ -28,6 +28,19 @@ Memory usage:
 
 import optparse, os, sre, string, sys
 
+# Setup Forth search path
+
+forth_search_path = ['.']
+try: forth_search_path += os.getenv('RFORTH1_PATH').split(':')
+except AttributeError: pass
+
+def forth_open(path, mode):
+  for p in forth_search_path:
+    try: return open(os.path.join(p, path), mode)
+    except IOError: pass
+  # Get an exception with the default file name (based on the current dir)
+  return open(path, mode)
+
 def parse_number(str):
   """Parse a string and return a Number object with the right number and the
   preferred base for representation."""
@@ -2177,7 +2190,7 @@ class Compiler:
   def include(self, filename):
     self.loaded_files.append(filename)
     self.save_input()
-    self.run(Input(filename, open(filename, 'r').readlines()))
+    self.run(Input(filename, forth_open(filename, 'r').readlines()))
     self.restore_input()
 
   def needs(self, filename):
