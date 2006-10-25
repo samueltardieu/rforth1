@@ -33,6 +33,7 @@ import optparse, os, sre, string, sys
 forth_search_path = ['.']
 try: forth_search_path += os.getenv('RFORTH1_PATH').split(':')
 except AttributeError: pass
+forth_search_path.append(os.path.dirname(sys.argv[0]))
 
 def forth_open(path, mode):
   for p in forth_search_path:
