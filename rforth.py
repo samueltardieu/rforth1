@@ -2624,7 +2624,7 @@ def main():
                      help = 'set processor type [18f248]')
   parser.add_option('-s', '--start', default = parse_number('0x2000'),
                      action = 'callback', callback = set_start_cb,
-                     metavar = 'ADDR', type='string',
+                     metavar = 'ADDR', type = 'string', dest = 'start',
                      help = 'set starting address [0x2000]')
   opts, args = parser.parse_args()
   if len(args) != 1:
