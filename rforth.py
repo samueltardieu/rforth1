@@ -1962,11 +1962,11 @@ class Input:
 
 class Compiler:
 
-  EOF = 'eof'
-  FATAL_ERROR = 'fatal_error'
-  UNIMPLEMENTED = 'unimplemented'
-  INTERNAL_ERROR = 'internal_error'
-  COMPILATION_ERROR = 'compilation_error'
+  class EOF(Exception): pass
+  class FATAL_ERROR(Exception): pass
+  class UNIMPLEMENTED(Exception): pass
+  class INTERNAL_ERROR(Exception): pass
+  class COMPILATION_ERROR(Exception): pass
 
   pic_opcodes = ['clrwdt', 'daw', 'nop', 'sleep', 'reset',
                 'tblrd*', 'tblrd*+', 'tblrd*-', 'tblrd+*',
