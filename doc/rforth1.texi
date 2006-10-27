@@ -5,7 +5,7 @@
 
 @titlepage
 @title rforth1 programmer manual
-@subtitle @today
+@subtitle @today{}
 @author Samuel Tardieu
 
 @end titlepage
@@ -14,6 +14,7 @@
 
 @menu
 * Introduction::                
+* Prerequisites::               
 * Conventions::                 
 
 @detailmenu
@@ -23,22 +24,29 @@ Conventions
 
 * Integer literals::            
 * Bit operations::              
+* Declaring variables::         
 
 @end detailmenu
 @end menu
 
-@node Introduction, Conventions, Top, Top
+@node Introduction, Prerequisites, Top, Top
 @chapter Introduction
 
 rforth1 is a 16 bits Forth compiler for Microchip PIC18Fxyz microcontrollers
 family, where @code{x} is @code{4} or @code{5}.
 
-@node Conventions,  , Introduction, Top
+@node Prerequisites, Conventions, Introduction, Top
+@section Prerequisites
+
+To run rforth1, you need to have Python 2.3 or greater installed.
+
+@node Conventions,  , Prerequisites, Top
 @chapter Conventions
 
 @menu
 * Integer literals::            
 * Bit operations::              
+* Declaring variables::         
 @end menu
 
 @node Integer literals, Bit operations, Conventions, Conventions
@@ -57,7 +65,7 @@ $fe
 0b11110101
 @end example
 
-@node Bit operations,  , Integer literals, Conventions
+@node Bit operations, Declaring variables, Integer literals, Conventions
 @section Bit operations
 
 The following operations allow you to manipulate individual bits at a given
@@ -85,7 +93,7 @@ led bit-set
 @end example
 to manipulate the individual bit.
 
-@node Declaring variables
+@node Declaring variables,  , Bit operations, Conventions
 @section Declaring variables
 
 16 bits variables may be declared using the @code{variable} defining word.
