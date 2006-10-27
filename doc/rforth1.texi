@@ -1,0 +1,95 @@
+\input texinfo
+
+@setfilename rforth1.info
+@settitle rforth1 programmer manual
+
+@titlepage
+@title rforth1 programmer manual
+@subtitle @today
+@author Samuel Tardieu
+
+@end titlepage
+
+@node Top, Introduction, (dir), (dir)
+
+@menu
+* Introduction::                
+* Conventions::                 
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Conventions
+
+* Integer literals::            
+* Bit operations::              
+
+@end detailmenu
+@end menu
+
+@node Introduction, Conventions, Top, Top
+@chapter Introduction
+
+rforth1 is a 16 bits Forth compiler for Microchip PIC18Fxyz microcontrollers
+family, where @code{x} is @code{4} or @code{5}.
+
+@node Conventions,  , Introduction, Top
+@chapter Conventions
+
+@menu
+* Integer literals::            
+* Bit operations::              
+@end menu
+
+@node Integer literals, Bit operations, Conventions, Conventions
+@section Integer literals
+
+By default, integers are input in decimal. However, you can prefix them by
+@code{0x} or @code{$} to use hexadecimal or @code{0b} to denote a binary
+value. One or several minus signs in front of the integer value will negate
+the integer. Thus the following values are valid:
+
+@example
+15
+-17
+$fe
+--0x1234
+0b11110101
+@end example
+
+@node Bit operations,  , Integer literals, Conventions
+@section Bit operations
+
+The following operations allow you to manipulate individual bits at a given
+memory address:
+@itemize @bullet
+@item @code{bit-set ( addr b -- )} set bit b of addr
+@item @code{bit-clr ( addr b -- )} clear bit b of addr
+@item @code{bit-toggle ( addr b -- )} toggle bit b of addr
+@item @code{bit-set? ( addr b -- f )} check whether bit b of addr is set
+@item @code{bit-clr? ( addr b -- f )} check whether bit b of addr is cleared
+@end itemize
+
+Using the @code{bit} defining word, you may create new words denoting
+individual bits. For example, the following declaration
+
+@example
+PORTB 5 bit led
+@end example
+
+defines a new @code{led} word which, when executed, will push the values
+@code{PORTB} and @code{5} on the stack. You can then use constructs such as
+
+@example
+led bit-set
+@end example
+to manipulate the individual bit.
+
+@node Declaring variables
+@section Declaring variables
+
+16 bits variables may be declared using the @code{variable} defining word.
+8 bits variables may be declared using the @code{cvariable} defining word.
+
+@contents
+@bye

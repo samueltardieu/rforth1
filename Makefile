@@ -18,11 +18,22 @@ FLAGS = ${OPTS} --start ${STARTADDR}
 
 PYTHON ?= python
 
+TEXI2PDF ?= texi2pdf
+TEXI2HTML ?= texi2html
+
 tests: ${TESTCASES}
 
 never::
 
 update-tests: ${TESTCASES:.cmp=.newref}
+
+doc: doc/rforth1.html doc/rforth1.pdf
+
+doc/rforth1.html: doc/rforth1.texi
+	cd doc && ${TEXI2HTML} rforth1.texi
+
+doc/rforth1.pdf: doc/rforth1.texi
+	cd doc && ${TEXI2PDF} rforth1.texi
 
 clean:
 	${RM} *.asm tests/*.asm examples/*.asm examples/engines/*.asm
@@ -30,6 +41,7 @@ clean:
 	${RM} *.lst tests/*.lst examples/*.lst examples/engines/*.lst
 	${RM} *.map tests/*.map examples/*.map examples/engines/*.map
 	${RM} *.cod tests/*.cod examples/*.cod examples/engines/*.cod
+	${RM} doc/rforth1.{aux,cp,fn,ky,log,pg,toc,tp,vr}
 
 %.asm %.hex %.lst %.map %.cod: %.fs ${COMPILER} ${PREDEFINED}
 	${PYTHON} ${COMPILER} ${FLAGS} $<
