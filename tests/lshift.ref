@@ -41,8 +41,8 @@ STATUS equ 0xfd8
 
 init_runtime
 	movlb 1
-	clrf a,1
 	clrf (a+1),1
+	clrf a,1
 	clrf b,1
 	movlw 0x5f
 	movwf FSR0L,0

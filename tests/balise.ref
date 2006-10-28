@@ -97,12 +97,12 @@ alt_EX_
 
 init_runtime
 	movlb 1
-	clrf nexttimer,1
 	clrf (nexttimer+1),1
-	clrf ondelay,1
+	clrf nexttimer,1
 	clrf (ondelay+1),1
-	clrf offdelay,1
+	clrf ondelay,1
 	clrf (offdelay+1),1
+	clrf offdelay,1
 	clrf pattern_1,1
 	clrf pattern_2,1
 	movlw 0x5f
@@ -496,8 +496,8 @@ _lbl___214
 timer_reset
 	clrf TMR0H,0
 	clrf TMR0L,0
-	clrf nexttimer,1
 	clrf (nexttimer+1),1
+	clrf nexttimer,1
 	return
 
 pwm
@@ -520,12 +520,12 @@ init_ports
 	movwf TRISC,0
 	movlw 0x80
 	movwf T0CON,0
-	clrf ondelay,1
 	movlw HIGH(0xa000)
 	movwf (ondelay+1),1
-	clrf offdelay,1
+	clrf ondelay,1
 	movlw HIGH(0xa000)
 	movwf (offdelay+1),1
+	clrf offdelay,1
 	return
 
 ;---------------------------------------------------------

@@ -77,8 +77,8 @@ bl equ 0x20
 
 init_runtime
 	movlb 1
-	clrf x,1
 	clrf (x+1),1
+	clrf x,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -388,10 +388,10 @@ test_plus_EX_
 	movwf PREINC0,0
 	movlw 34
 	call type
-	movlw LOW(0x103)
-	movwf x,1
 	movlw HIGH(0x103)
 	movwf (x+1),1
+	movlw LOW(0x103)
+	movwf x,1
 	movlw LOW(0x1234)
 	movwf PREINC0,0
 	movlw HIGH(0x1234)
@@ -412,10 +412,10 @@ test_minus_EX_
 	movwf PREINC0,0
 	movlw 41
 	call type
-	movlw LOW(0x1337)
-	movwf x,1
 	movlw HIGH(0x1337)
 	movwf (x+1),1
+	movlw LOW(0x1337)
+	movwf x,1
 	movlw LOW(0x1234)
 	movwf PREINC0,0
 	movlw HIGH(0x1234)

@@ -89,8 +89,8 @@ init_runtime
 	movlb 1
 	clrf current_command,1
 	clrf current_mode,1
-	clrf current_address,1
 	clrf (current_address+1),1
+	clrf current_address,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0

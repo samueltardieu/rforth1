@@ -155,10 +155,10 @@ tmr1_wait
 
 init_runtime
 	movlb 1
-	clrf pulse0,1
 	clrf (pulse0+1),1
-	clrf pulse1,1
+	clrf pulse0,1
 	clrf (pulse1+1),1
+	clrf pulse1,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -171,14 +171,14 @@ main
 	call init_pwm
 
 main_loop
-	movlw LOW(-6000)
-	movwf pulse0,1
 	movlw HIGH(-6000)
 	movwf (pulse0+1),1
 	movlw LOW(-6000)
-	movwf pulse1,1
+	movwf pulse0,1
 	movlw HIGH(-6000)
 	movwf (pulse1+1),1
+	movlw LOW(-6000)
+	movwf pulse1,1
 _lbl___217
 	call pwm
 	call key

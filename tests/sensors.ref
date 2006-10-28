@@ -371,9 +371,9 @@ _lbl___160
 	return
 
 can_send_values
+	clrf (can_arbitration+1),0
 	movlw VALUES_ARBITRATION
 	movwf can_arbitration,0
-	clrf (can_arbitration+1),0
 	movlw 8
 	movwf can_msg_length,0
 	movff (current_value_0+1),(can_msg_0+1)
@@ -431,24 +431,24 @@ interactive_mode
 
 init_runtime
 	movlb 1
-	clrf calibrated_QM_,1
 	clrf (calibrated_QM_+1),1
-	clrf current_value_0,1
+	clrf calibrated_QM_,1
 	clrf (current_value_0+1),1
-	clrf current_value_1,1
+	clrf current_value_0,1
 	clrf (current_value_1+1),1
-	clrf current_value_2,1
+	clrf current_value_1,1
 	clrf (current_value_2+1),1
-	clrf current_value_3,1
+	clrf current_value_2,1
 	clrf (current_value_3+1),1
+	clrf current_value_3,1
 	clrf current_color_0,1
 	clrf current_color_1,1
 	clrf current_color_2,1
 	clrf current_color_3,1
-	clrf brown_cream_threshold,1
 	clrf (brown_cream_threshold+1),1
-	clrf cream_white_threshold,1
+	clrf brown_cream_threshold,1
 	clrf (cream_white_threshold+1),1
+	clrf cream_white_threshold,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
@@ -705,9 +705,9 @@ maybe_send_colors
 	return
 
 can_send_colors
+	clrf (can_arbitration+1),0
 	movlw COLORS_ARBITRATION
 	movwf can_arbitration,0
-	clrf (can_arbitration+1),0
 	movlw 4
 	movwf can_msg_length,0
 	movff current_color_0,can_msg_0
@@ -717,8 +717,8 @@ can_send_colors
 	call can_transmit
 
 timer1_reset
-	clrf TMR0L,0
 	clrf (TMR0L+1),0
+	clrf TMR0L,0
 	bcf PIR1,0,0
 	return
 
@@ -1319,9 +1319,9 @@ update_color
 	goto op_cstore
 
 can_send_calibration
+	clrf (can_arbitration+1),0
 	movlw CALIBRATION_ARBITRATION
 	movwf can_arbitration,0
-	clrf (can_arbitration+1),0
 	movlw 4
 	movwf can_msg_length,0
 	movff (cream_white_threshold+1),(can_msg_0+1)

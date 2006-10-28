@@ -13,10 +13,10 @@
 
 init_runtime
 	movlb 1
-	clrf a,1
 	clrf (a+1),1
-	clrf b,1
+	clrf a,1
 	clrf (b+1),1
+	clrf b,1
 
 main
 	infsnz a,1

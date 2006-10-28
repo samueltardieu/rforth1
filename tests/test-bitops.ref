@@ -71,8 +71,8 @@ bl equ 0x20
 
 init_runtime
 	movlb 1
-	clrf x,1
 	clrf (x+1),1
+	clrf x,1
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
