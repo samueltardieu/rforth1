@@ -1115,8 +1115,8 @@ class Store(StoreOp):
           # Constant write
           compiler.rewind()
           const = params[0]
-          self.write_literal(low(const), addr)
           self.write_literal(high(const), addr1)
+          self.write_literal(low(const), addr)
         elif name == 'OP_FETCH' and ram_addr(params[0]):
           # Memory move
           compiler.rewind()
