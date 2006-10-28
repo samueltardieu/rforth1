@@ -112,6 +112,11 @@ def in_access_bank(addr):
   addr = addr.static_value()
   return addr is not None and addr <= 0x5f or(addr >= 0xf60 and addr <= 0xfff)
 
+def is_special_register(addr):
+  """Check whether an address denotes an internal PIC register."""
+  a = addr.static_value()
+  return a >= 0xf00 and a <= 0xfff
+
 def in_bank_1(addr):
   """Check whether an address can be accessed in bank 1 using BSR."""
   addr = addr.static_value()
@@ -1120,11 +1125,24 @@ class Store(StoreOp):
         elif name == 'OP_FETCH' and ram_addr(params[0]):
           # Memory move
           compiler.rewind()
-          compiler.add_instruction('movff',
-                                         [Add(params[0],
-                                                   Number(1)),
-                                          addr1])
-          compiler.add_instruction('movff', [params[0], addr])
+          # If both source and target are 16 bits PIC registers,
+          # the low value must be latched into W to benefit from
+          # internal latches.
+          if is_special_register(addr) and is_special_register(params[0]):
+            compiler.push(params[0])
+            compiler['c@'].run()
+            compiler['>w'].run()
+            compiler.add_instruction('movff', [Add(params[0], Number(1)),
+                                               addr1])
+            compiler['w>'].run()
+            compiler.push(addr)
+            compiler['c!'].run()
+          else:
+            compiler.add_instruction('movff', 
+                                     [Add(params[0],
+                                          Number(1)),
+                                      addr1])
+            compiler.add_instruction('movff', [params[0], addr])
         elif name == 'OP_CFETCH' and ram_addr(params[0]):
           # Memory byte move with one byte
           compiler.rewind()
