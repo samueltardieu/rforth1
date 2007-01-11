@@ -16,17 +16,17 @@ code flash-addr!
 
 : eeprom-addr! ( a -- ) w> EEADR c! EEPGD bit-clr CFGS bit-clr ; inw
 
-: eepromc@ ( a -- c ) w> eeprom-addr! RD bit-set EEDATA c@ >w ; inw outw
+: eepromc@ ( a -- c ) eeprom-addr! RD bit-set EEDATA c@ ;
 
 : eeprom@ ( a -- u ) dup eepromc@ swap 1+ eepromc@ 2>1 ;
 
 : eepromc! ( c a -- )
-  w> eeprom-addr! EEDATA c!
+  eeprom-addr! EEDATA c!
   WREN bit-set 0x55 EECON2 c! 0xAA EECON2 c! WR bit-set
   begin WR bit-clr? until
   WREN bit-clr
   EEIF bit-clr
-; inw
+;
 
 : eeprom! ( u a -- ) >r 1>2 r@ 1+ eepromc! r> eepromc! ;
 
