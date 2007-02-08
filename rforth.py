@@ -955,18 +955,20 @@ class CPlusStore(Primitive):
       if is_static_push((name, params)):
         value = params[0]
         svalue = value.static_value()
+        compiler.rewind()
         if negate: svalue = -svalue
         if svalue == 0:
-          compiler.rewind()
           return
         elif svalue == 1:
-          compiler.rewind()
           compiler.add_instruction('incf', [addr, dst_f, access_bit(addr)])
           return
         elif svalue == -1 or svalue == 255:
-          compiler.rewind()
           compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
           return
+        else:
+          # Let the regular treatment proceed with a negated value on
+          # the stack instead.
+          compiler.push(Negated(value))
       compiler['>w'].run()
       compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
     elif negate:

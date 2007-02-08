@@ -1,6 +1,6 @@
 rforth1 requires Python 2.3
 
-rforth1 is (c) 2005-2006 Samuel Tardieu <sam@rfc1149.net>
+rforth1 is (c) 2005-2007 Samuel Tardieu <sam@rfc1149.net>
 and is being distributed under the General Public License version 2
 (see the file COPYING in the distribution)
 
@@ -12,4 +12,7 @@ Thanks go to:
     choosing the right logo
 
   - Pablo Oliveira de Castro <oliveira@enst.fr>, pre-alpha tester
+
   - Sébastien "Calou" Gruchet <gruchet@enst.fr>, pre-alpha tester
+
+  - Antoine Poliakov <poliakov@enst.fr> for his bug reports
