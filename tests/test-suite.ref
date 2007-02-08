@@ -935,13 +935,10 @@ test_mult
 	movwf PREINC0,0
 	movlw 16
 	call type
-	movlw 0x75
+	movlw LOW((0x75*0x3a))
 	movwf PREINC0,0
-	clrf PREINC0,0
-	movlw 0x3a
+	movlw HIGH((0x75*0x3a))
 	movwf PREINC0,0
-	clrf PREINC0,0
-	call _ST_
 	call _
 	goto cr
 
@@ -1063,25 +1060,6 @@ _2_ST_
 	movf POSTDEC0,0,0
 	rlcf POSTINC0,1,0
 	rlcf INDF0,1,0
-	return
-
-_ST_
-	movff POSTDEC0,(temp_x1+1)
-	movff POSTDEC0,temp_x1
-	movff POSTDEC0,(temp_x2+1)
-	movff POSTDEC0,temp_x2
-	movf temp_x1,0,0
-	mulwf temp_x2,0
-	movff PRODL,PREINC0
-	movff PRODH,temp_x3
-	mulwf (temp_x2+1),0
-	movf PRODL,0,0
-	addwf temp_x3,1,0
-	movf (temp_x1+1),0,0
-	mulwf temp_x2,0
-	movf PRODL,0,0
-	addwfc temp_x3,0,0
-	movwf PREINC0,0
 	return
 
 depth
@@ -1303,10 +1281,6 @@ _lbl___95
 ;---------------------------------------------------------
 
 temp_x1 equ 0x0
-
-temp_x2 equ 0x2
-
-temp_x3 equ 0x4
 
 temp_w equ 0x7
 

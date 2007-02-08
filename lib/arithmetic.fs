@@ -227,7 +227,7 @@ code (*)
     return
 ;code inline
 
-: * intr-protect temp_x1 ! temp_x2 ! (*) ;
+: op_* intr-protect temp_x1 ! temp_x2 ! (*) ;
 
 code op_1+
     POSTDEC0 ,w ,a movf

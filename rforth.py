@@ -254,6 +254,12 @@ class Sub(Binary):
 
   def compute(self, a1, a2): return a1-a2
 
+class Mult(Binary):
+
+  op = '*'
+
+  def compute(self, a1, a2): return a1*a2
+
 class LeftShift(Binary):
 
   op = '<<'
@@ -916,6 +922,24 @@ class Minus(Primitive):
       x2 = compiler.ct_pop()
       x1 = compiler.ct_pop()
       compiler.ct_push(Sub(x1, x2))
+
+class Times(Primitive):
+
+  def run(self):
+    if compiler.state:
+      if is_static_push(compiler.last_instruction()) and \
+         is_static_push(compiler.before_last_instruction()):
+        res = Mult(compiler.before_last_instruction()[1][0],
+                       compiler.last_instruction()[1][0])
+        compiler.rewind()
+        compiler.rewind()
+        compiler.push(res)
+      else:
+        compiler['op_*'].run()
+    else:
+      x2 = compiler.ct_pop()
+      x1 = compiler.ct_pop()
+      compiler.ct_push(Mult(x1, x2))
 
 class OnePlus(Primitive):
 
@@ -2163,6 +2187,7 @@ class Compiler:
     self.add_primitive('2>1', TwoToOne)
     self.add_primitive('+', Plus)
     self.add_primitive('-', Minus)
+    self.add_primitive('*', Times)
     self.add_primitive('1+', OnePlus)
     self.add_primitive('1+!', OnePlusStore)
     self.add_primitive('1-', OneMinus)
