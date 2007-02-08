@@ -153,21 +153,22 @@ def is_static_push(opcode):
 
 class Named:
 
+  immediate = True
+  section = 'undefined'
+  inlined = False
+  inw = False
+  outw = False
+  outz = False
+  from_source = True
+  referenced_by = 0
+  not_inlinable = False
+  
   def __init__(self, name, compile = True):
     self.name = name
     if compile: compiler.start_compilation(self)
     else: compiler.enter_object(self)
-    self.immediate = True
     self.references = []
-    self.section = 'undefined'
     self.definition = compiler.current_location()
-    self.inlined = False
-    self.inw = False
-    self.outw = False
-    self.outz = False
-    self.from_source = True
-    self.referenced_by = 0
-    self.not_inlinable = False
 
   def reset_referenced_by(self):
     self.referenced_by = 0
@@ -222,8 +223,9 @@ class Named:
 
 class Binary(LiteralValue):
 
-  def __init__(self, op, v1, v2):
-    self.op = op
+  op = None
+
+  def __init__(self, v1, v2):
     self.v1 = v1
     self.v2 = v2
 
@@ -242,26 +244,29 @@ class Binary(LiteralValue):
 
 class Add(Binary):
 
-  def __init__(self, v1, v2): Binary.__init__(self, '+', v1, v2)
+  op = '+'
 
   def compute(self, a1, a2): return a1+a2
 
 class Sub(Binary):
 
-  def __init__(self, v1, v2): Binary.__init__(self, '-', v1, v2)
+  op = '-'
 
   def compute(self, a1, a2): return a1-a2
 
 class LeftShift(Binary):
 
-  def __init__(self, v1, v2): Binary.__init__(self, '<<', v1, v2)
+  op = '<<'
 
   def compute(self, a1, a2): return a1 << a2
 
 class Unary(LiteralValue):
 
-  def __init__(self, value):
-    self.value = value
+  r = None
+
+  def __init__(self, value): self.value = value
+
+  def __repr__(self): return self.r % self.value
 
   def static_value(self):
     a = self.value.static_value()
@@ -271,15 +276,13 @@ class Unary(LiteralValue):
 
 class Low(Unary):
 
-  def __repr__(self):
-    return 'LOW(%s)' % self.value
+  r = 'LOW(%s)'
 
   def compute(self, a): return a & 0xff
 
 class High(Unary):
 
-  def __repr__(self):
-    return 'HIGH(%s)' % self.value
+  r = 'HIGH(%s)'
 
   def compute(self, a): return a >> 8
 
@@ -295,8 +298,7 @@ def high(x):
 
 class Negated(Unary):
 
-  def __repr__(self):
-    return '(-%s)' % self.value
+  r = '(-%s)'
 
   def compute(self, a): return -a
 
@@ -326,13 +328,14 @@ class Label(NamedReference): pass
 
 class FlashData(NamedReference):
 
+  section = 'static data'
+  from_source = False
+
   def __init__(self, data, original_data, basename = None):
     if basename is None: basename = '_data_'
     NamedReference.__init__(self, basename)
     self.data = data
     self.original_data = original_data
-    self.section = 'static data'
-    self.from_source = False
 
   def output_header(self, outfd):
     outfd.write('; defined at %s as:\n; %s\n' %
@@ -1039,13 +1042,13 @@ class MakeConstant(Primitive):
 
 class Constant(Named, LiteralValue):
 
+  section = 'constants'
+
   def __init__(self, name, value):
     Named.__init__(self, name)
     self.value = value
     compiler.enter()
-    self.immediate = True
     self.refers_to(value)
-    self.section = 'constants'
 
   def output(self, outfd):
     outfd.write("%s equ %s\n" %(self, self.value))
@@ -1206,6 +1209,8 @@ class Allot(Primitive):
 
 class Variable(Constant):
 
+  section = 'memory'
+
   def __init__(self, name, size, initial_value = None, zone = 'RAM'):
     if zone == 'RAM':
       self.addr = compiler.here
@@ -1216,7 +1221,6 @@ class Variable(Constant):
     else:
       raise Compiler.UNIMPLEMENTED
     Constant.__init__(self, name, Number(self.addr, 16))
-    self.section = 'memory'
     if compiler.initialize_variables and size > 0 and \
            initial_value != 'NO_INIT':
       compiler.push_init_runtime()
@@ -1522,14 +1526,15 @@ class Postfix(Primitive):
 
 class Word(Named, Literal):
 
+  section = 'code'
+  immediate = False
+
   def __init__(self, name):
     Named.__init__(self, name)
     self.opcodes = []
-    self.section = 'code'
     self.definition = compiler.current_location()
     self.prepared = None
     self.substitute = None
-    self.immediate = False
     self.nrefs = 0                  # Number of references to this word
 
   def __repr__(self):

@@ -201,12 +201,17 @@ eeprom_addr_EX_
 	return
 
 eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call eeprom_addr_EX_
 	bsf EECON1,0,0
-	movf EEDATA,0,0
+	movff EEDATA,PREINC0
+	clrf PREINC0,0
 	return
 
 eepromc_EX_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
 	call eeprom_addr_EX_
 	movf POSTDEC0,0,0
 	movff POSTDEC0,EEDATA
