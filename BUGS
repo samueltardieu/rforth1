@@ -2,3 +2,7 @@
   honored in previous calls and will lead into problems.
 
 * .s is limited to 256 values on the stack
+
+* The inlining model would be more efficient if it was handled at a
+  logical level (before opcode generation) rather than after. This
+  would mean that the whole compilation model has to change.
