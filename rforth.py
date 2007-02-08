@@ -428,37 +428,36 @@ def run(): compiler.state = 0
 @register(']')
 def run(): compiler.state = 1
 
-class Literal(Primitive):
-  
-  def run(self): compiler.push(compiler.ct_pop())
+@register('literal')
+def run(): compiler.push(compiler.ct_pop())
 
-class ToW(Primitive):
-  def run(self, warn = True):
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH':
-      compiler.rewind()
-      value = params[0]
-      s = value.static_value()
-      if warn and s is not None and(s < -128 or s > 255):
-        compiler.warning('value will not fit in W register')
-      compiler.add_instruction('movlw', [low(value)])
-    elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
-      compiler.rewind()
-      addr = params[0]
-      if warn and name == 'OP_FETCH':
-        compiler.warning('value may not fit in W register')
-      if short_addr(addr):
-        compiler.add_instruction('movf',
-                                       [addr, dst_w, access_bit(addr)])
-      else:
-        compiler.add_instruction('movff', [addr, compiler['WREG']])
-    elif name == 'OP_DUP':
-      compiler.rewind()
-      compiler.add_instruction('movf', [compiler['INDF0'], dst_w, access])
-    elif name == 'OP_PUSH_W':
-      compiler.rewind()
+@register('>w')
+def run(warn = True):
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    compiler.rewind()
+    value = params[0]
+    s = value.static_value()
+    if warn and s is not None and(s < -128 or s > 255):
+      compiler.warning('value will not fit in W register')
+    compiler.add_instruction('movlw', [low(value)])
+  elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+    compiler.rewind()
+    addr = params[0]
+    if warn and name == 'OP_FETCH':
+      compiler.warning('value may not fit in W register')
+    if short_addr(addr):
+      compiler.add_instruction('movf',
+                                     [addr, dst_w, access_bit(addr)])
     else:
-      compiler.add_instruction('OP_POP_W', [])
+      compiler.add_instruction('movff', [addr, compiler['WREG']])
+  elif name == 'OP_DUP':
+    compiler.rewind()
+    compiler.add_instruction('movf', [compiler['INDF0'], dst_w, access])
+  elif name == 'OP_PUSH_W':
+    compiler.rewind()
+  else:
+    compiler.add_instruction('OP_POP_W', [])
 
 @register('dup')
 def run():
@@ -474,19 +473,17 @@ def run():
   else:
     compiler.add_instruction('OP_DUP')
 
-class Drop(ToW):
-  """Drop the top of stack"""
-  
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name in ['OP_PUSH', 'OP_DUP']:
-      compiler.rewind()
-    elif name == 'OP_FETCH' and ram_addr(params[0]) and \
-         params[0].static_value() < 0xf60:
-      # Regular memory read, can be safely removed
-      compiler.rewind()
-    else:
-      ToW.run(self, warn = False)
+@register('drop')
+def run():
+  name, params = compiler.last_instruction()
+  if name in ['OP_PUSH', 'OP_DUP']:
+    compiler.rewind()
+  elif name == 'OP_FETCH' and ram_addr(params[0]) and \
+       params[0].static_value() < 0xf60:
+    # Regular memory read, can be safely removed
+    compiler.rewind()
+  else:
+    compiler['>w'].run(False)
 
 @register('w>')
 def run():
@@ -1414,7 +1411,7 @@ def run(): PICIns.prefix = True
 @register('postfix')
 def run(): PICIns.prefix = False
 
-class Word(Named, Literal):
+class Word(Named, LiteralValue):
 
   section = 'code'
   immediate = False
@@ -1982,9 +1979,6 @@ class Compiler:
     for name, cls in _primitives: self.add_primitive(name, cls)
     self.add_primitive(',', Comma)
     self.add_primitive('char', compiler['[char]'].__class__)
-    self.add_primitive('>w', ToW)
-    self.add_primitive('drop', Drop)
-    self.add_primitive('literal', Literal)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')
