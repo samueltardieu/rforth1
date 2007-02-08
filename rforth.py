@@ -28,18 +28,20 @@ Memory usage:
 
 import optparse, os, sre, string, sys
 
-# Setup Forth search path
-
+# Setup Forth search path. The search path is the current directory
+# then the directories in RFORTH1_PATH (if any) then rforth1 directory
 forth_search_path = ['.']
-try: forth_search_path += os.getenv('RFORTH1_PATH').split(':')
+try: forth_search_path += os.getenv('RFORTH1_PATH').split(os.path.pathsep)
 except AttributeError: pass
 forth_search_path.append(os.path.dirname(sys.argv[0]))
 
 def forth_open(path, mode):
-  for p in forth_search_path:
-    try: return open(os.path.join(p, path), mode)
-    except IOError: pass
-  # Get an exception with the default file name (based on the current dir)
+  """Open a file according to the Forth search path if the name is relative."""
+  if path[0] not in [os.path.sep, os.path.altsep]:
+    for p in forth_search_path:
+      try: return open(os.path.join(p, path), mode)
+      except IOError: pass
+  # Open locally or get an exception
   return open(path, mode)
 
 def parse_number(str):
@@ -48,7 +50,7 @@ def parse_number(str):
   sign = 1
   while str[:1] == '-': sign, str = -sign, str[1:]
   for prefix, base in [('$', 16), ('0x', 16), ('0b', 2), ('', 10)]:
-    if str[:len(prefix)] == prefix:
+    if str.startswith(prefix):
       try: return Number(sign * int(str[len(prefix):], base), base)
       except: return None
   return None
