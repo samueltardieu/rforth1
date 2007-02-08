@@ -361,12 +361,6 @@ class FlashData(NamedReference):
       outfd.write('%d' % i)
     outfd.write('\n')
 
-class MakeLabel(Primitive):
-
-  def run(self):
-    label = Label(compiler.parse_word())
-    compiler.add_instruction('LABEL', [label])
-
 class Forward(Label):
   """Forward declaration."""
 
@@ -384,66 +378,61 @@ class Forward(Label):
     compiler.error('%s(defined at %s) needs to be overloaded' %
                    (self.name, self.definition))
 
-class MakeForward(Primitive):
+_primitives = []
 
-  def run(self):
-    Forward(compiler.parse_word())
+def register(prim_name):
+  def build(f):
+    class _primitive(Primitive):
+      def run(self, *args):
+        apply(f, args)
+    _primitives.append((prim_name, _primitive))
+    return _primitive
+  return build
 
-class IntrProtect(Primitive):
+@register('label')
+def run():
+  label = Label(compiler.parse_word())
+  compiler.add_instruction('LABEL', [label])
 
-  def run(self):
-    compiler.add_instruction('OP_INTR_PROTECT', [])
+@register('forward')
+def run(): Forward(compiler.parse_word())
 
-class IntrUnprotect(Primitive):
+@register('intr-protect')
+def run(): compiler.add_instruction('OP_INTR_PROTECT', [])
 
-  def run(self):
-    compiler.add_instruction('OP_INTR_UNPROTECT', [])
+@register('intr-unprotect')
+def run(): compiler.add_instruction('OP_INTR_UNPROTECT', [])
 
-class Char(Primitive):
+@register('[char]')
+def run():
+  char = Number(ord(compiler.parse_word()[0]))
+  if compiler.state: compiler.push(char)
+  else: compiler.ct_push(char)
 
-  def run(self):
-    char = Number(ord(compiler.parse_word()[0]))
-    if compiler.state: compiler.push(char)
-    else: compiler.ct_push(char)
+@register('begin')
+def run():
+  compiler.ct_push(0)
+  label = Label()
+  compiler.ct_push(label)
+  compiler.add_instruction('LABEL', [label])
 
-class Begin(Primitive):
-  """Push a counter and a backward label onto the stack."""
+@register('again')
+def run(do_not_pop_counter = False):
+  label = compiler.ct_pop()
+  compiler.add_instruction('bra', [label])
+  if not do_not_pop_counter: assert(compiler.ct_pop() == 0)
 
-  def run(self):
-    compiler.ct_push(0)
-    label = Label()
-    compiler.ct_push(label)
-    compiler.add_instruction('LABEL', [label])
+@register('[')
+def run(): compiler.state = 0
 
-class Again(Primitive):
-  """Jump back to a label from the stack."""
-
-  def run(self, do_not_pop_counter = False):
-    label = compiler.ct_pop()
-    compiler.add_instruction('bra', [label])
-    if not do_not_pop_counter: assert(compiler.ct_pop() == 0)
-
-class OpeningBracket(Primitive):
-  """Escape to interpretation mode."""
-
-  def run(self):
-    compiler.state = 0
-
-class ClosingBracket(Primitive):
-  """Return to compilation mode."""
-
-  def run(self):
-    compiler.state = 1
+@register(']')
+def run(): compiler.state = 1
 
 class Literal(Primitive):
-  """Pop a literal from the stack and generate code to push it at run time."""
-
-  def run(self):
-    compiler.push(compiler.ct_pop())
+  
+  def run(self): compiler.push(compiler.ct_pop())
 
 class ToW(Primitive):
-  """Move the top of stack into W."""
-
   def run(self, warn = True):
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
@@ -471,21 +460,19 @@ class ToW(Primitive):
     else:
       compiler.add_instruction('OP_POP_W', [])
 
-class Dup(Primitive):
-  """Duplicate top of stack"""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name in ['OP_PUSH', 'OP_PUSH_W']:
-      compiler.add_instruction(name, params)
-    elif name in ['OP_CFETCH']:
-      compiler.rewind()
-      addr = params[0]
-      compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
-      compiler.add_instruction('OP_PUSH_W')
-      compiler.add_instruction('OP_PUSH_W')
-    else:
-      compiler.add_instruction('OP_DUP')
+@register('dup')
+def run():
+  name, params = compiler.last_instruction()
+  if name in ['OP_PUSH', 'OP_PUSH_W']:
+    compiler.add_instruction(name, params)
+  elif name in ['OP_CFETCH']:
+    compiler.rewind()
+    addr = params[0]
+    compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
+    compiler.add_instruction('OP_PUSH_W')
+    compiler.add_instruction('OP_PUSH_W')
+  else:
+    compiler.add_instruction('OP_DUP')
 
 class Drop(ToW):
   """Drop the top of stack"""
@@ -501,570 +488,494 @@ class Drop(ToW):
     else:
       ToW.run(self, warn = False)
 
-class FromW(Primitive):
-  """Move W onto the top of stack."""
+@register('w>')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_POP_W':
+    compiler.rewind()
+  elif name == 'movf' and params[1] == dst_w:
+    compiler.rewind()
+    compiler.push(params[0])
+    compiler['c@'].run()
+  else:
+    compiler.add_instruction('OP_PUSH_W', [])
 
-  def run(self):
+@register('and')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH' and octet(params[0].static_value()):
+    compiler.rewind()
+    compiler['>w'].run()
+    compiler.add_instruction('andlw', params)
+    compiler['w>'].run()
+  else:
+    compiler['op_and'].run()
+
+@register('cfor')
+def run():
+  name, params = compiler.last_instruction()
+  label_uncfor = Label()
+  label_noloop = Label()
+  compiler.ct_push(label_noloop)
+  compiler.ct_push(label_uncfor)
+  if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+    compiler.rewind()
+    addr = params[0]
+    compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
+    if name == 'OP_FETCH':
+      compiler.warning('loop index may be larger than one byte')
+    compiler.add_instruction('movwf', [compiler['PREINC2'], access])
+    compiler.add_instruction('bz', [label_uncfor])
+  else:
+    bound_checks = True
+    if name == 'OP_PUSH':
+      value = params[0].static_value()
+      if value == 0:
+        compiler.rewind()
+        compiler.warning('empty loop will not execute')
+        compiler.add_instruction('bra', [label_noloop])
+      elif value < 0 or value > 255:
+        compiler.warning('loop limit does not fit in a byte')
+      elif value is not None:
+        bound_checks = False
+    compiler['>w'].run()
+    compiler.add_instruction('movwf',
+                                   [compiler['PREINC2'], access])
+    if bound_checks:
+      name, params = compiler.before_last_instruction()
+      if name != 'OP_POP_W':
+        compiler.add_instruction('iorlw', [Number(0)])
+      compiler.add_instruction('bz', [label_uncfor])
+  compiler['begin'].run()
+
+@register('ahead')
+def run():
+  label = Label()
+  compiler.ct_push(label)
+  compiler.add_instruction('bra', [label])
+
+@register('then')
+def run():
+  label = compiler.ct_pop()
+  compiler.add_instruction('LABEL', [label])
+
+@register('repeat')
+def run():
+  compiler['again'].run(True)
+  counter = compiler.ct_pop()
+  for _ in range(counter): compiler['then'].run()
+
+@register('if')
+def run(invert = False):
+  name, params = compiler.last_instruction()
+  if name == 'OP_NORMALIZE':
+    compiler.rewind()
+    return compiler['if'].run(invert)
+  if name == 'OP_0=':
+    compiler.rewind()
+    return compiler['if'].run(not invert)
+  if name == 'OP_BIT_SET?':
+    compiler.rewind()
+    value = params[0]
+    bit = params[1]
+    acc = params[2]
+    invert = not invert
+  elif name == 'OP_BIT_CLR?':
+    compiler.rewind()
+    value = params[0]
+    bit = params[1]
+    acc = params[2]
+  else:
+    if name != 'MARKER_ZSET':
+      compiler.add_instruction('movf', [compiler['POSTDEC0'],
+                                         dst_w, access])
+      compiler.add_instruction('iorwf', [compiler['POSTDEC0'],
+                                          dst_w, access])
+    value, bit = compiler['Z']
+    acc = access
+  if invert: ins = 'btfss'
+  else: ins = 'btfsc'
+  compiler.add_instruction(ins, [value, bit, acc])
+  compiler['ahead'].run()
+
+@register('switchw')
+# Structure of the switch statement on the compile stack is:
+#   - next label or None for the first case
+#   - switch end label
+#   - xored value
+def run():
+  compiler.ct_push(None)
+  compiler.ct_push(Label())
+  compiler.ct_push(0)
+
+@register('casew')
+def run():
+  name, params = compiler.last_instruction()
+  if name != 'OP_PUSH':
+    raise Compiler.FATAL_ERROR, \
+          "%s: casew must be used with a constant" % \
+          compiler.current_location
+  compiler.rewind()
+  xored = compiler.ct_pop()
+  label = compiler.ct_pop()
+  nlabel = compiler.ct_pop()
+  if nlabel is not None:
+    compiler.add_instruction('bra', [label])
+    compiler.add_instruction('LABEL', [nlabel])
+  xored ^= params[0].static_value()
+  compiler.add_instruction('xorlw', [Number(xored)])
+  value, bit = compiler['Z']
+  compiler.add_instruction('btfss', [value, bit, access])
+  nlabel = Label()
+  compiler.add_instruction('bra', [nlabel])
+  compiler.ct_push(nlabel)
+  compiler.ct_push(label)
+  compiler.ct_push(params[0].static_value())
+
+@register('endswitchw')
+def run():
+  xored = compiler.ct_pop()
+  label = compiler.ct_pop()
+  nlabel = compiler.ct_pop()
+  compiler.add_instruction('LABEL', [nlabel])
+  compiler.add_instruction('LABEL', [label])
+
+@register("[']")
+def run(): compiler.push(compiler.find(compiler.parse_word()))
+
+@register('jump')
+def run():
+  compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
+  compiler.push(compiler['PCL'])
+  compiler['!'].run()
+
+@register('while')
+def run(is_until = False):
+  flabel = compiler.ct_pop()
+  counter = compiler.ct_pop()
+  compiler['if'].run(is_until)
+  compiler.ct_push(counter+1)
+  compiler.ct_push(flabel)
+
+@register('until')
+def run():
+  compiler['while'].run(True)
+  compiler['repeat'].run()
+
+@register('cnext')
+def run():
+  compiler.add_instruction('decfsz',
+                                 [compiler['INDF2'], dst_f, access])
+  compiler['again'].run()
+  label = compiler.ct_pop()
+  compiler.add_instruction('LABEL', [label])
+  compiler.add_instruction('movf',
+                                 [compiler['POSTDEC2'], dst_f, access])
+  label = compiler.ct_pop()
+  compiler.add_instruction('LABEL', [label])
+
+@register('else')
+def run():
+  compiler['ahead'].run()
+  compiler.ct_swap()
+  compiler['then'].run()
+
+@register('0<>')
+def run():
+  name, params = compiler.last_instruction()
+  if name != 'OP_NORMALIZE': compiler.add_instruction('OP_NORMALIZE', [])
+
+@register('0=')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_0=':
+    compiler.rewind()
+    compiler['0<>'].run()
+    return
+  if name == 'OP_NORMALIZE': compiler.rewind()
+  compiler.add_instruction('OP_0=', [])
+
+def bitop(kind):       # kind can be 'set', 'clear' or 'toggle'
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    # The bit to change is statically known
+    compiler.rewind()
+    bit = params[0]
     name, params = compiler.last_instruction()
-    if name == 'OP_POP_W':
-      compiler.rewind()
-    elif name == 'movf' and params[1] == dst_w:
-      compiler.rewind()
-      compiler.push(params[0])
-      compiler['c@'].run()
-    else:
-      compiler.add_instruction('OP_PUSH_W', [])
-
-class LAnd(Primitive):
-  """Logical and."""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH' and octet(params[0].static_value()):
-      compiler.rewind()
-      compiler['>w'].run()
-      compiler.add_instruction('andlw', params)
-      compiler['w>'].run()
-    else:
-      compiler['op_and'].run()
-
-class CFor(Primitive):
-  """Simple loop with a one byte index."""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    label_uncfor = Label()
-    label_noloop = Label()
-    compiler.ct_push(label_noloop)
-    compiler.ct_push(label_uncfor)
-    if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+    if kind == 'set': op = 'bsf'
+    elif kind == 'clear': op = 'bcf'
+    elif kind == 'toggle': op = 'btg'
+    if name == 'OP_PUSH' and short_addr(params[0]):
+      # The address can also be access directly
       compiler.rewind()
       addr = params[0]
-      compiler.add_instruction('movf', [addr, dst_w, access_bit(addr)])
-      if name == 'OP_FETCH':
-        compiler.warning('loop index may be larger than one byte')
-      compiler.add_instruction('movwf', [compiler['PREINC2'], access])
-      compiler.add_instruction('bz', [label_uncfor])
+      compiler.add_instruction(op, [addr, bit, access_bit(params[0])])
     else:
-      bound_checks = True
-      if name == 'OP_PUSH':
-        value = params[0].static_value()
-        if value == 0:
-          compiler.rewind()
-          compiler.warning('empty loop will not execute')
-          compiler.add_instruction('bra', [label_noloop])
-        elif value < 0 or value > 255:
-          compiler.warning('loop limit does not fit in a byte')
-        elif value is not None:
-          bound_checks = False
-      compiler['>w'].run()
-      compiler.add_instruction('movwf',
-                                     [compiler['PREINC2'], access])
-      if bound_checks:
-        name, params = compiler.before_last_instruction()
-        if name != 'OP_POP_W':
-          compiler.add_instruction('iorlw', [Number(0)])
-        compiler.add_instruction('bz', [label_uncfor])
-    compiler['begin'].run()
-
-class Ahead(Primitive):
-  """Create and use a forward label."""
-
-  def run(self):
-    label = Label()
-    compiler.ct_push(label)
-    compiler.add_instruction('bra', [label])
-
-class Then(Primitive):
-  """Resolve a forward label from the stack."""
-
-  def run(self):
-    label = compiler.ct_pop()
-    compiler.add_instruction('LABEL', [label])
-
-class Repeat(Primitive):
-  """Jump back to a label from the stack and declare forward label."""
-
-  def run(self):
-    compiler['again'].run(do_not_pop_counter = True)
-    counter = compiler.ct_pop()
-    for _ in range(counter): compiler['then'].run()
-
-class If(Primitive):
-  """Compile a test."""
-
-  def run(self, invert = False):
-    name, params = compiler.last_instruction()
-    if name == 'OP_NORMALIZE':
-      compiler.rewind()
-      return self.run(invert)
-    if name == 'OP_0=':
-      compiler.rewind()
-      return self.run(not invert)
-    if name == 'OP_BIT_SET?':
-      compiler.rewind()
-      value = params[0]
-      bit = params[1]
-      acc = params[2]
-      invert = not invert
-    elif name == 'OP_BIT_CLR?':
-      compiler.rewind()
-      value = params[0]
-      bit = params[1]
-      acc = params[2]
+      # Latch through FSR1
+      compiler.pop_to_fsr(1)
+      compiler.add_instruction(op, [compiler['INDF1'], bit,
+                                          access])
+  else:
+    # Resort to a library function
+    if kind == 'set':
+      compiler['op_bit_set'].run()
+    elif kind == 'clear':
+      compiler['op_bit_clr'].run()
     else:
-      if name != 'MARKER_ZSET':
-        compiler.add_instruction('movf', [compiler['POSTDEC0'],
-                                           dst_w, access])
-        compiler.add_instruction('iorwf', [compiler['POSTDEC0'],
-                                            dst_w, access])
-      value, bit = compiler['Z']
-      acc = access
-    if invert: ins = 'btfss'
-    else: ins = 'btfsc'
-    compiler.add_instruction(ins, [value, bit, acc])
-    compiler['ahead'].run()
+      compiler['op_bit_toggle'].run()
 
-class SwitchW(Primitive):
-  """Simple switch statement"""
+@register('bit-set')
+def run(): bitop('set')
 
-  # Structure of the switch statement on the compile stack is:
-  #   - next label or None for the first case
-  #   - switch end label
-  #   - xored value
+@register('bit-clr')
+def run(): bitop('clear')
 
-  def run(self):
-    compiler.ct_push(None)
-    compiler.ct_push(Label())
-    compiler.ct_push(0)
+@register('bit-toggle')
+def run(): bitop('toggle')
 
-class CaseW(Primitive):
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name != 'OP_PUSH':
-      raise Compiler.FATAL_ERROR, \
-            "%s: casew must be used with a constant" % \
-            compiler.current_location
+@register('bit-set?')
+def run(invert = False):
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    # The bit to test is statically known
     compiler.rewind()
-    xored = compiler.ct_pop()
-    label = compiler.ct_pop()
-    nlabel = compiler.ct_pop()
-    if nlabel is not None:
-      compiler.add_instruction('bra', [label])
-      compiler.add_instruction('LABEL', [nlabel])
-    xored ^= params[0].static_value()
-    compiler.add_instruction('xorlw', [Number(xored)])
-    value, bit = compiler['Z']
-    compiler.add_instruction('btfss', [value, bit, access])
-    nlabel = Label()
-    compiler.add_instruction('bra', [nlabel])
-    compiler.ct_push(nlabel)
-    compiler.ct_push(label)
-    compiler.ct_push(params[0].static_value())
-
-class EndSwitchW(Primitive):
-
-  def run(self):
-    xored = compiler.ct_pop()
-    label = compiler.ct_pop()
-    nlabel = compiler.ct_pop()
-    compiler.add_instruction('LABEL', [nlabel])
-    compiler.add_instruction('LABEL', [label])
-
-class AddressOf(Primitive):
-  """Implement the ['] word."""
-
-  def run(self):
-    compiler.push(compiler.find(compiler.parse_word()))
-
-class Jump(Primitive):
-  """Implement the execute word."""
-
-  def run(self):
-    compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
-    compiler.push(compiler['PCL'])
-    compiler['!'].run()
-
-class While(Primitive):
-  """Implement the while word."""
-
-  def run(self, is_until = False):
-    flabel = compiler.ct_pop()
-    counter = compiler.ct_pop()
-    compiler['if'].run(invert = is_until)
-    compiler.ct_push(counter+1)
-    compiler.ct_push(flabel)
-
-class Until(Primitive):
-  """Implement the until word."""
-
-  def run(self):
-    compiler['while'].run(is_until = True)
-    compiler['repeat'].run()
-
-class CNext(Primitive):
-  """cnext corresponding to a preceding cfor."""
-
-  def run(self):
-    compiler.add_instruction('decfsz',
-                                   [compiler['INDF2'], dst_f, access])
-    compiler['again'].run()
-    label = compiler.ct_pop()
-    compiler.add_instruction('LABEL', [label])
-    compiler.add_instruction('movf',
-                                   [compiler['POSTDEC2'], dst_f, access])
-    label = compiler.ct_pop()
-    compiler.add_instruction('LABEL', [label])
-
-class Else(Primitive):
-  """Create and use a forward label the resolve a backward one."""
-
-  def run(self):
-    compiler['ahead'].run()
-    compiler.ct_swap()
-    compiler['then'].run()
-
-class Normalize(Primitive):
-  """Mark an entry on the stack as being a boolean(-1 or 0)."""
-
-  def run(self):
+    bit = params[0]
     name, params = compiler.last_instruction()
-    if name != 'OP_NORMALIZE': compiler.add_instruction('OP_NORMALIZE', [])
-
-class ZeroEqual(Primitive):
-  """Invert the boolean on the stack."""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name == 'OP_0=':
+    if invert: op = 'OP_BIT_CLR?'
+    else: op = 'OP_BIT_SET?'
+    if name == 'OP_PUSH' and short_addr(params[0]):
+      # The address is also usable as-is
       compiler.rewind()
-      compiler['0<>'].run()
-      return
-    if name == 'OP_NORMALIZE': compiler.rewind()
-    compiler.add_instruction('OP_0=', [])    
-
-class BitOp(Primitive):
-
-  def run(self, kind):       # kind can be 'set', 'clear' or 'toggle'
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH':
-      # The bit to change is statically known
-      compiler.rewind()
-      bit = params[0]
-      name, params = compiler.last_instruction()
-      if kind == 'set': op = 'bsf'
-      elif kind == 'clear': op = 'bcf'
-      elif kind == 'toggle': op = 'btg'
-      if name == 'OP_PUSH' and short_addr(params[0]):
-        # The address can also be access directly
-        compiler.rewind()
-        addr = params[0]
-        compiler.add_instruction(op, [addr, bit, access_bit(params[0])])
-      else:
-        # Latch through FSR1
-        compiler.pop_to_fsr(1)
-        compiler.add_instruction(op, [compiler['INDF1'], bit,
-                                            access])
+      addr = params[0]
+      compiler.add_instruction(op, [addr, bit, access_bit(addr)])
     else:
-      # Resort to a library function
-      if kind == 'set':
-        compiler['op_bit_set'].run()
-      elif kind == 'clear':
-        compiler['op_bit_clr'].run()
-      else:
-        compiler['op_bit_toggle'].run()
+      # Use FSR1 to latch the address
+      compiler.pop_to_fsr(1)
+      compiler.add_instruction(op, [compiler['INDF1'], bit,
+                                          access])
+  else:
+    # Resort to a library function
+    if invert: compiler['op_bit_clr_q'].run()
+    else: compiler['op_bit_set_q'].run()
 
-class BitSet(BitOp):
-  """Set a bit."""
+@register('bit-clr?')
+def run(): compiler['bit-set?'].run(True)
 
-  def run(self): BitOp.run(self, kind = 'set')
+@register('bit-mask')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    # The bit is known, compute a left shift
+    compiler.rewind()
+    compiler.push(LeftShift(Number(1), params[0]))
+  else:
+    # Default primitive
+    compiler['op_bit_mask'].run()
 
-class BitClr(BitOp):
-  """Clear a bit."""
+@register('\\')
+def run(): compiler.input_buffer = ''
 
-  def run(self): BitOp.run(self, kind = 'clear')
+@register('(')
+def run(): compiler.parse(')')
 
-class BitToggle(BitOp):
-  "Toggle a bit."""
+@register('include')
+def run(): compiler.include(compiler.parse_word())
 
-  def run(self): BitOp.run(self, kind = 'toggle')
+@register('needs')
+def run(): compiler.needs(compiler.parse_word())
 
-class BitTest(Primitive):
-  """Perform a bit test."""
+@register('exit')
+def run():
+  compiler.add_instruction('goto', [compiler.current_object.end_label])
 
-  def run(self, invert = False):
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH':
-      # The bit to test is statically known
-      compiler.rewind()
-      bit = params[0]
-      name, params = compiler.last_instruction()
-      if invert: op = 'OP_BIT_CLR?'
-      else: op = 'OP_BIT_SET?'
-      if name == 'OP_PUSH' and short_addr(params[0]):
-        # The address is also usable as-is
-        compiler.rewind()
-        addr = params[0]
-        compiler.add_instruction(op, [addr, bit, access_bit(addr)])
-      else:
-        # Use FSR1 to latch the address
-        compiler.pop_to_fsr(1)
-        compiler.add_instruction(op, [compiler['INDF1'], bit,
-                                            access])
-    else:
-      # Resort to a library function
-      if invert: compiler['op_bit_clr_q'].run()
-      else: compiler['op_bit_set_q'].run()
-
-class BitSetTest(BitTest): pass
-
-class BitClrTest(BitSetTest):
-  """Perform a negated bit test."""
-
-  def run(self): BitSetTest.run(self, invert = True)
-
-class BitMask(Primitive):
-  """Compute a bit mask."""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH':
-      # The bit is known, compute a left shift
-      compiler.rewind()
-      compiler.push(LeftShift(Number(1), params[0]))
-    else:
-      # Default primitive
-      compiler['op_bit_mask'].run()
-
-class Backslash(Primitive):
-
-  def run(self):
-    compiler.input_buffer = ''
-
-class Parenthesis(Primitive):
-
-  def run(self):
-    compiler.parse(')')
-
-class Include(Primitive):
-
-  def run(self):
-    compiler.include(compiler.parse_word())
-
-class Needs(Primitive):
-
-  def run(self):
-    compiler.needs(compiler.parse_word())
-
-class Exit(Primitive):
-
-  def run(self):
-    compiler.add_instruction('goto', [compiler.current_object.end_label])
-
-class Plus(Primitive):
-
-  def run(self):
-    if compiler.state:
-      name, params = compiler.last_instruction()
-      if is_static_push((name, params)):
-        compiler.rewind()
-        v = params[0].static_value16()
-        if is_static_push(compiler.last_instruction()):
-          res = Add(params[0], compiler.last_instruction()[1][0])
-          compiler.rewind()
-          compiler.push(res)
-        elif v == 0:
-          pass
-        elif v == 1:
-          compiler['op_1+'].run()
-        elif v == 0x0100:
-          compiler.add_instruction('incf', [compiler['INDF0'], dst_f, access])
-        elif v == 0xff00:
-          compiler.add_instruction('decf', [compiler['INDF0'], dst_f, access])
-        elif v is not None and v & 0xff == 0:
-          compiler.add_instruction('movlw', [High(params[0])])
-          compiler.add_instruction('addwf',
-                                    [compiler['INDF0'], dst_f, access])
-        else:
-          compiler.add_instruction('movlw', [Low(params[0])])
-          compiler.add_instruction('movf', [compiler['POSTDEC0'],
-                                             dst_f, access])
-          compiler.add_instruction('addwf', [compiler['POSTINC0'],
-                                              dst_f, access])
-          compiler.add_instruction('movlw', [High(params[0])])
-          compiler.add_instruction('addwfc', [compiler['INDF0'],
-                                               dst_f, access])
-      else:
-        compiler['op_plus'].run()
-    else:
-      x2 = compiler.ct_pop()
-      x1 = compiler.ct_pop()
-      compiler.ct_push(Add(x1, x2))
-
-class Minus(Primitive):
-
-  def run(self):
-    if compiler.state:
-      if is_static_push(compiler.last_instruction()) and \
-         is_static_push(compiler.before_last_instruction()):
-        res = Sub(compiler.before_last_instruction()[1][0],
-                       compiler.last_instruction()[1][0])
-        compiler.rewind()
-        compiler.rewind()
-        compiler.push(res)
-      elif is_static_push(compiler.last_instruction()):
-        value = compiler.last_instruction()[1][0]
-        compiler.rewind()
-        compiler.push(Negated(value))
-        compiler['+'].run()
-      else:
-        compiler['op_minus'].run()
-    else:
-      x2 = compiler.ct_pop()
-      x1 = compiler.ct_pop()
-      compiler.ct_push(Sub(x1, x2))
-
-class Times(Primitive):
-
-  def run(self):
-    if compiler.state:
-      if is_static_push(compiler.last_instruction()) and \
-         is_static_push(compiler.before_last_instruction()):
-        res = Mult(compiler.before_last_instruction()[1][0],
-                       compiler.last_instruction()[1][0])
-        compiler.rewind()
-        compiler.rewind()
-        compiler.push(res)
-      else:
-        compiler['op_*'].run()
-    else:
-      x2 = compiler.ct_pop()
-      x1 = compiler.ct_pop()
-      compiler.ct_push(Mult(x1, x2))
-
-class OnePlus(Primitive):
-
-  def run(self):
-    compiler.push(Number(1))
-    compiler['+'].run()
-
-class OneMinus(Primitive):
-
-  def run(self):
-    compiler.push(Number(1))
-    compiler['-'].run()
-
-class OnePlusStore(Primitive):
-
-  def run(self):
-    if compiler.state:
-      name, params = compiler.last_instruction()
-      if name == 'OP_PUSH' and ram_addr(params[0]):
-        # Increment a statically known RAM address
-        compiler.rewind()
-        addr = params[0]
-        compiler.add_instruction('infsnz', [addr, dst_f])
-        compiler.add_instruction('incf', [Add(addr, Number(1)), dst_f])
-        return
-    compiler['dup'].run()
-    compiler['@'].run()
-    compiler['1+'].run()
-    compiler['swap'].run()
-    compiler['!'].run()
-
-class CPlusStore(Primitive):
-
-  def run(self, negate = False):
+@register('+')
+def run():
+  if compiler.state:
     name, params = compiler.last_instruction()
     if is_static_push((name, params)):
       compiler.rewind()
-      addr = params[0]
-      name, params = compiler.last_instruction()
-      if is_static_push((name, params)):
-        value = params[0]
-        svalue = value.static_value()
+      v = params[0].static_value16()
+      if is_static_push(compiler.last_instruction()):
+        res = Add(params[0], compiler.last_instruction()[1][0])
         compiler.rewind()
-        if negate: svalue = -svalue
-        if svalue == 0:
-          return
-        elif svalue == 1:
-          compiler.add_instruction('incf', [addr, dst_f, access_bit(addr)])
-          return
-        elif svalue == -1 or svalue == 255:
-          compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
-          return
-        else:
-          # Let the regular treatment proceed with a negated value on
-          # the stack instead.
-          compiler.push(Negated(value))
-      compiler['>w'].run()
-      compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
-    elif negate:
-      compiler['op_c-!'].run()
-    else:
-      compiler['op_c+!'].run()
-
-class CMinusStore(CPlusStore):
-
-  def run(self):
-    CPlusStore.run(self, negate = True)
-
-class LShift(Primitive):
-
-  def run(self):
-    if compiler.state:
-      if is_static_push(compiler.last_instruction()) and \
-         is_static_push(compiler.before_last_instruction()):
-        name, nsteps = compiler.last_instruction()
-        compiler.rewind()
-        name, operand = compiler.last_instruction()
-        compiler.rewind()
-        compiler.push(LeftShift(operand[0], nsteps[0]))
+        compiler.push(res)
+      elif v == 0:
+        pass
+      elif v == 1:
+        compiler['op_1+'].run()
+      elif v == 0x0100:
+        compiler.add_instruction('incf', [compiler['INDF0'], dst_f, access])
+      elif v == 0xff00:
+        compiler.add_instruction('decf', [compiler['INDF0'], dst_f, access])
+      elif v is not None and v & 0xff == 0:
+        compiler.add_instruction('movlw', [High(params[0])])
+        compiler.add_instruction('addwf',
+                                  [compiler['INDF0'], dst_f, access])
       else:
-        compiler['cfor'].run()
-        compiler['2*'].run()
-        compiler['cnext'].run()
+        compiler.add_instruction('movlw', [Low(params[0])])
+        compiler.add_instruction('movf', [compiler['POSTDEC0'],
+                                           dst_f, access])
+        compiler.add_instruction('addwf', [compiler['POSTINC0'],
+                                            dst_f, access])
+        compiler.add_instruction('movlw', [High(params[0])])
+        compiler.add_instruction('addwfc', [compiler['INDF0'],
+                                             dst_f, access])
     else:
-      nsteps = compiler.ct_pop()
-      operand = compiler.ct_pop()
-      compiler.ct_push(LeftShift(operand, nsteps))
+      compiler['op_plus'].run()
+  else:
+    x2 = compiler.ct_pop()
+    x1 = compiler.ct_pop()
+    compiler.ct_push(Add(x1, x2))
 
-class Equal(Primitive):
-
-  def run(self):
+@register('-')
+def run():
+  if compiler.state:
     if is_static_push(compiler.last_instruction()) and \
-       compiler.last_instruction()[1][0].static_value() == 0:
+       is_static_push(compiler.before_last_instruction()):
+      res = Sub(compiler.before_last_instruction()[1][0],
+                     compiler.last_instruction()[1][0])
       compiler.rewind()
-      compiler['0='].run()
+      compiler.rewind()
+      compiler.push(res)
+    elif is_static_push(compiler.last_instruction()):
+      value = compiler.last_instruction()[1][0]
+      compiler.rewind()
+      compiler.push(Negated(value))
+      compiler['+'].run()
     else:
-      compiler['op_='].run()
+      compiler['op_minus'].run()
+  else:
+    x2 = compiler.ct_pop()
+    x1 = compiler.ct_pop()
+    compiler.ct_push(Sub(x1, x2))
 
-class Colon(Primitive):
+@register('*')
+def run():
+  if compiler.state:
+    if is_static_push(compiler.last_instruction()) and \
+       is_static_push(compiler.before_last_instruction()):
+      res = Mult(compiler.before_last_instruction()[1][0],
+                     compiler.last_instruction()[1][0])
+      compiler.rewind()
+      compiler.rewind()
+      compiler.push(res)
+    else:
+      compiler['op_*'].run()
+  else:
+    x2 = compiler.ct_pop()
+    x1 = compiler.ct_pop()
+    compiler.ct_push(Mult(x1, x2))
 
-  def run(self):
-    compiler.state = 1
-    name = compiler.parse_word()
-    Word(name).end_label = Label()
-    
-class SemiColon(Primitive):
+@register('1+')
+def run():
+  compiler.push(Number(1))
+  compiler['+'].run()
 
-  def run(self):
-    compiler.add_instruction('LABEL', [compiler.current_object.end_label])
-    compiler.add_instruction('return', [no_fast])
-    compiler.enter()
-    compiler.state = 0
+@register('1-')
+def run():
+  compiler.push(Number(1))
+  compiler['-'].run()
 
-class Recurse(Primitive):
+@register('1+!')
+def run():
+  if compiler.state:
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and ram_addr(params[0]):
+      # Increment a statically known RAM address
+      compiler.rewind()
+      addr = params[0]
+      compiler.add_instruction('infsnz', [addr, dst_f])
+      compiler.add_instruction('incf', [Add(addr, Number(1)), dst_f])
+      return
+  compiler['dup'].run()
+  compiler['@'].run()
+  compiler['1+'].run()
+  compiler['swap'].run()
+  compiler['!'].run()
 
-  def run(self):
-    compiler.add_call(compiler.current_object)
+@register('c+!')
+def run(negate = False):
+  name, params = compiler.last_instruction()
+  if is_static_push((name, params)):
+    compiler.rewind()
+    addr = params[0]
+    name, params = compiler.last_instruction()
+    if is_static_push((name, params)):
+      value = params[0]
+      svalue = value.static_value()
+      compiler.rewind()
+      if negate: svalue = -svalue
+      if svalue == 0:
+        return
+      elif svalue == 1:
+        compiler.add_instruction('incf', [addr, dst_f, access_bit(addr)])
+        return
+      elif svalue == -1 or svalue == 255:
+        compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
+        return
+      else:
+        # Let the regular treatment proceed with a negated value on
+        # the stack instead.
+        compiler.push(Negated(value))
+    compiler['>w'].run()
+    compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
+  elif negate:
+    compiler['op_c-!'].run()
+  else:
+    compiler['op_c+!'].run()
 
-class MakeConstant(Primitive):
+@register('c-!')
+def run(): compiler['c+!'].run(negate = True)
 
-  def run(self):
-    name = compiler.parse_word()
-    Constant(name, compiler.ct_pop())
+@register('lshift')
+def run():
+  if compiler.state:
+    if is_static_push(compiler.last_instruction()) and \
+       is_static_push(compiler.before_last_instruction()):
+      name, nsteps = compiler.last_instruction()
+      compiler.rewind()
+      name, operand = compiler.last_instruction()
+      compiler.rewind()
+      compiler.push(LeftShift(operand[0], nsteps[0]))
+    else:
+      compiler['cfor'].run()
+      compiler['2*'].run()
+      compiler['cnext'].run()
+  else:
+    nsteps = compiler.ct_pop()
+    operand = compiler.ct_pop()
+    compiler.ct_push(LeftShift(operand, nsteps))
+
+@register('=')
+def run():
+  if is_static_push(compiler.last_instruction()) and \
+     compiler.last_instruction()[1][0].static_value() == 0:
+    compiler.rewind()
+    compiler['0='].run()
+  else:
+    compiler['op_='].run()
+
+@register(':')
+def run():
+  compiler.state = 1
+  name = compiler.parse_word()
+  Word(name).end_label = Label()
+
+@register(';')
+def run():
+  compiler.add_instruction('LABEL', [compiler.current_object.end_label])
+  compiler.add_instruction('return', [no_fast])
+  compiler.enter()
+  compiler.state = 0
+
+@register('recurse')
+def run():
+  compiler.add_call(compiler.current_object)
+
+@register('constant')
+def run():
+  name = compiler.parse_word()
+  Constant(name, compiler.ct_pop())
 
 class Constant(Named, LiteralValue):
 
@@ -1107,131 +1018,124 @@ class Bit(Constant):
   def static_value(self):
     raise Compiler.INTERNAL_ERROR
 
-class MakeBit(Primitive):
+@register('bit')
+def run():
+  name = compiler.parse_word()
+  bit = compiler.ct_pop()
+  addr = compiler.ct_pop()
+  Bit(name, addr, bit)
 
-  def run(self):
-    name = compiler.parse_word()
-    bit = compiler.ct_pop()
-    addr = compiler.ct_pop()
-    Bit(name, addr, bit)
+def write_w(addr):
+  if short_addr(addr):
+    compiler.add_instruction('movwf', [addr, access_bit(addr)])
+  else:
+    compiler.add_instruction('movff', [compiler['WREG'], addr])
 
-class StoreOp(Primitive):
-
-  def write_w(self, addr):
-    if short_addr(addr):
-      compiler.add_instruction('movwf', [addr, access_bit(addr)])
-    else:
-      compiler.add_instruction('movff', [compiler['WREG'], addr])
-
-  def write_literal(self, value, addr):
-    if short_addr(addr):
-      if value.static_value() == 0:
-        compiler.add_instruction('clrf', [addr, access_bit(addr)])
-      elif value.static_value() == 0xff:
-        compiler.add_instruction('setf', [addr, access_bit(addr)])
-      else:
-        compiler.add_instruction('movlw', [value])
-        self.write_w(addr)
+def write_literal(value, addr):
+  if short_addr(addr):
+    if value.static_value() == 0:
+      compiler.add_instruction('clrf', [addr, access_bit(addr)])
+    elif value.static_value() == 0xff:
+      compiler.add_instruction('setf', [addr, access_bit(addr)])
     else:
       compiler.add_instruction('movlw', [value])
-      compiler.add_instruction('movff', [compiler['WREG'], addr])
-        
-class Store(StoreOp):
+      write_w(addr)
+  else:
+    compiler.add_instruction('movlw', [value])
+    compiler.add_instruction('movff', [compiler['WREG'], addr])
 
-  def run(self):
-    if compiler.state:
+@register('!')
+def run():
+  if compiler.state:
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and ram_addr(params[0]):
+      # The store tries to write at a statically known RAM address
+      compiler.rewind()
+      addr = params[0]
+      addr1 = Add(addr, Number(1))
       name, params = compiler.last_instruction()
-      if name == 'OP_PUSH' and ram_addr(params[0]):
-        # The store tries to write at a statically known RAM address
+      if name == 'OP_PUSH':
+        # Constant write
         compiler.rewind()
-        addr = params[0]
-        addr1 = Add(addr, Number(1))
-        name, params = compiler.last_instruction()
-        if name == 'OP_PUSH':
-          # Constant write
-          compiler.rewind()
-          const = params[0]
-          self.write_literal(high(const), addr1)
-          self.write_literal(low(const), addr)
-        elif name == 'OP_FETCH' and ram_addr(params[0]):
-          # Memory move
-          compiler.rewind()
-          # If both source and target are 16 bits PIC registers,
-          # the low value must be latched into W to benefit from
-          # internal latches.
-          if is_special_register(addr) and is_special_register(params[0]):
-            compiler.push(params[0])
-            compiler['c@'].run()
-            compiler['>w'].run()
-            compiler.add_instruction('movff', [Add(params[0], Number(1)),
-                                               addr1])
-            compiler['w>'].run()
-            compiler.push(addr)
-            compiler['c!'].run()
-          else:
-            compiler.add_instruction('movff', 
-                                     [Add(params[0],
-                                          Number(1)),
-                                      addr1])
-            compiler.add_instruction('movff', [params[0], addr])
-        elif name == 'OP_CFETCH' and ram_addr(params[0]):
-          # Memory byte move with one byte
-          compiler.rewind()
-          compiler.add_instruction('movff', [params[0], addr])
-          self.write_literal(Number(0), addr1)
-        elif name == 'OP_PUSH_W':
-          # Write W
-          compiler.warning('you may be wanting to use c! here')
-          compiler.rewind()
-          self.write_w(addr)
-          self.write_literal(0, addr1)
-        elif name == 'OP_2>1':
-          # Get content(LSB then MSB) and store it
-          compiler.rewind()
-          compiler.add_instruction('movff', [params[0], addr])
-          compiler.add_instruction('movff', [params[1], addr1])
+        const = params[0]
+        write_literal(high(const), addr1)
+        write_literal(low(const), addr)
+      elif name == 'OP_FETCH' and ram_addr(params[0]):
+        # Memory move
+        compiler.rewind()
+        # If both source and target are 16 bits PIC registers,
+        # the low value must be latched into W to benefit from
+        # internal latches.
+        if is_special_register(addr) and is_special_register(params[0]):
+          compiler.push(params[0])
+          compiler['c@'].run()
+          compiler['>w'].run()
+          compiler.add_instruction('movff', [Add(params[0], Number(1)),
+                                             addr1])
+          compiler['w>'].run()
+          compiler.push(addr)
+          compiler['c!'].run()
         else:
-          compiler.tos_to_addr(addr)
+          compiler.add_instruction('movff', 
+                                   [Add(params[0],
+                                        Number(1)),
+                                    addr1])
+          compiler.add_instruction('movff', [params[0], addr])
+      elif name == 'OP_CFETCH' and ram_addr(params[0]):
+        # Memory byte move with one byte
+        compiler.rewind()
+        compiler.add_instruction('movff', [params[0], addr])
+        write_literal(Number(0), addr1)
+      elif name == 'OP_PUSH_W':
+        # Write W
+        compiler.warning('you may be wanting to use c! here')
+        compiler.rewind()
+        write_w(addr)
+        write_literal(0, addr1)
+      elif name == 'OP_2>1':
+        # Get content(LSB then MSB) and store it
+        compiler.rewind()
+        compiler.add_instruction('movff', [params[0], addr])
+        compiler.add_instruction('movff', [params[1], addr1])
       else:
-        # Any address and content
-        compiler['op_store'].run()
+        compiler.tos_to_addr(addr)
+    else:
+      # Any address and content
+      compiler['op_store'].run()
 
-class CStore(StoreOp):
-
-  def run(self):
-    if compiler.state:
+@register('c!')
+def run():
+  if compiler.state:
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and ram_addr(params[0]):
+      # The store tries to write at a statically known address in RAM
+      compiler.rewind()
+      addr = params[0]
       name, params = compiler.last_instruction()
-      if name == 'OP_PUSH' and ram_addr(params[0]):
-        # The store tries to write at a statically known address in RAM
+      if name == 'OP_PUSH':
+        # Constant write
         compiler.rewind()
-        addr = params[0]
-        name, params = compiler.last_instruction()
-        if name == 'OP_PUSH':
-          # Constant write
-          compiler.rewind()
-          const = params[0]
-          self.write_literal(low(const), addr)
-        elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
-          # Memory move
-          compiler.rewind()
-          if name == 'OP_FETCH':
-            compiler.warning('target may not be large enough to '
-                                   'store entire result')
-          compiler.add_instruction('movff', [params[0], addr])
-        elif name == 'OP_PUSH_W':
-          # Write W
-          compiler.rewind()
-          self.write_w(addr)
-        else:
-          compiler.tos_to_addr_byte(addr)
+        const = params[0]
+        write_literal(low(const), addr)
+      elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+        # Memory move
+        compiler.rewind()
+        if name == 'OP_FETCH':
+          compiler.warning('target may not be large enough to '
+                                 'store entire result')
+        compiler.add_instruction('movff', [params[0], addr])
+      elif name == 'OP_PUSH_W':
+        # Write W
+        compiler.rewind()
+        write_w(addr)
       else:
-        # Any address and content
-        compiler['op_cstore'].run()
+        compiler.tos_to_addr_byte(addr)
+    else:
+      # Any address and content
+      compiler['op_cstore'].run()
 
-class Allot(Primitive):
-
-  def run(self):
-    compiler.allot(compiler.ct_pop().static_value())
+@register('allot')
+def run(): compiler.allot(compiler.ct_pop().static_value())
 
 class Variable(Constant):
 
@@ -1259,17 +1163,15 @@ class Variable(Constant):
         compiler['!'].run()
       compiler.pop_object()
 
-class Create(Primitive):
+@register('create')
+def run():
+  name = compiler.parse_word()
+  Variable(name, 0)
 
-  def run(self):
-    name = compiler.parse_word()
-    Variable(name, 0)
-
-class MakeVariable(Primitive):
-
-  def run(self):
-    name = compiler.parse_word()
-    Variable(name, 2)
+@register('variable')
+def run():
+  name = compiler.parse_word()
+  Variable(name, 2)
 
 class Value(Variable):
 
@@ -1277,30 +1179,26 @@ class Value(Variable):
     compiler.push(self)
     compiler['@'].run()
 
-class MakeCVariable(Primitive):
+@register('cvariable')
+def run():
+  name = compiler.parse_word()
+  Variable(name, 1)
 
-  def run(self):
-    name = compiler.parse_word()
-    Variable(name, 1)
+@register('eevariable')
+def run():
+  name = compiler.parse_word()
+  Variable(name, 2, 'NO_INIT', 'EEPROM')
 
-class MakeEEVariable(Primitive):
+@register('eecvariable')
+def run():
+  name = compiler.parse_word()
+  Variable(name, 1, 'NO_INIT', 'EEPROM')
 
-  def run(self):
-    name = compiler.parse_word()
-    Variable(name, 2, 'NO_INIT', 'EEPROM')
-
-class MakeEECVariable(Primitive):
-
-  def run(self):
-    name = compiler.parse_word()
-    Variable(name, 1, 'NO_INIT', 'EEPROM')
-
-class MakeValue(Primitive):
-
-  def run(self):
-    value = compiler.ct_pop()
-    name = compiler.parse_word()
-    Value(name, 2, value)
+@register('value')
+def run():
+  value = compiler.ct_pop()
+  name = compiler.parse_word()
+  Value(name, 2, value)
 
 class Comma(Primitive):
 
@@ -1316,125 +1214,97 @@ class Comma(Primitive):
     name = '_unnamed_%d' % self.next_count()
     Variable(name, size, value)
 
-class CComma(Comma):
+@register('c,')
+def run(): compiler[','].run(size = 1)
 
-  def run(self):
-    Comma.run(self, size = 1)
-
-class Fetch(Primitive):
-
-  def run(self):
-    if compiler.state:
-      name, params = compiler.last_instruction()
-      if name == 'OP_PUSH' and ram_addr(params[0]):
-        # Statically known address
-        compiler.rewind()
-        compiler.add_instruction('OP_FETCH', params)
-      else:
-        compiler.add_instruction('OP_FETCH_TOS', [])
+@register('@')
+def run():
+  if compiler.state:
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and ram_addr(params[0]):
+      # Statically known address
+      compiler.rewind()
+      compiler.add_instruction('OP_FETCH', params)
     else:
-      raise Compiler.FATAL_ERROR, \
-            "%s: cannot fetch while interpreting" % compiler.current_location
+      compiler.add_instruction('OP_FETCH_TOS', [])
+  else:
+    raise Compiler.FATAL_ERROR, \
+          "%s: cannot fetch while interpreting" % compiler.current_location
 
-class CFetch(Primitive):
-
-  def run(self):
-    if compiler.state:
-      name, params = compiler.last_instruction()
-      if name == 'OP_PUSH' and ram_addr(params[0]):
-        # Statically known address
-        compiler.rewind()
-        compiler.add_instruction('OP_CFETCH', params)
-      else:
-        compiler.add_instruction('OP_CFETCH_TOS', [])
+@register('c@')
+def run():
+  if compiler.state:
+    name, params = compiler.last_instruction()
+    if name == 'OP_PUSH' and ram_addr(params[0]):
+      # Statically known address
+      compiler.rewind()
+      compiler.add_instruction('OP_CFETCH', params)
     else:
-      raise Compiler.FATAL_ERROR, \
-            "%s: cannot fetch byte while interpreting" % \
-            compiler.current_location
+      compiler.add_instruction('OP_CFETCH_TOS', [])
+  else:
+    raise Compiler.FATAL_ERROR, \
+          "%s: cannot fetch byte while interpreting" % \
+          compiler.current_location
 
-class To(Primitive):
+@register('to')
+def run():
+  name = compiler.parse_word()
+  compiler.push(compiler.find(name))
+  compiler['!'].run()
 
-  def run(self):
-    name = compiler.parse_word()
-    compiler.push(compiler.find(name))
-    compiler['!'].run()
-
-class TwoToOne(Primitive):
-  """Combine a LSB and a MSB into one cell."""
-
-  def run(self):
+@register('2>1')
+def run():
+  name, params = compiler.last_instruction()
+  if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+    compiler.rewind()
+    msb = params[0]
     name, params = compiler.last_instruction()
     if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
       compiler.rewind()
-      msb = params[0]
-      name, params = compiler.last_instruction()
-      if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
-        compiler.rewind()
-        lsb = params[0]
-        compiler.add_instruction('OP_2>1', [lsb, msb])
-      else:
-        # Replace msb on stack
-        compiler.add_instruction('movff', [msb, compiler['INDF0']])
+      lsb = params[0]
+      compiler.add_instruction('OP_2>1', [lsb, msb])
     else:
-      # Resort to library routine
-      compiler['op_2>1'].run()
+      # Replace msb on stack
+      compiler.add_instruction('movff', [msb, compiler['INDF0']])
+  else:
+    # Resort to library routine
+    compiler['op_2>1'].run()
 
-class Inline(Primitive):
-  """Mark the latest defined word as inlined."""
+@register('inline')
+def run(): compiler.current_object.inlined = True
 
-  def run(self):
-    compiler.current_object.inlined = True
+@register('no-inline')
+def run(): compiler.current_object.not_inlineable = True
 
-class NoInline(Primitive):
-  """Mark the latest defined word as not inlinable."""
+@register('low-interrupt')
+def run():
+  compiler.check_interrupts()
+  compiler.low_interrupt = compiler.current_object
+  compiler.rewind()
+  compiler.add_instruction('retfie', [no_fast])
 
-  def run(self):
-    compiler.current_object.not_inlineable = True
+@register('high-interrupt')
+def run():
+  compiler.check_interrupts()
+  compiler.high_interrupt = compiler.current_object
+  compiler.rewind()
+  compiler.add_instruction('retfie', [no_fast])
 
-class LowInterrupt(Primitive):
-  """Mark the latest defined word as being the low-level interrupt."""
-
-  def run(self):
-    compiler.check_interrupts()
-    compiler.low_interrupt = compiler.current_object
+@register('fast')
+def run():
+  name, params = compiler.last_instruction()
+  if params == [no_fast]:
     compiler.rewind()
-    compiler.add_instruction('retfie', [no_fast])
+    compiler.add_instruction(name, [fast])
 
-class HighInterrupt(Primitive):
-  """Mark the latest defined word as being the low-level interrupt."""
+@register('inw')
+def run(): compiler.current_object.inw = True
 
-  def run(self):
-    compiler.check_interrupts()
-    compiler.high_interrupt = compiler.current_object
-    compiler.rewind()
-    compiler.add_instruction('retfie', [no_fast])
+@register('outw')
+def run(): compiler.current_object.outw = True
 
-class Fast(Primitive):
-  """Mark the latest word as returning fast(return or retfie)."""
-
-  def run(self):
-    name, params = compiler.last_instruction()
-    if params == [no_fast]:
-      compiler.rewind()
-      compiler.add_instruction(name, [fast])
-
-class InW(Primitive):
-  """Mark the latest defined word as getting its argument in W."""
-
-  def run(self):
-    compiler.current_object.inw = True
-
-class OutW(Primitive):
-  """Mark the latest defined word as getting its argument in W."""
-
-  def run(self):
-    compiler.current_object.outw = True
-
-class OutZ(Primitive):
-  """Mark the latest defined word as returning its truth value in Z."""
-
-  def run(self):
-    compiler.current_object.outz = True
+@register('outz')
+def run(): compiler.current_object.outz = True
 
 def is_internal_jump(opcode):
   return opcode[0] in ['goto', 'bra'] and isinstance(opcode[1][0], Label)
@@ -1500,55 +1370,49 @@ def PICIns_reset():
 
 PICIns_reset()
 
-class Code(Primitive):
-  """Inline assembly."""
+@register('code')
+def run():
+  name = compiler.parse_word()
+  Word(name)
+  compiler.state = 0
+  PICIns.ct_depth = len(compiler.data_stack)
 
-  def run(self):
-    name = compiler.parse_word()
-    Word(name)
-    compiler.state = 0
-    PICIns.ct_depth = len(compiler.data_stack)
+@register('python')
+def run():
+  """Include everything up to ;python in the default context."""
+  lines = []
+  while True:
+    compiler.refill()
+    words = compiler.input_buffer.split('#',1)[0].split()
+    if words and words[0].strip() == ';python': break
+    lines.append(compiler.input_buffer)
+  compiler.input_buffer = ''
+  exec string.join(lines, '\n') in globals()
 
-class Python(Primitive):
-  """Inline Python extensions to the core compiler."""
+@register(';code')
+def run():
+  compiler.enter()
+  if len(compiler.data_stack) != PICIns.ct_depth:
+    compiler.warning('wrong count on items on compiler '
+                           'stack(%d instead of %d)' %
+                          (len(compiler.data_stack), PICIns.ct_depth))
 
-  def run(self):
-    """Include everything up to ;python in the default context."""
-    lines = []
-    while True:
-      compiler.refill()
-      words = compiler.input_buffer.split('#',1)[0].split()
-      if words and words[0].strip() == ';python': break
-      lines.append(compiler.input_buffer)
-    compiler.input_buffer = ''
-    exec string.join(lines, '\n') in globals()
-
-class SemiColonCode(Primitive):
-  """End code definition."""
-
-  def run(self):
-    compiler.enter()
-    if len(compiler.data_stack) != PICIns.ct_depth:
-      compiler.warning('wrong count on items on compiler '
-                             'stack(%d instead of %d)' %
-                            (len(compiler.data_stack), PICIns.ct_depth))
-
-class CommaA(Primitive):
-  def run(self): PICIns.a = 0
-class Comma0(Primitive):
-  def run(self): PICIns.a = 0
-class Comma1(Primitive):
-  def run(self): PICIns.a = 1
-class CommaW(Primitive):
-  def run(self): PICIns.f = 0
-class CommaF(Primitive):
-  def run(self): PICIns.f = 1
-class CommaS(Primitive):
-  def run(self): PICIns.s = 1
-class Prefix(Primitive):
-  def run(self): PICIns.prefix = True
-class Postfix(Primitive):
-  def run(self): PICIns.prefix = False
+@register(',a')
+def run(): PICIns.a = 0
+@register(',0')
+def run(): PICIns.a = 0
+@register(',1')
+def run(): PICIns.a = 1
+@register(',w')
+def run(): PICIns.f = 0
+@register(',f')
+def run(): PICIns.f = 1
+@register(',s')
+def run(): PICIns.s = 1
+@register('prefix')
+def run(): PICIns.prefix = True
+@register('postfix')
+def run(): PICIns.prefix = False
 
 class Word(Named, Literal):
 
@@ -2115,98 +1979,12 @@ class Compiler:
     self.initialize_variables = True
 
   def add_primitives(self):
-    self.add_primitive(':', Colon)
-    self.add_primitive(';', SemiColon)
-    self.add_primitive('exit', Exit)
-    self.add_primitive('constant', MakeConstant)
-    self.add_primitive('create', Create)
-    self.add_primitive('allot', Allot)
-    self.add_primitive('variable', MakeVariable)
-    self.add_primitive('cvariable', MakeCVariable)
-    self.add_primitive('eevariable', MakeEEVariable)
-    self.add_primitive('eecvariable', MakeEECVariable)
-    self.add_primitive('value', MakeValue)
-    self.add_primitive('to', To)
-    self.add_primitive('bit', MakeBit)
-    self.add_primitive('recurse', Recurse)
-    self.add_primitive('\\', Backslash)
-    self.add_primitive('(', Parenthesis)
-    self.add_primitive('@', Fetch)
-    self.add_primitive('!', Store)
-    self.add_primitive('c@', CFetch)
-    self.add_primitive('c!', CStore)
-    self.add_primitive('code', Code)
-    self.add_primitive(';code', SemiColonCode)
-    self.add_primitive('python', Python)
-    self.add_primitive('label', MakeLabel)
-    self.add_primitive('forward', MakeForward)
-    self.add_primitive(',a', CommaA)
-    self.add_primitive(',0', Comma0)
-    self.add_primitive(',1', Comma1)
-    self.add_primitive(',w', CommaW)
-    self.add_primitive(',f', CommaF)
-    self.add_primitive(',s', CommaS)
+    for name, cls in _primitives: self.add_primitive(name, cls)
     self.add_primitive(',', Comma)
-    self.add_primitive('c,', CComma)
-    self.add_primitive('prefix', Prefix)
-    self.add_primitive('postfix', Postfix)
-    self.add_primitive('include', Include)
-    self.add_primitive('needs', Needs)
-    self.add_primitive('char', Char)
-    self.add_primitive('[char]', Char)
-    self.add_primitive('begin', Begin)
-    self.add_primitive('again', Again)
-    self.add_primitive('while', While)
-    self.add_primitive('repeat', Repeat)
-    self.add_primitive('ahead', Ahead)
-    self.add_primitive('until', Until)
-    self.add_primitive('cfor', CFor)
-    self.add_primitive('cnext', CNext)
-    self.add_primitive('if', If)
-    self.add_primitive('then', Then)
-    self.add_primitive('else', Else)
-    self.add_primitive('=', Equal)
-    self.add_primitive('0=', ZeroEqual)
-    self.add_primitive('0<>', Normalize)
-    self.add_primitive('bit-set?', BitSetTest)
-    self.add_primitive('bit-clr?', BitClrTest)
-    self.add_primitive('bit-mask', BitMask)
-    self.add_primitive('bit-set', BitSet)
-    self.add_primitive('bit-clr', BitClr)
-    self.add_primitive('bit-toggle', BitToggle)
-    self.add_primitive('inline', Inline)
-    self.add_primitive('no-inline', NoInline)
-    self.add_primitive('low-interrupt', LowInterrupt)
-    self.add_primitive('high-interrupt', HighInterrupt)
-    self.add_primitive('fast', Fast)
+    self.add_primitive('char', compiler['[char]'].__class__)
     self.add_primitive('>w', ToW)
-    self.add_primitive('w>', FromW)
     self.add_primitive('drop', Drop)
-    self.add_primitive('dup', Dup)
-    self.add_primitive('inw', InW)    
-    self.add_primitive('outw', OutW)
-    self.add_primitive('outz', OutZ)
-    self.add_primitive('2>1', TwoToOne)
-    self.add_primitive('+', Plus)
-    self.add_primitive('-', Minus)
-    self.add_primitive('*', Times)
-    self.add_primitive('1+', OnePlus)
-    self.add_primitive('1+!', OnePlusStore)
-    self.add_primitive('1-', OneMinus)
-    self.add_primitive('c+!', CPlusStore)
-    self.add_primitive('c-!', CMinusStore)
-    self.add_primitive('lshift', LShift)
     self.add_primitive('literal', Literal)
-    self.add_primitive('[', OpeningBracket)
-    self.add_primitive(']', ClosingBracket)
-    self.add_primitive('intr-protect', IntrProtect)
-    self.add_primitive('intr-unprotect', IntrUnprotect)
-    self.add_primitive('switchw', SwitchW)
-    self.add_primitive('casew', CaseW)
-    self.add_primitive('endswitchw', EndSwitchW)
-    self.add_primitive('and', LAnd)
-    self.add_primitive("[']", AddressOf)
-    self.add_primitive("jump", Jump)
     self.include('lib/core.fs')
     if self.use_interrupts:
       self.include('lib/interrupts.fs')
