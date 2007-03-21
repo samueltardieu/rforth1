@@ -214,6 +214,8 @@ def action_program (options, args):
         load_hex_file (args[0])
         program_device (fd, options)
     finally:
+        if options.execute:
+            writefd(fd, "X002000")
         close_port (fd, options)
 
 def handle_client (client):
@@ -328,6 +330,8 @@ Each mode has its own option requirements."""
     parser.add_option ('-s', '--speed', type = 'int',
                        help = 'speed to use for programming [115200]',
                        default = 115200)
+    parser.add_option('-X', '--execute', action = 'store_true', default = False,
+                       help = 'launch the program at address 0x2000')
     opts, args = parser.parse_args ()
     if opts.action is None:
         parser.print_help ()
