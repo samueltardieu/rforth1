@@ -378,6 +378,9 @@ class Forward(Label):
     compiler.error('%s(defined at %s) needs to be overloaded' %
                    (self.name, self.definition))
 
+  def can_inline(self):
+    return False
+
 _primitives = []
 
 def register(prim_name):
@@ -2100,7 +2103,8 @@ class Compiler:
     self.dict[string.lower(object.name)] = object
     if occurrence == 0: self.first_dict[string.lower(object.name)] = object
     object.occurrence = occurrence
-    if `object` in self.inline_list: object.inlined = True
+    if `object` in self.inline_list and object.can_inline():
+      object.inlined = True
 
   def fix_forward(self, old, new):
     self.all_entities.remove(old)
