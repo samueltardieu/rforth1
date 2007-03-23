@@ -36,6 +36,7 @@ class SQuote (Primitive):
     parsed = parsed.replace ('\\t', '\t')
     data = FlashData ([ord (c) for c in parsed], str,
                       compiler.current_object.name + '_str')
+    data.from_source = False
     compiler.push (Add (data, Number (0x8000, 16)))
     compiler.push (Number (len (parsed)))
 
