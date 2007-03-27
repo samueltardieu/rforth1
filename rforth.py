@@ -604,28 +604,36 @@ def run():
   compiler.ct_push(0)
 
 @register('casew')
-def run():
-  name, params = compiler.last_instruction()
-  if name != 'OP_PUSH':
-    raise Compiler.FATAL_ERROR, \
-          "%s: casew must be used with a constant" % \
-          compiler.current_location
-  compiler.rewind()
+def run(is_default = False):
+  if not is_default:
+    name, params = compiler.last_instruction()
+    if name != 'OP_PUSH':
+      raise Compiler.FATAL_ERROR, \
+            "%s: casew must be used with a constant" % \
+            compiler.current_location
+    compiler.rewind()
   xored = compiler.ct_pop()
   label = compiler.ct_pop()
   nlabel = compiler.ct_pop()
   if nlabel is not None:
     compiler.add_instruction('bra', [label])
     compiler.add_instruction('LABEL', [nlabel])
-  xored ^= params[0].static_value()
-  compiler.add_instruction('xorlw', [Number(xored)])
-  value, bit = compiler['Z']
-  compiler.add_instruction('btfss', [value, bit, access])
   nlabel = Label()
-  compiler.add_instruction('bra', [nlabel])
   compiler.ct_push(nlabel)
   compiler.ct_push(label)
-  compiler.ct_push(params[0].static_value())
+  if not is_default:
+    xored ^= params[0].static_value()
+    compiler.add_instruction('xorlw', [Number(xored)])
+    value, bit = compiler['Z']
+    compiler.add_instruction('btfss', [value, bit, access])
+    compiler.add_instruction('bra', [nlabel])
+    compiler.ct_push(params[0].static_value())
+  else:
+    compiler.ct_push(xored)
+
+@register('defaultw')
+def run():
+  compiler['casew'].run(True)
 
 @register('endswitchw')
 def run():

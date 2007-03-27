@@ -138,13 +138,19 @@ _lbl___206
 	goto type
 _lbl___207
 	xorlw 3
-	btfss STATUS,2,0
-	return
+	bnz _lbl___208
 	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
+	goto type
+_lbl___208
+	movlw LOW((handle_key_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 4
 
 type
 	movwf PREINC2,0
@@ -304,5 +310,8 @@ handle_key_str__1
 
 handle_key_str__2
 	db 50,50,50
+
+handle_key_str__3
+	db 51,51,51,51
 
 END

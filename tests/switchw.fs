@@ -5,6 +5,7 @@ needs lib/tty-rs232.fs
     0 casew ." 000"
     1 casew ." 111"
     2 casew ." 222"
+    defaultw ." 3333"
   endswitchw
 ; inw
 
