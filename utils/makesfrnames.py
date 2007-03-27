@@ -3,14 +3,14 @@
 # Usage: makesfrname.py < gpasm-header-file > forth-file
 #
 
-import sre, sys
+import re, sys
 
-sep = sre.compile (';(----- |=====)')
-regs = sre.compile (';----- Register Files')
-bits = sre.compile (';----- ((.*) Bits|PORT.)')
+sep = re.compile (';(----- |=====)')
+regs = re.compile (';----- Register Files')
+bits = re.compile (';----- ((.*) Bits|PORT.)')
 
-reg = sre.compile ("(\S+)\s+EQU\s+H'0([0-9A-F]{3})'\s*;?\s*(.*)")
-port = sre.compile ("(\S+)\s+EQU\s+(\d)\s*;?\s*(.*)")
+reg = re.compile ("(\S+)\s+EQU\s+H'0([0-9A-F]{3})'\s*;?\s*(.*)")
+port = re.compile ("(\S+)\s+EQU\s+(\d)\s*;?\s*(.*)")
 
 all_regs = []
 all_bits = []
