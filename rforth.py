@@ -312,11 +312,6 @@ class Negated(Unary):
 
 class Primitive(Named): pass
 
-class AsmInstruction(Primitive):
-
-  def run(self):
-    compiler.add_instruction(self.name, [])
-
 class NamedReference(Named):
   """Label with an implicit or explicit name."""
 
