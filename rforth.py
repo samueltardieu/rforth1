@@ -26,7 +26,7 @@ Memory usage:
      variables used in computations
    - user-defined variables are located starting at 0x0100"""
 
-import optparse, os, sre, string, sys
+import optparse, os, re, string, sys
 
 # Setup Forth search path. The search path is the current directory
 # then the directories in RFORTH1_PATH (if any) then rforth1 directory
@@ -2048,7 +2048,7 @@ class Compiler:
     result, self.input_buffer = self.input_buffer.split(char, 1)
     return result
 
-  _next_word = sre.compile('(\s*)(\S+)\s?')
+  _next_word = re.compile('(\s*)(\S+)\s?')
 
   def parse_word(self):
     while True:
