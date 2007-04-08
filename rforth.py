@@ -1313,11 +1313,11 @@ def is_internal_jump(opcode):
   return opcode[0] in ['goto', 'bra'] and isinstance(opcode[1][0], Label)
 
 def is_external_jump(opcode):
-  if opcode[0] in ['return', 'retfie']: return True
+  if opcode[0] in ['return', 'retfie', 'retlw']: return True
   return opcode[0] == 'goto' and isinstance(opcode[1][0], (Label, Word))
 
 def is_jump(opcode):
-  return opcode[0] in ['goto', 'bra', 'return', 'retfie']
+  return opcode[0] in ['goto', 'bra', 'return', 'retfie', 'retlw']
 
 def last_goto(x):
   """Check whether the last instruction of x is a real goto to somewhere
@@ -1490,6 +1490,7 @@ class Word(Named, LiteralValue):
       old_opcodes = self.opcodes[:]
       self.optimize_tail_calls()
       self.optimize_chained_calls()
+      self.optimize_retlw()
       self.optimize_dead_labels()
       self.optimize_dead_code()
       self.optimize_small_gotos()
@@ -1532,8 +1533,22 @@ class Word(Named, LiteralValue):
       if self.opcodes[o][0] in ['goto', 'bra']:
         target = self.opcodes[o][1][0]
         ins = self.instruction_at_label(target)
-        if ins and ins[0] in ['goto', 'bra', 'return', 'retfie', 'reset']:
+        if ins and ins[0] in ['goto', 'bra', 'return', 'retfie', 'reset',
+                              'retlw']:
           self.opcodes[o] = ins
+
+  def optimize_retlw(self):
+    new = []
+    while len(self.opcodes) > 1:
+      if self.opcodes[0][0] == 'movlw' and \
+         self.opcodes[1] == ('return', [no_fast]):
+        new.append(('retlw', self.opcodes[0][1]))
+        del self.opcodes[0]
+      else:
+        new.append(self.opcodes[0])
+      del self.opcodes[0]
+    new += self.opcodes
+    self.opcodes = new
 
   def optimize_dead_labels(self):
     new = []
@@ -1581,7 +1596,7 @@ class Word(Named, LiteralValue):
         new.append(self.opcodes[o])
         o += 1
         new.append(self.opcodes[o])
-      elif not dead and self.opcodes[o][0] in ['goto', 'bra',
+      elif not dead and self.opcodes[o][0] in ['goto', 'bra', 'retlw',
                                                'return', 'retfie', 'reset']:
         new.append(self.opcodes[o])
         dead = True
