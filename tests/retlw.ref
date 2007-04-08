@@ -1,0 +1,74 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto main
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+STATUS equ 0xfd8
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+main
+	movlw 17
+
+hex_to_int
+	xorlw 48
+	btfsc STATUS,2,0
+	retlw 0
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 1
+	xorlw 3
+	btfsc STATUS,2,0
+	retlw 2
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 3
+	xorlw 7
+	btfsc STATUS,2,0
+	retlw 4
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 5
+	xorlw 3
+	btfsc STATUS,2,0
+	retlw 6
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 7
+	xorlw 15
+	btfsc STATUS,2,0
+	retlw 8
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 9
+	xorlw 120
+	btfsc STATUS,2,0
+	retlw 10
+	xorlw 3
+	btfsc STATUS,2,0
+	retlw 11
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 12
+	xorlw 7
+	btfsc STATUS,2,0
+	retlw 13
+	xorlw 1
+	btfsc STATUS,2,0
+	retlw 14
+	xorlw 101
+	btfsc STATUS,2,0
+	retlw 255
+	retlw 0
+
+END
