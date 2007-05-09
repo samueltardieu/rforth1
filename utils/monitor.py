@@ -222,7 +222,7 @@ def receive_line(s):
     data = ''
     while data[-1:] != '\n':
         data += s.recv(1500)
-    while l[-1:] in ['\r', '\n']:
+    while data[-1:] in ['\r', '\n']:
         data = data[:-1]
     return data
 
