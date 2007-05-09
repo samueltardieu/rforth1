@@ -451,7 +451,8 @@ def run(warn = True):
       compiler.add_instruction('movff', [addr, compiler['WREG']])
   elif name == 'OP_DUP':
     compiler.rewind()
-    compiler.add_instruction('movf', [compiler['INDF0'], dst_w, access])
+    compiler.add_instruction('movlw', [Number(-1)])
+    compiler.add_instruction('movf', [compiler['PLUSW0'], dst_w, access])
   elif name == 'OP_PUSH_W':
     compiler.rewind()
   else:
