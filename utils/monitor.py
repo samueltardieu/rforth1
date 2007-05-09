@@ -237,7 +237,7 @@ def action_client (options, args):
         host, port = options.server_addr, options.server_port
         if host == 'auto': host = 'localhost'
         s.connect((host, port))
-        print "Connected to", addr
+        print "Connected to", host
         print "Sending file %s" % args[0]	
         for l in open (args[0],'r').readlines():
             s.send(l)
