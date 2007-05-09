@@ -218,17 +218,27 @@ def action_program (options, args):
             writefd(fd, "X002000")
         close_port (fd, options)
 
+def receive_line(s):
+    data = ''
+    while data[-1:] != '\n':
+        data += s.recv(1500)
+    while l[-1:] in ['\r', '\n']:
+        data = data[:-1]
+    return data
+
+def send_line(s, l):
+    s.send(l + '\n')
+
 def handle_client (client):
-    ACK="ok"
     while 1:
-        l = client.recv(1024)
-        if not l:raise TransmissionWithServerFailed 	 
-        if l=="eof": break
-        while l[-1:] in ['\r', '\n']: 
-            l = l[:-1]
+        l = receive_line(client)
+        if not l:
+            raise TransmissionWithServerFailed 	 
+        if l=="eof":
+            break
         if l[:1] == ':': 
             handle_hex_line (l)
-        client.send(ACK)
+        client.send_line('ok')
 
 def action_client (options, args):
     check_argv (args, 1)
@@ -240,17 +250,19 @@ def action_client (options, args):
         print "Connected to", host
         print "Sending file %s" % args[0]	
         for l in open (args[0],'r').readlines():
-            s.send(l)
-            data = ''
-            while len(data) < 2:
-                data += s.recv(2 - len(data))
+            while l[-1:] in ['\r', '\n']:
+                l = l[:-1]
+            send_line(s, l)
+            data = receive_line(s)
             if data != "ok":
                 raise TransmissionWithServerFailed 	
-        s.send("eof")
+        send_line(s, "eof")
         while 1:
-            data = s.recv(1024)
-            if not data:raise TransmissionWithServerFailed 	
-            if data == "bye": break
+            data = receive_line(s)
+            if not data:
+                raise TransmissionWithServerFailed 	
+            if data == "bye":
+                break
             print data
     finally:
         s.close()
@@ -273,12 +285,12 @@ def action_server (options, args):
             client,addr = s.accept()
             print "Connection from ", addr
             handle_client (client)
-            client.send("Hex file loaded")
+            send_line(client, "Hex file loaded")
             fd = open_port (options)
             program_device (fd, options)
             close_port (fd,options)
-            client.send("Device programmed")
-            client.send("bye")
+            send_line(client, "Device programmed")
+            send_line(client, "bye")
             client.close()
     finally:
             s.close()
