@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# Copyright (c) 2004-2006 Samuel Tardieu <sam@rfc1149.net>
+# Copyright (c) 2004-2007 Samuel Tardieu <sam@rfc1149.net>
 #
 # This file allows the loading of an hex file onto a PIC 18Fxx8 device
 # using a serial monitor.
