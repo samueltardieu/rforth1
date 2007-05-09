@@ -241,7 +241,9 @@ def action_client (options, args):
         print "Sending file %s" % args[0]	
         for l in open (args[0],'r').readlines():
             s.send(l)
-            data = s.recv(1024)
+            data = ''
+            while len(data) < 2:
+                data += s.recv(2 - len(data))
             if data != "ok":
                 raise TransmissionWithServerFailed 	
         s.send("eof")
