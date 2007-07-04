@@ -632,6 +632,10 @@ def run(is_default = False):
   else:
     compiler.ct_push(xored)
 
+@register('endcasew')
+def run():
+  pass
+
 @register('defaultw')
 def run():
   compiler['casew'].run(True)
