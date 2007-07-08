@@ -252,6 +252,11 @@ class Named:
   def prepare(self):
     pass
 
+  def check_real(self):
+    """Check whether the current object is real or signal an error if
+    it is an unresolved forward reference (overriden in Forward)."""
+    pass
+
 class Binary(LiteralValue):
 
   op = None
@@ -421,7 +426,7 @@ class Forward(Label):
     else:
       compiler.ct_push(self)
 
-  def output(self, _):
+  def check_real(self):
     compiler.error('%s (defined at %s) needs to be overloaded' %
                    (self.name, self.definition))
 
@@ -2370,6 +2375,8 @@ class Compiler:
     self.state = 1
     inlinable = [x for x in self.all_entities if x.can_inline()]
     refs = self.find(self.main).deep_references([])
+    for i in refs:
+      i.check_real()
     if self.automatic_inlining:
       to_inline = [x for x in refs if x in inlinable and x.should_inline()]
       if to_inline:
