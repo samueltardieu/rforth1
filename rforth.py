@@ -2511,7 +2511,8 @@ class Compiler:
     warning('%s: %s' % (self.current_location(), str))
 
   def error(self, str):
-    raise Compiler.COMPILATION_ERROR, '%s: %s' % (self.current_location(), str)
+    raise Compiler.COMPILATION_ERROR, \
+          '%s: %s' % (self.current_location(), str)
 
   def add_instruction(self, instruction, params = []):
     self.current_object.add_instruction(instruction, params)
