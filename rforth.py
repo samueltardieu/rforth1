@@ -247,7 +247,7 @@ class Named:
       self.references.append(object)
 
   def output_header(self, outfd):
-    outfd.write('; %s: defined at %s\n' %(self.name, self.definition))
+    outfd.write('; %s: defined at %s\n' % (self.name, self.definition))
 
   def prepare(self):
     pass
@@ -261,7 +261,7 @@ class Binary(LiteralValue):
     self.v2 = v2
 
   def __repr__(self):
-    return '(%s%s%s)' %(self.v1, self.op, self.v2)
+    return '(%s%s%s)' % (self.v1, self.op, self.v2)
 
   def deep_references(self, stack):
     self.v1.deep_references(stack)
@@ -422,7 +422,7 @@ class Forward(Label):
       compiler.ct_push(self)
 
   def output(self, _):
-    compiler.error('%s(defined at %s) needs to be overloaded' %
+    compiler.error('%s (defined at %s) needs to be overloaded' %
                    (self.name, self.definition))
 
   def can_inline(self):
@@ -498,7 +498,7 @@ def run(warn = True):
     value = params[0]
     s = value.static_value()
     if warn and s is not None and(s < -128 or s > 255):
-      compiler.warning('value will not fit in W register')
+      compiler.error('value will not fit in W register')
     compiler.add_instruction('movlw', [low(value)])
   elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
     compiler.rewind()
@@ -592,7 +592,7 @@ def run():
         compiler.warning('empty loop will not execute')
         compiler.add_instruction('bra', [label_noloop])
       elif value < 0 or value > 255:
-        compiler.warning('loop limit does not fit in a byte')
+        compiler.error('loop limit does not fit in a byte')
       elif value is not None:
         bound_checks = False
     compiler['>w'].run()
@@ -1080,7 +1080,7 @@ class Constant(Named, LiteralValue):
     self.refers_to(value)
 
   def output(self, outfd):
-    outfd.write("%s equ %s\n" %(self, self.value))
+    outfd.write("%s equ %s\n" % (self, self.value))
 
   def run(self):
     if compiler.state:
@@ -1216,7 +1216,7 @@ def run():
         compiler.rewind()
         if name == 'OP_FETCH':
           compiler.warning('target may not be large enough to '
-                                 'store entire result')
+                           'store entire result')
         compiler.add_instruction('movff', [params[0], addr])
       elif name == 'OP_PUSH_W':
         # Write W
@@ -1507,8 +1507,8 @@ def run():
   compiler.enter()
   if len(compiler.data_stack) != PICIns.ct_depth:
     compiler.warning('wrong count on items on compiler '
-                           'stack(%d instead of %d)' %
-                          (len(compiler.data_stack), PICIns.ct_depth))
+                     'stack (%d instead of %d)' %
+                     (len(compiler.data_stack), PICIns.ct_depth))
 
 @register(',a')
 def run():
@@ -1603,9 +1603,9 @@ class Word(Named, LiteralValue):
   def dump(self, msg = ''):
     if msg:
       msg = '(%s)' % msg
-    stderror("Dumping content of %s%s:" %(self.name, msg))
+    stderror("Dumping content of %s%s:" % (self.name, msg))
     for o in self.opcodes:
-      stderror("   %s %s" %(o[0], string.join([`x` for x in o[1]], ",")))
+      stderror("   %s %s" % (o[0], string.join([`x` for x in o[1]], ",")))
 
   def remove_markers(self):
     self.opcodes = [o for o in self.opcodes if o[0][:7] != 'MARKER_']
@@ -2003,11 +2003,11 @@ class Word(Named, LiteralValue):
     elif len(params) == 0:
       write_insn(name)
     elif len(params) == 1:
-      write_insn('%s %s' %(name, params[0]))
+      write_insn('%s %s' % (name, params[0]))
     elif len(params) == 2:
-      write_insn('%s %s,%s' %(name, params[0], params[1]))
+      write_insn('%s %s,%s' % (name, params[0], params[1]))
     elif len(params) == 3:
-      write_insn('%s %s,%s,%s' %(name, params[0], params[1], params[2]))
+      write_insn('%s %s,%s,%s' % (name, params[0], params[1], params[2]))
     else:
       raise Compiler.UNIMPLEMENTED, (name, params)
 
@@ -2030,22 +2030,32 @@ class Input:
 
   def current_location(self):
     """Return an identifier of the current location"""
-    return "%s:%d" %(self.name, self.current_line)
+    return "%s:%d" % (self.name, self.current_line)
 
   def __repr__(self):
     return self.current_location()
 
 class Compiler:
 
-  class EOF(Exception):
+  class Error(Exception):
+
+    def __init__(self, msg):
+      Exception.__init__(self)
+      self.msg = msg      
+      
+  class EOF(Error):
     pass
-  class FATAL_ERROR(Exception):
+  
+  class FATAL_ERROR(Error):
     pass
-  class UNIMPLEMENTED(Exception):
+  
+  class UNIMPLEMENTED(Error):
     pass
-  class INTERNAL_ERROR(Exception):
+  
+  class INTERNAL_ERROR(Error):
     pass
-  class COMPILATION_ERROR(Exception):
+  
+  class COMPILATION_ERROR(Error):
     pass
 
   pic_opcodes = ['clrwdt', 'daw', 'nop', 'sleep', 'reset',
@@ -2346,7 +2356,7 @@ class Compiler:
         if number is None:
           input = self.input
 	  raise Compiler.FATAL_ERROR, \
-                "%s: unknown word %s" %(self.current_location(),
+                "%s: unknown word %s" % (self.current_location(),
                                          word)
         if self.state:
 		self.push(number)
@@ -2364,7 +2374,7 @@ class Compiler:
       to_inline = [x for x in refs if x in inlinable and x.should_inline()]
       if to_inline:
         stderror("Restarting with automatic inlining of:\n   %s" %
-                  "\n   ".join(["%s (%s)" %(x.name, x.definition)
+                  "\n   ".join(["%s (%s)" % (x.name, x.definition)
                                  for x in to_inline]))
         outfd.close()
         compiler = Compiler(self.processor, self.start, self.main,
@@ -2476,19 +2486,19 @@ class Compiler:
 
   def output_section_header(self, outfd, name):
     t = '---------------------------------------------------------'
-    outfd.write('\n;%s\n; Section: %s\n;%s\n' %(t, name, t))
+    outfd.write('\n;%s\n; Section: %s\n;%s\n' % (t, name, t))
 
   def output_prologue(self, outfd):
     outfd.write("\tprocessor pic%s\n" % self.processor)
     outfd.write("\tradix dec\n")
     outfd.write("\torg %s\n" % self.start)
     outfd.write("\tgoto %s\n" % self['init_runtime'])
-    outfd.write("\torg %s\n" %(self.start + 8))
+    outfd.write("\torg %s\n" % (self.start + 8))
     if self.high_interrupt:
       outfd.write("\tgoto %s\n" % self.high_interrupt)
     else:
       outfd.write("\treset\n")
-    outfd.write("\torg %s\n" %(self.start + 0x18))
+    outfd.write("\torg %s\n" % (self.start + 0x18))
     if self.low_interrupt:
       outfd.write("\tgoto %s\n" % self.low_interrupt)
     else:
@@ -2498,10 +2508,10 @@ class Compiler:
     outfd.write("END\n")
 
   def warning(self, str):
-    warning('%s: %s' %(self.current_location(), str))
+    warning('%s: %s' % (self.current_location(), str))
 
   def error(self, str):
-    error('%s: %s' %(self.current_location(), str))
+    raise Compiler.COMPILATION_ERROR, '%s: %s' % (self.current_location(), str)
 
   def add_instruction(self, instruction, params = []):
     self.current_object.add_instruction(instruction, params)
@@ -2622,8 +2632,8 @@ class Compiler:
       return e
     else:
       raise Compiler.INTERNAL_ERROR, \
-            "%s: cannot find internal entity %s" %(self.current_location(),
-                                                   item)
+            "%s: cannot find internal entity %s" % (self.current_location(),
+                                                    item)
 
 def set_start_cb(option, opt, value, parser):
   s = parse_number(value)
@@ -2675,7 +2685,11 @@ def main():
                        infile, asmfile)
   if opts.enable_interrupts:
     compiler.enable_interrupts()
-  compiler.process()
+  try:
+    compiler.process()
+  except Exception, e:
+    error(e.msg)
+    sys.exit(1)
   if not opts.compile_only:
     if os.fork() == 0:
       os.execlp('gpasm', 'gpasm', '-o', hexfile, asmfile)
