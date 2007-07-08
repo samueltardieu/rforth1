@@ -2687,6 +2687,7 @@ def main():
 if __name__ == '__main__':
   try:
     import psyco
+    psyco.full()
   except:
     pass
   main()
