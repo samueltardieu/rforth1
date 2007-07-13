@@ -60,12 +60,12 @@ main
 	movff (a+1),PREINC0
 	movf b,0,1
 	movwf PREINC2,0
-	bz _lbl___196
-_lbl___198
+	bz _lbl___430
+_lbl___432
 	call _2_ST_
 	decfsz INDF2,1,0
-	bra _lbl___198
-_lbl___196
+	bra _lbl___432
+_lbl___430
 	movf POSTDEC2,1,0
 	movlw (3<<4)
 	movwf PREINC0,0
