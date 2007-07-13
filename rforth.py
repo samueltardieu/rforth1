@@ -1591,6 +1591,7 @@ class Word(Named, LiteralValue):
     return actual_length >= projected_length
 
   def add_instruction(self, instruction, params):
+    assert(instruction != 'call' or len(params) == 2)
     self.opcodes.append((instruction, params))
     for p in params:
       self.refers_to(p)
@@ -2558,7 +2559,7 @@ class Compiler:
       if is_external_jump((n, p)):
         self.warning('inlining of %s uses a non-local jump' % target.name)
       if p and p[0] in rep:
-        self.add_instruction(n, [rep[p[0]]])
+        self.add_instruction(n, [rep[p[0]]] + p[1:])
       else:
         self.add_instruction(n, p)
     # If there were no multiple exits, remove the end_label so that
