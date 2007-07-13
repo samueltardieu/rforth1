@@ -1115,7 +1115,7 @@ class Bit(Constant):
       compiler.ct_push(self.bit)
 
   def static_value(self):
-    raise Compiler.INTERNAL_ERROR
+    raise Compiler.INTERNAL_ERROR, "in Bit.static_value"
 
 @register('bit')
 def run():
@@ -1816,7 +1816,7 @@ class Word(Named, LiteralValue):
             new.append((Word.conditions[n], list(a)))
             break
         else:
-          raise compiler.INTERNAL_ERROR
+          raise compiler.INTERNAL_ERROR, "in optimize_short_conditions"
         new.append(self.opcodes[o+1])
         o += 1
       else:
@@ -2349,7 +2349,7 @@ class Compiler:
           try:
             object.run()
           except:
-            self.error('internal error')
+            error('internal error in object.run()')
             raise
         else:
           if self.state:
@@ -2696,7 +2696,10 @@ def main():
   try:
     compiler.process()
   except Exception, e:
-    error(e.msg)
+    try:
+      error(e.msg)
+    except AttributeError:
+      raise e
     sys.exit(1)
   if not opts.compile_only:
     if os.fork() == 0:
