@@ -1067,7 +1067,8 @@ def run():
 
 @register('recurse')
 def run():
-  compiler.add_call(compiler.current_object)
+  assert(compiler.current_object.opcodes[0][0] == 'LABEL')
+  compiler.add_call(compiler.current_object.opcodes[0][1][0])
 
 @register('constant')
 def run():
@@ -1547,7 +1548,7 @@ class Word(Named, LiteralValue):
 
   def __init__(self, name):
     Named.__init__(self, name)
-    self.opcodes = []
+    self.opcodes = [('LABEL', [Label()])]
     self.definition = compiler.current_location()
     self.prepared = None
     self.substitute = None
