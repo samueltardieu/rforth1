@@ -1874,10 +1874,12 @@ class Word(Named, LiteralValue):
     """If the word is a single goto to another word, replace invocations
     by invocations to this word."""
     if len(self.opcodes) == 1 and self.opcodes[0][0] in ['goto', 'bra']:
-      self.substitute = self.opcodes[0][1][0]
-      self.opcodes[0] =('COMMENT',
-                         ['replaced by equivalent %s' %
-                          self.substitute])
+      target = self.opcodes[0][1][0]
+      if target != self:
+        self.substitute = target
+        self.opcodes[0] =('COMMENT',
+                          ['replaced by equivalent %s' %
+                           self.substitute])
                            
   def output(self, outfd):
     outfd.write('%s\n' % self.unsubstituted())
