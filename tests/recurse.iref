@@ -1,0 +1,174 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PRODH equ 0xff4
+
+PRODL equ 0xff3
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+WREG equ 0xfe8
+
+STATUS equ 0xfd8
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+_GT__EQ_
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
+	btfss WREG,7,0
+	bra _lbl___107
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___107
+	call op_minus
+	call _0_LT_
+
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+foo
+_lbl___435
+	call _lbl___435
+	bra foo
+
+init_runtime
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+
+main
+	call foo
+	call foo
+_lbl___457
+	call _lbl___457
+	call _lbl___457
+_lbl___458
+	call _lbl___458
+	call _lbl___458
+_lbl___460
+	call op_dup
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___461
+	call op_dup
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call _lbl___460
+	call op__ST_
+_lbl___461
+_lbl___463
+	call op_dup
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	return
+	call op_dup
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call _lbl___463
+
+op__ST_
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,(temp_x2+1)
+	movff POSTDEC0,temp_x2
+	movf temp_x1,0,0
+	mulwf temp_x2,0
+	movff PRODL,PREINC0
+	movff PRODH,temp_x3
+	mulwf (temp_x2+1),0
+	movf PRODL,0,0
+	addwf temp_x3,1,0
+	movf (temp_x1+1),0,0
+	mulwf temp_x2,0
+	movf PRODL,0,0
+	addwfc temp_x3,0,0
+	movwf PREINC0,0
+	return
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+temp_x2 equ 0x2
+
+temp_x3 equ 0x4
+
+END
