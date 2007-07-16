@@ -6,7 +6,7 @@ TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/cfor.cmp tests/switchw.cmp tests/retlw.cmp \
             tests/charinterp.cmp tests/duptow.cmp tests/cfetchdup.cmp \
             tests/cfetchdrop.cmp tests/wnoop.cmp tests/doublezero.cmp \
-            tests/bitmask.cmp
+            tests/bitmask.cmp tests/addzero.cmp
 
 ITESTCASES = ${TESTCASES:.cmp=.icmp}
 
