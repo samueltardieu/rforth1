@@ -546,6 +546,8 @@ def run():
   name, params = compiler.last_instruction()
   if name == 'OP_POP_W':
     compiler.rewind()
+    # >w w> only keeps the low 8 bits of the TOS
+    compiler.add_instruction('clrf', [compiler['INDF0'], access])
   elif name == 'movf' and params[1] == dst_w:
     compiler.rewind()
     compiler.push(params[0])
