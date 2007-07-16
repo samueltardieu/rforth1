@@ -1,0 +1,27 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto main
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PREINC0 equ 0xfec
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+main
+	movlw LOW((3*200))
+	movwf PREINC0,0
+	movlw HIGH((3*200))
+	movwf PREINC0,0
+	return
+
+END
