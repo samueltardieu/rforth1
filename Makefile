@@ -3,7 +3,8 @@ TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/test-can.cmp tests/test-plusminus.cmp tests/spi-pic.cmp \
             tests/colortest.cmp tests/interrupts.cmp tests/increment.cmp \
             tests/lshift.cmp tests/interrupts2.cmp tests/address_of.cmp \
-            tests/cfor.cmp tests/switchw.cmp tests/retlw.cmp
+            tests/cfor.cmp tests/switchw.cmp tests/retlw.cmp \
+            tests/charinterp.cmp
 
 ITESTCASES = ${TESTCASES:.cmp=.icmp}
 
