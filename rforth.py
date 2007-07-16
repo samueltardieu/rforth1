@@ -1662,7 +1662,7 @@ class Word(Named, LiteralValue):
   def instruction_at_label(self, label):
     """Find the next non-label instruction following a label."""
     for o in range(len(self.opcodes)):
-      if self.opcodes[o] ==('LABEL', [label]):
+      if self.opcodes[o] == ('LABEL', [label]):
         for i in range(o+1, len(self.opcodes)):
           if self.opcodes[i][0] != 'LABEL':
             return self.opcodes[i]
@@ -1779,7 +1779,7 @@ class Word(Named, LiteralValue):
           o += 3
           continue
         elif o+3 < len(self.opcodes) and \
-             self.opcodes[o+3] ==('LABEL', [self.opcodes[o+1][1][0]]):
+             self.opcodes[o+3] == ('LABEL', [self.opcodes[o+1][1][0]]):
           new.append((Word.conditions[self.opcodes[o][0]],
                        self.opcodes[o][1]))
           new.append(self.opcodes[o+2])
@@ -1809,7 +1809,7 @@ class Word(Named, LiteralValue):
       elif t in short_conditions and \
            o+2 < len(self.opcodes) and \
            is_internal_jump(self.opcodes[o+2]):
-        reverse =(Word.conditions[t[0]], t[1])
+        reverse = (Word.conditions[t[0]], t[1])
         new.append((short_conditions[reverse], [self.opcodes[o+2][1][0]]))
         new.append(self.opcodes[o+1])
         o += 2
@@ -1858,10 +1858,10 @@ class Word(Named, LiteralValue):
 
   def replace_label(self, source, target):
     for i in range(len(self.opcodes)):
-      if self.opcodes[i] ==('goto', [source]):
-        self.opcodes[i] =('goto', [target])
-      elif self.opcodes[i] ==('bra', [source]):
-        self.opcodes[i] =('bra', [target])
+      if self.opcodes[i] == ('goto', [source]):
+        self.opcodes[i] = ('goto', [target])
+      elif self.opcodes[i] == ('bra', [source]):
+        self.opcodes[i] = ('bra', [target])
 
   def optimize_duplicate_labels(self):
     """If two labels follow each other, use the first one in place of
@@ -1884,7 +1884,7 @@ class Word(Named, LiteralValue):
       target = self.opcodes[0][1][0]
       if target != self:
         self.substitute = target
-        self.opcodes[0] =('COMMENT',
+        self.opcodes[0] = ('COMMENT',
                           ['replaced by equivalent %s' %
                            self.substitute])
                            
