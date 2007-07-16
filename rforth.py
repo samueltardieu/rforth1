@@ -206,9 +206,6 @@ class Named:
     self.prepare()
     return stack
 
-  def enter(self):
-    compiler.enter()
-
   def __repr__(self):
     name = self.name
     if name not in Compiler.all_opcodes:
