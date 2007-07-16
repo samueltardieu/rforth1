@@ -9,7 +9,7 @@ TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/bitmask.cmp tests/addzero.cmp tests/staticminus.cmp \
             tests/staticmult.cmp tests/oneplusstore.cmp \
             tests/cplusstore.cmp tests/recurse.cmp tests/store.cmp \
-            tests/eeprom.cmp tests/values.cmp
+            tests/eeprom.cmp tests/values.cmp tests/commas.cmp
 
 ITESTCASES = ${TESTCASES:.cmp=.icmp}
 
