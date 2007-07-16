@@ -1197,40 +1197,43 @@ def run():
       compiler.add_instruction('movff', [params[1], addr1])
     else:
       compiler.tos_to_addr(addr)
+  elif name == 'OP_PUSH' and eeprom_addr(params[0]):
+    compiler.add_call(compiler['eeprom!'])
   else:
     # Any address and content
     compiler['op_store'].run()
 
 @register('c!')
 def run():
-  if compiler.state:
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH' and ram_addr(params[0]):
+    # The store tries to write at a statically known address in RAM
+    compiler.rewind()
+    addr = params[0]
     name, params = compiler.last_instruction()
-    if name == 'OP_PUSH' and ram_addr(params[0]):
-      # The store tries to write at a statically known address in RAM
+    if name == 'OP_PUSH':
+      # Constant write
       compiler.rewind()
-      addr = params[0]
-      name, params = compiler.last_instruction()
-      if name == 'OP_PUSH':
-        # Constant write
-        compiler.rewind()
-        const = params[0]
-        write_literal(low(const), addr)
-      elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
-        # Memory move
-        compiler.rewind()
-        if name == 'OP_FETCH':
-          compiler.warning('target may not be large enough to '
-                           'store entire result')
-        compiler.add_instruction('movff', [params[0], addr])
-      elif name == 'OP_PUSH_W':
-        # Write W
-        compiler.rewind()
-        write_w(addr)
-      else:
-        compiler.tos_to_addr_byte(addr)
+      const = params[0]
+      write_literal(low(const), addr)
+    elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
+      # Memory move
+      compiler.rewind()
+      if name == 'OP_FETCH':
+        compiler.warning('target may not be large enough to '
+                         'store entire result')
+      compiler.add_instruction('movff', [params[0], addr])
+    elif name == 'OP_PUSH_W':
+      # Write W
+      compiler.rewind()
+      write_w(addr)
     else:
-      # Any address and content
-      compiler['op_cstore'].run()
+      compiler.tos_to_addr_byte(addr)
+  elif name == 'OP_PUSH' and eeprom_addr(params[0]):
+    compiler.add_call(compiler['eepromc!'])
+  else:
+    # Any address and content
+    compiler['op_cstore'].run()
 
 @register('allot')
 def run():
@@ -1326,6 +1329,8 @@ def run():
       # Statically known address
       compiler.rewind()
       compiler.add_instruction('OP_FETCH', params)
+    elif name == 'OP_PUSH' and eeprom_addr(params[0]):
+      compiler.add_call(compiler['eeprom@'])
     else:
       compiler.add_instruction('OP_FETCH_TOS', [])
   else:
@@ -1340,6 +1345,8 @@ def run():
       # Statically known address
       compiler.rewind()
       compiler.add_instruction('OP_CFETCH', params)
+    elif name == 'OP_PUSH' and eeprom_addr(params[0]):
+      compiler.add_call(compiler['eepromc@'])
     else:
       compiler.add_instruction('OP_CFETCH_TOS', [])
   else:
