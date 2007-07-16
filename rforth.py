@@ -1207,6 +1207,13 @@ def run():
 def run():
   if compiler.state:
     name, params = compiler.last_instruction()
+    if name == 'OP_FETCH' and ram_addr(params[0]):
+      compiler.rewind()
+      compiler['>w'].run()
+      compiler.add_instruction(name, params)
+      compiler.pop_to_fsr(1)
+      compiler.add_instruction('movwf', [compiler['INDF1']])
+      return
     if name == 'OP_PUSH' and ram_addr(params[0]):
       # The store tries to write at a statically known address in RAM
       compiler.rewind()
@@ -1328,6 +1335,13 @@ def run():
       # Statically known address
       compiler.rewind()
       compiler.add_instruction('OP_FETCH', params)
+    elif name == 'OP_FETCH' and ram_addr(params[0]):
+      # Go through FSR1
+      compiler.pop_to_fsr(1)
+      compiler.add_instruction('movff', [compiler['POSTINC1'],
+                                         compiler['PREINC0']])
+      compiler.add_instruction('movff', [compiler['INDF1'],
+                                         compiler['PREINC0']])
     else:
       compiler.add_instruction('OP_FETCH_TOS', [])
   else:
@@ -1342,6 +1356,10 @@ def run():
       # Statically known address
       compiler.rewind()
       compiler.add_instruction('OP_CFETCH', params)
+    elif name == 'OP_FETCH' and ram_addr(params[0]):
+      # Go through FSR1
+      compiler.pop_to_fsr(1)
+      compiler.add_instruction('OP_CFETCH', [compiler['INDF1']])
     else:
       compiler.add_instruction('OP_CFETCH_TOS', [])
   else:
@@ -2608,10 +2626,15 @@ class Compiler:
     self.add_instruction('movf', [self['POSTDEC0'], dst_w, access])
     
   def pop_to_fsr(self, fsr):
-    if is_static_push(self.last_instruction()):
-      name, params = self.last_instruction()
+    name, params = self.last_instruction()
+    if is_static_push((name, params)):
       self.rewind()
       self.add_instruction('lfsr', [Number(fsr), params[0]])
+    elif name == 'OP_FETCH' and ram_addr(params[0]):
+      self.rewind()
+      self.add_instruction('movff', [params[0], self['FSR%dL' % fsr]])
+      self.add_instruction('movff', [Add(params[0], Number(1)),
+                                     self['FSR%dH' % fsr]])
     else:
       self.add_instruction('movff', [self['POSTDEC0'],
                                       self['FSR%dH' % fsr]])
