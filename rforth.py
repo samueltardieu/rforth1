@@ -2143,6 +2143,7 @@ class Compiler:
     self.inline_list = []
     self.low_interrupt = None
     self.high_interrupt = None
+    PICIns.prefix = False
 
   def process(self):
     self.add_default_content()
