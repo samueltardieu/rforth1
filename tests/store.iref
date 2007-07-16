@@ -1,0 +1,61 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PREINC0 equ 0xfec
+
+WREG equ 0xfe8
+
+RCREG equ 0xfae
+
+b equ 0x200
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlb 1
+	clrf (a+1),1
+	clrf a,1
+
+main
+	clrf (a+1),1
+	movlw 3
+	movwf a,1
+	setf (a+1),1
+	clrf a,1
+	movf RCREG,0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movwf a,1
+	movlw 0
+	movff WREG,(b+1)
+	movlw 3
+	movff WREG,b
+	movlw HIGH(0xff00)
+	movff WREG,(b+1)
+	movlw LOW(0xff00)
+	movff WREG,b
+	movf RCREG,0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movff WREG,b
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+a equ 0x100
+
+END
