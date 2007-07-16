@@ -179,6 +179,7 @@ class Named:
   from_source = True
   referenced_by = 0
   not_inlinable = False
+  definition = None
   
   def __init__(self, name, compile = True):
     self.name = name
@@ -2285,7 +2286,7 @@ class Compiler:
         break
       if not isinstance(previous, Forward):
         if previous.from_source:
-          self.warning('redefinition of %s(defined at %s)' %
+          self.warning('redefinition of %s (defined at %s)' %
                        (previous.name, previous.definition))
         break
       self.fix_forward(previous, object)
@@ -2299,7 +2300,7 @@ class Compiler:
     if occurrence == 0:
       self.first_dict[string.lower(object.name)] = object
     object.occurrence = occurrence
-    if `object` in self.inline_list and object.can_inline():
+    if object.definition in self.inline_list and object.can_inline():
       object.inlined = True
 
   def fix_forward(self, old, new):
@@ -2391,7 +2392,8 @@ class Compiler:
         compiler = Compiler(self.processor, self.start, self.main,
                              self.automatic_inlining, self.no_comments,
                             self.infile, self.asmfile)
-        compiler.inline_list = self.inline_list + [`x` for x in to_inline]
+        compiler.inline_list = self.inline_list + \
+                               [x.definition for x in to_inline]
         if self.use_interrupts:
           compiler.enable_interrupts()
         compiler.process()

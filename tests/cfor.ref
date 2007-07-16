@@ -108,11 +108,11 @@ _GT_
 _LT_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___95
+	bra _lbl___99
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	goto _0_LT_
-_lbl___95
+_lbl___99
 	call op_minus
 
 _0_LT_
@@ -388,8 +388,8 @@ nibble_to_hex
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___250
-_lbl___252
+	bz _lbl___254
+_lbl___256
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -399,8 +399,8 @@ _lbl___252
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___252
-_lbl___250
+	bra _lbl___256
+_lbl___254
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -417,7 +417,7 @@ _s
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___256
+	bz _lbl___260
 	call op_dup
 	movlw 8
 	movwf PREINC0,0
@@ -425,7 +425,7 @@ _s
 	call _GT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___257
+	bz _lbl___261
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((_s_str+0x8000))
@@ -437,12 +437,12 @@ _s
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___257
+_lbl___261
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___258
-_lbl___260
+	bz _lbl___262
+_lbl___264
 	call _space
 	movff INDF2,PREINC0
 	clrf PREINC0,0
@@ -454,11 +454,11 @@ _lbl___260
 	call pick
 	call _
 	decfsz INDF2,1,0
-	bra _lbl___260
-_lbl___258
+	bra _lbl___264
+_lbl___262
 	movf POSTDEC2,1,0
 	return
-_lbl___256
+_lbl___260
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
@@ -490,13 +490,13 @@ test3
 	call h
 	movlw 4
 	movwf PREINC2,0
-_lbl___467
+_lbl___471
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___467
+	bra _lbl___471
 	movf POSTDEC2,1,0
 	return
 
@@ -514,13 +514,13 @@ test4
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___475
+_lbl___479
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___475
+	bra _lbl___479
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -538,15 +538,15 @@ test5
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___481
-_lbl___483
+	bz _lbl___485
+_lbl___487
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___483
-_lbl___481
+	bra _lbl___487
+_lbl___485
 	movf POSTDEC2,1,0
 	return
 
@@ -562,15 +562,15 @@ test6
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___489
-_lbl___491
+	bz _lbl___493
+_lbl___495
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___491
-_lbl___489
+	bra _lbl___495
+_lbl___493
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -587,15 +587,15 @@ test7
 	call h
 	movf a,0,1
 	movwf PREINC2,0
-	bz _lbl___497
-_lbl___499
+	bz _lbl___501
+_lbl___503
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___499
-_lbl___497
+	bra _lbl___503
+_lbl___501
 	movf POSTDEC2,1,0
 	return
 
@@ -610,15 +610,15 @@ test8
 	call h
 	movf a,0,1
 	movwf PREINC2,0
-	bz _lbl___505
-_lbl___507
+	bz _lbl___509
+_lbl___511
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___507
-_lbl___505
+	bra _lbl___511
+_lbl___509
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

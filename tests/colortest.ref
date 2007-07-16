@@ -144,9 +144,9 @@ an
 
 measure
 	bsf ADCON0,2,0
-_lbl___448
+_lbl___452
 	btfsc ADCON0,2,0
-	bra _lbl___448
+	bra _lbl___452
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	return
@@ -168,12 +168,12 @@ main
 	call type
 	call cr
 	call init_adc
-_lbl___464
+_lbl___468
 	call key
 	call disp0
 	call disp1
 	call disp2
-	bra _lbl___464
+	bra _lbl___468
 
 flash_addr_EX_
 	bcf INDF0,7,0
@@ -269,8 +269,8 @@ nibble_to_hex
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___250
-_lbl___252
+	bz _lbl___254
+_lbl___256
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -280,8 +280,8 @@ _lbl___252
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___252
-_lbl___250
+	bra _lbl___256
+_lbl___254
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

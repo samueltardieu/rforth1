@@ -192,7 +192,7 @@ can_mode
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
-_lbl___436
+_lbl___440
 	call op_dup
 	movf CANSTAT,0,0
 	andlw 0xe0
@@ -201,7 +201,7 @@ _lbl___436
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___436
+	bnz _lbl___440
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
@@ -217,7 +217,7 @@ can_handle_message
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___664
+	bnz _lbl___668
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movff can_msg_0,PREINC0
@@ -234,13 +234,13 @@ can_handle_message
 	movwf PREINC0,0
 	call op_store
 	goto read_from_eeprom
-_lbl___664
+_lbl___668
 	btfsc can_msg_flags,0,0
-	bra _lbl___667
+	bra _lbl___671
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	goto can_unknown_msg
-_lbl___667
+_lbl___671
 	call op_dup
 	movlw COLORS_ARBITRATION
 	movwf PREINC0,0
@@ -248,11 +248,11 @@ _lbl___667
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___670
+	bnz _lbl___674
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	goto can_send_colors
-_lbl___670
+_lbl___674
 	call op_dup
 	movlw VALUES_ARBITRATION
 	movwf PREINC0,0
@@ -260,7 +260,7 @@ _lbl___670
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___673
+	bnz _lbl___677
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	clrf (can_arbitration+1),0
@@ -277,7 +277,7 @@ _lbl___670
 	movff (current_value_3+1),(can_msg_6+1)
 	movff current_value_3,can_msg_6
 	goto can_transmit
-_lbl___673
+_lbl___677
 	call op_dup
 	movlw CALIBRATION_ARBITRATION
 	movwf PREINC0,0
@@ -285,7 +285,7 @@ _lbl___673
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___678
+	bnz _lbl___682
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	clrf (can_arbitration+1),0
@@ -298,7 +298,7 @@ _lbl___673
 	movff (brown_cream_threshold+1),(can_msg_2+1)
 	movff brown_cream_threshold,can_msg_2
 	goto can_transmit
-_lbl___678
+_lbl___682
 
 can_unknown_msg
 	movlw LOW((can_unknown_msg_str+0x8000))
@@ -315,14 +315,14 @@ can_unknown_msg
 	movlw 5
 	call type
 	btfsc can_msg_flags,0,0
-	bra _lbl___659
+	bra _lbl___663
 	movlw LOW((can_unknown_msg_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((can_unknown_msg_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	call type
-_lbl___659
+_lbl___663
 	movlw LOW((can_unknown_msg_str__3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((can_unknown_msg_str__3+0x8000))
@@ -425,7 +425,7 @@ handle_key
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___718
+	bnz _lbl___723
 	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str+0x8000))
@@ -438,7 +438,7 @@ handle_key
 	call channel_determine_color
 	call _
 	goto cr
-_lbl___718
+_lbl___723
 	call op_dup
 	movlw 49
 	movwf PREINC0,0
@@ -446,7 +446,7 @@ _lbl___718
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___721
+	bnz _lbl___726
 	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__1+0x8000))
@@ -459,7 +459,7 @@ _lbl___718
 	call channel_determine_color
 	call _
 	goto cr
-_lbl___721
+_lbl___726
 	call op_dup
 	movlw 50
 	movwf PREINC0,0
@@ -467,7 +467,7 @@ _lbl___721
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___724
+	bnz _lbl___729
 	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__2+0x8000))
@@ -480,7 +480,7 @@ _lbl___721
 	call channel_determine_color
 	call _
 	goto cr
-_lbl___724
+_lbl___729
 	call op_dup
 	movlw 51
 	movwf PREINC0,0
@@ -488,7 +488,7 @@ _lbl___724
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___727
+	bnz _lbl___732
 	movlw LOW((handle_key_str__3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__3+0x8000))
@@ -501,7 +501,7 @@ _lbl___724
 	call channel_determine_color
 	call _
 	goto cr
-_lbl___727
+_lbl___732
 	call op_dup
 	movlw 113
 	movwf PREINC0,0
@@ -509,7 +509,7 @@ _lbl___727
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___730
+	bnz _lbl___735
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((handle_key_str__4+0x8000))
@@ -525,7 +525,7 @@ _lbl___727
 	movlw 41
 	call type
 	call cr
-	call pause
+	call key
 	clrf PREINC0,0
 	clrf PREINC0,0
 	call channel_measure
@@ -536,7 +536,7 @@ _lbl___727
 	movlw 41
 	call type
 	call cr
-	call pause
+	call key
 	clrf PREINC0,0
 	clrf PREINC0,0
 	call channel_measure
@@ -548,7 +548,7 @@ _lbl___727
 	movlw 41
 	call type
 	call cr
-	call pause
+	call key
 	clrf PREINC0,0
 	clrf PREINC0,0
 	call channel_measure
@@ -583,7 +583,7 @@ _lbl___727
 	movff POSTDEC0,(brown_cream_threshold+1)
 	movff POSTDEC0,brown_cream_threshold
 	return
-_lbl___730
+_lbl___735
 	call op_dup
 	movlw 100
 	movwf PREINC0,0
@@ -591,7 +591,7 @@ _lbl___730
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___737
+	bnz _lbl___745
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((handle_key_str__5+0x8000))
@@ -614,7 +614,7 @@ _lbl___730
 	rrcf POSTINC0,1,0
 	call _
 	goto cr
-_lbl___737
+_lbl___745
 	call op_dup
 	movlw 117
 	movwf PREINC0,0
@@ -622,13 +622,13 @@ _lbl___737
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___743
+	bnz _lbl___751
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call print_usage
 	call _
 	goto cr
-_lbl___743
+_lbl___751
 	call op_dup
 	movlw 108
 	movwf PREINC0,0
@@ -636,7 +636,7 @@ _lbl___743
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___746
+	bnz _lbl___754
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((handle_key_str__6+0x8000))
@@ -647,7 +647,7 @@ _lbl___743
 	call type
 	call cr
 	goto can_loopback
-_lbl___746
+_lbl___754
 	call op_dup
 	movlw 107
 	movwf PREINC0,0
@@ -655,7 +655,7 @@ _lbl___746
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___749
+	bnz _lbl___757
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((handle_key_str__7+0x8000))
@@ -666,7 +666,7 @@ _lbl___746
 	call type
 	call cr
 	goto can_normal
-_lbl___749
+_lbl___757
 	call op_dup
 	movlw 115
 	movwf PREINC0,0
@@ -674,11 +674,11 @@ _lbl___749
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___752
+	bnz _lbl___760
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	goto step
-_lbl___752
+_lbl___760
 	call op_dup
 	movlw 76
 	movwf PREINC0,0
@@ -686,7 +686,7 @@ _lbl___752
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___755
+	bnz _lbl___763
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	btg LATA,5,0
@@ -697,7 +697,7 @@ _lbl___752
 	movlw 21
 	call type
 	goto cr
-_lbl___755
+_lbl___763
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 
@@ -793,11 +793,11 @@ _LT_
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___98
+	bra _lbl___102
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	goto _0_LT_
-_lbl___98
+_lbl___102
 	call op_minus
 
 _0_LT_
@@ -845,9 +845,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___230
+_lbl___234
 	btfsc EECON1,1,0
-	bra _lbl___230
+	bra _lbl___234
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
@@ -856,7 +856,7 @@ print_color
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___683
+	bnz _lbl___687
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((print_color_str+0x8000))
@@ -865,7 +865,7 @@ print_color
 	movwf PREINC0,0
 	movlw 7
 	goto type
-_lbl___683
+_lbl___687
 	call op_dup
 	movlw CREAM
 	movwf PREINC0,0
@@ -873,7 +873,7 @@ _lbl___683
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___686
+	bnz _lbl___690
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((print_color_str__1+0x8000))
@@ -882,7 +882,7 @@ _lbl___683
 	movwf PREINC0,0
 	movlw 5
 	goto type
-_lbl___686
+_lbl___690
 	call op_dup
 	movlw BROWN
 	movwf PREINC0,0
@@ -890,7 +890,7 @@ _lbl___686
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___689
+	bnz _lbl___693
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((print_color_str__2+0x8000))
@@ -899,7 +899,7 @@ _lbl___686
 	movwf PREINC0,0
 	movlw 5
 	goto type
-_lbl___689
+_lbl___693
 	call op_dup
 	movlw WHITE
 	movwf PREINC0,0
@@ -907,7 +907,7 @@ _lbl___689
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___692
+	bnz _lbl___696
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((print_color_str__3+0x8000))
@@ -916,7 +916,7 @@ _lbl___689
 	movwf PREINC0,0
 	movlw 5
 	goto type
-_lbl___692
+_lbl___696
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((print_color_str__4+0x8000))
@@ -928,8 +928,8 @@ _lbl___692
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___274
-_lbl___276
+	bz _lbl___278
+_lbl___280
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -939,8 +939,8 @@ _lbl___276
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___276
-_lbl___274
+	bra _lbl___280
+_lbl___278
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -964,21 +964,21 @@ _4_SL_
 can_choose_buffer
 	lfsr 1,TXB0CON
 	btfsc INDF1,3,0
-	bra _lbl___405
+	bra _lbl___409
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto can_set_buffer
-_lbl___405
+_lbl___409
 	btfsc can_flags,0,0
 	bra can_choose_buffer
 	lfsr 1,TXB1CON
 	btfsc INDF1,3,0
-	bra _lbl___407
+	bra _lbl___411
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_set_buffer
-_lbl___407
+_lbl___411
 	lfsr 1,TXB2CON
 	btfsc INDF1,3,0
 	bra can_choose_buffer
@@ -1007,7 +1007,7 @@ determine_color
 	call _LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___587
+	bz _lbl___591
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((brown_detected_str+0x8000))
@@ -1021,14 +1021,14 @@ determine_color
 	movwf PREINC0,0
 	clrf PREINC0,0
 	return
-_lbl___587
+_lbl___591
 	movff cream_white_threshold,PREINC0
 	movff (cream_white_threshold+1),PREINC0
 	call swap
 	call _LT_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___592
+	bz _lbl___596
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((white_detected_str+0x8000))
@@ -1042,7 +1042,7 @@ _lbl___587
 	movwf PREINC0,0
 	clrf PREINC0,0
 	return
-_lbl___592
+_lbl___596
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((cream_detected_str+0x8000))
@@ -1064,7 +1064,7 @@ maybe_send_colors
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___641
+_lbl___645
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	movlw LOW((-1))
@@ -1089,7 +1089,7 @@ _lbl___641
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___648
+	bz _lbl___652
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	movlw LOW((-1))
@@ -1115,9 +1115,9 @@ _lbl___641
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-_lbl___648
+_lbl___652
 	decfsz INDF2,1,0
-	bra _lbl___641
+	bra _lbl___645
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
@@ -1208,7 +1208,7 @@ main
 	call can_set_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___818
+_lbl___812
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -1224,7 +1224,7 @@ _lbl___818
 	movf POSTDEC0,0,0
 	call can_set_filter
 	decfsz INDF2,1,0
-	bra _lbl___818
+	bra _lbl___812
 	movf POSTDEC2,1,0
 	call can_normal
 	call can_config
@@ -1246,9 +1246,9 @@ _lbl___818
 	movlw 30
 	call type
 	call cr
-_lbl___826
+_lbl___820
 	call step
-	bra _lbl___826
+	bra _lbl___820
 
 flash_addr_EX_
 	bcf INDF0,7,0
@@ -1432,7 +1432,7 @@ memcpy_loop
 
 can_receive
 	btfss RXB0CON,7,0
-	bra _lbl___371
+	bra _lbl___375
 	movf RXB0DLC,0,0
 	andlw 0xf
 	movwf PREINC0,0
@@ -1440,7 +1440,7 @@ can_receive
 	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___373
+	bz _lbl___377
 	movlw LOW(RXB0D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB0D0)
@@ -1450,7 +1450,7 @@ can_receive
 	clrf PREINC0,0
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___373
+_lbl___377
 	clrf can_msg_flags,0
 	btfsc RXB0DLC,6,0
 	bsf can_msg_flags,0,0
@@ -1461,7 +1461,7 @@ _lbl___373
 	movff POSTDEC0,can_arbitration
 	bcf RXB0CON,7,0
 	return
-_lbl___371
+_lbl___375
 	lfsr 1,RXB1CON
 	btfss INDF1,7,0
 	bra can_receive
@@ -1472,7 +1472,7 @@ _lbl___371
 	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___380
+	bz _lbl___384
 	movlw LOW(RXB1D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB1D0)
@@ -1482,7 +1482,7 @@ _lbl___371
 	clrf PREINC0,0
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___380
+_lbl___384
 	clrf can_msg_flags,0
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0
@@ -1510,7 +1510,7 @@ can_transmit
 	clrf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___421
+	bz _lbl___425
 	movlw can_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -1521,7 +1521,7 @@ can_transmit
 	call tx0_GT_txn
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___421
+_lbl___425
 	movff can_arbitration,PREINC0
 	movff (can_arbitration+1),PREINC0
 	call _5_LT__LT_
@@ -1556,6 +1556,12 @@ _lbl___421
 	bsf INDF1,3,0
 	return
 
+key
+	btfss PIR1,5,0
+	bra key
+	movf RCREG,0,0
+	return
+
 wait_timer0
 	clrf PREINC0,0
 	movlw HIGH(0x400)
@@ -1567,26 +1573,26 @@ wait_timer0
 	movff POSTDEC0,(TMR0L+1)
 	movff POSTDEC0,TMR0L
 	bcf INTCON,2,0
-_lbl___545
+_lbl___549
 	btfsc INTCON,2,0
 	return
-	bra _lbl___545
+	bra _lbl___549
 
 _4_measures
 	clrf PREINC0,0
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___563
+_lbl___567
 	bsf ADCON0,2,0
-_lbl___565
+_lbl___569
 	btfsc ADCON0,2,0
-	bra _lbl___565
+	bra _lbl___569
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	call op_plus
 	decfsz INDF2,1,0
-	bra _lbl___563
+	bra _lbl___567
 	movf POSTDEC2,1,0
 	return
 
@@ -1604,12 +1610,6 @@ read_from_eeprom
 	call op_fetch_tos
 	movff POSTDEC0,(brown_cream_threshold+1)
 	movff POSTDEC0,brown_cream_threshold
-	return
-
-pause
-	btfss PIR1,5,0
-	bra pause
-	movf RCREG,0,0
 	return
 
 step
@@ -1632,7 +1632,7 @@ step
 	call maybe_send_colors
 	movlw 4
 	movwf PREINC2,0
-_lbl___772
+_lbl___775
 	movlw LOW((serial_dump_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((serial_dump_str+0x8000))
@@ -1695,14 +1695,12 @@ _lbl___772
 	call type
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___772
+	bra _lbl___775
 	movf POSTDEC2,1,0
 	btfss PIR1,5,0
 	return
-_lbl___783
-	btfss PIR1,5,0
-	bra _lbl___783
-	movff RCREG,PREINC0
+	call key
+	movwf PREINC0,0
 	clrf PREINC0,0
 	movlw 109
 	movwf PREINC0,0
@@ -1712,13 +1710,12 @@ _lbl___783
 	iorwf POSTDEC0,0,0
 	btfss STATUS,2,0
 	return
-_lbl___791
-	btfss PIR1,5,0
-	bra _lbl___791
-	movff RCREG,PREINC0
+_lbl___789
+	call key
+	movwf PREINC0,0
 	clrf PREINC0,0
 	call handle_key
-	bra _lbl___791
+	bra _lbl___789
 
 ;---------------------------------------------------------
 ; Section: memory

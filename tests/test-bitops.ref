@@ -241,14 +241,14 @@ test_set
 	call op_bit_set_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___444
+	bz _lbl___448
 	movlw LOW((test_set_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_set_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___444
+_lbl___448
 	movlw LOW((test_set_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_set_str__1+0x8000))
@@ -258,8 +258,8 @@ _lbl___444
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___250
-_lbl___252
+	bz _lbl___254
+_lbl___256
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -269,8 +269,8 @@ _lbl___252
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___252
-_lbl___250
+	bra _lbl___256
+_lbl___254
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -319,14 +319,14 @@ test_clr
 	call op_bit_clr_q
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___448
+	bz _lbl___452
 	movlw LOW((test_clr_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_clr_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___448
+_lbl___452
 	movlw LOW((test_clr_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_clr_str__1+0x8000))
