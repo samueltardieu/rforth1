@@ -966,20 +966,19 @@ def run():
 
 @register('1+!')
 def run():
-  if compiler.state:
-    name, params = compiler.last_instruction()
-    if name == 'OP_PUSH' and ram_addr(params[0]):
-      # Increment a statically known RAM address
-      compiler.rewind()
-      addr = params[0]
-      compiler.add_instruction('infsnz', [addr, dst_f])
-      compiler.add_instruction('incf', [Add(addr, Number(1)), dst_f])
-      return
-  compiler['dup'].run()
-  compiler['@'].run()
-  compiler['1+'].run()
-  compiler['swap'].run()
-  compiler['!'].run()
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH' and ram_addr(params[0]):
+    # Increment a statically known RAM address
+    compiler.rewind()
+    addr = params[0]
+    compiler.add_instruction('infsnz', [addr, dst_f])
+    compiler.add_instruction('incf', [Add(addr, Number(1)), dst_f])
+  else:
+    compiler['dup'].run()
+    compiler['@'].run()
+    compiler['1+'].run()
+    compiler['swap'].run()
+    compiler['!'].run()
 
 @register('c+!')
 def run(negate = False):
