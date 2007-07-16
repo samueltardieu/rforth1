@@ -1,0 +1,54 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto main
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+STATUS equ 0xfd8
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+main
+	call op_zeroeq
+	call op_normalize
+	call op_normalize
+	call op_zeroeq
+
+op_normalize
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+op_normalize_z
+	movlw -1
+	btfsc STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+END
