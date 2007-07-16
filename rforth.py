@@ -155,6 +155,11 @@ def ram_addr(addr):
   addr = addr.static_value()
   return addr is not None and(addr & 0xf000 == 0x0000)
 
+def eeprom_addr(addr):
+  """Check whether the access designates an EEPROM address."""
+  addr = addr.static_value()
+  return addr is not None and(addr & 0xf000 == 0x1000)
+
 def flash_addr(addr):
   """Check whether the access designates an flash address."""
   addr = addr.static_value()
