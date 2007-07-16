@@ -1,0 +1,62 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+WREG equ 0xfe8
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+
+main
+	call test1
+
+op_bit_mask
+	call op_bit_mask_to_w
+	movwf POSTINC0,0
+	clrf INDF0,0
+	return
+
+op_bit_mask_to_w
+	movf POSTDEC0,0,0
+	incf INDF0,1,0
+	movlw 1
+op_bit_mask_loop
+	dcfsnz INDF0,1,0
+	return
+	rlncf WREG,1,0
+	bra op_bit_mask_loop
+
+test1
+	movlw (1<<3)
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+END
