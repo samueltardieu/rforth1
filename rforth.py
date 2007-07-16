@@ -1140,62 +1140,61 @@ def write_literal(value, addr):
 
 @register('!')
 def run():
-  if compiler.state:
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH' and ram_addr(params[0]):
+    # The store tries to write at a statically known RAM address
+    compiler.rewind()
+    addr = params[0]
+    addr1 = Add(addr, Number(1))
     name, params = compiler.last_instruction()
-    if name == 'OP_PUSH' and ram_addr(params[0]):
-      # The store tries to write at a statically known RAM address
+    if name == 'OP_PUSH':
+      # Constant write
       compiler.rewind()
-      addr = params[0]
-      addr1 = Add(addr, Number(1))
-      name, params = compiler.last_instruction()
-      if name == 'OP_PUSH':
-        # Constant write
-        compiler.rewind()
-        const = params[0]
-        write_literal(high(const), addr1)
-        write_literal(low(const), addr)
-      elif name == 'OP_FETCH' and ram_addr(params[0]):
-        # Memory move
-        compiler.rewind()
-        # If both source and target are 16 bits PIC registers,
-        # the low value must be latched into W to benefit from
-        # internal latches.
-        if is_special_register(addr) and is_special_register(params[0]):
-          compiler.push(params[0])
-          compiler['c@'].run()
-          compiler['>w'].run()
-          compiler.add_instruction('movff', [Add(params[0], Number(1)),
-                                             addr1])
-          compiler['w>'].run()
-          compiler.push(addr)
-          compiler['c!'].run()
-        else:
-          compiler.add_instruction('movff', 
-                                   [Add(params[0],
-                                        Number(1)),
-                                    addr1])
-          compiler.add_instruction('movff', [params[0], addr])
-      elif name == 'OP_CFETCH' and ram_addr(params[0]):
-        # Memory byte move with one byte
-        compiler.rewind()
-        compiler.add_instruction('movff', [params[0], addr])
-        write_literal(Number(0), addr1)
-      elif name == 'OP_PUSH_W':
-        # Write W
-        compiler.warning('you may be wanting to use c! here')
-        compiler.rewind()
-        write_w(addr)
-        write_literal(0, addr1)
-      elif name == 'OP_2>1':
-        # Get content(LSB then MSB) and store it
-        compiler.rewind()
-        compiler.add_instruction('movff', [params[0], addr])
-        compiler.add_instruction('movff', [params[1], addr1])
+      const = params[0]
+      write_literal(high(const), addr1)
+      write_literal(low(const), addr)
+    elif name == 'OP_FETCH' and ram_addr(params[0]):
+      # Memory move
+      compiler.rewind()
+      # If both source and target are 16 bits PIC registers,
+      # the low value must be latched into W to benefit from
+      # internal latches.
+      if is_special_register(addr) and is_special_register(params[0]):
+        compiler.push(params[0])
+        compiler['c@'].run()
+        compiler['>w'].run()
+        compiler.add_instruction('movff', [Add(params[0], Number(1)),
+                                           addr1])
+        compiler['w>'].run()
+        compiler.push(addr)
+        compiler['c!'].run()
       else:
-        compiler.tos_to_addr(addr)
+        compiler.add_instruction('movff', 
+                                 [Add(params[0],
+                                      Number(1)),
+                                  addr1])
+        compiler.add_instruction('movff', [params[0], addr])
+    elif name == 'OP_CFETCH' and ram_addr(params[0]):
+      # Memory byte move with one byte
+      compiler.rewind()
+      compiler.add_instruction('movff', [params[0], addr])
+      write_literal(Number(0), addr1)
+    elif name == 'OP_PUSH_W':
+      # Write W
+      compiler.warning('you may be wanting to use c! here')
+      compiler.rewind()
+      write_w(addr)
+      write_literal(0, addr1)
+    elif name == 'OP_2>1':
+      # Get content(LSB then MSB) and store it
+      compiler.rewind()
+      compiler.add_instruction('movff', [params[0], addr])
+      compiler.add_instruction('movff', [params[1], addr1])
     else:
-      # Any address and content
-      compiler['op_store'].run()
+      compiler.tos_to_addr(addr)
+  else:
+    # Any address and content
+    compiler['op_store'].run()
 
 @register('c!')
 def run():

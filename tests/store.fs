@@ -7,5 +7,6 @@ variable a
 : test4 3 b ! ;
 : test5 0xff00 b ! ;
 : test6 RCREG c@ dup b c! ;
+: test7 TMR1L @ TMR0L ! ;
 
-: main test1 test2 test3 test4 test5 test6 ;
+: main test1 test2 test3 test4 test5 test6 test7 ;

@@ -15,6 +15,10 @@ PREINC0 equ 0xfec
 
 WREG equ 0xfe8
 
+TMR0L equ 0xfd6
+
+TMR1L equ 0xfce
+
 RCREG equ 0xfae
 
 b equ 0x200
@@ -34,12 +38,12 @@ main
 	call test3
 	call test4
 	call test5
+	call test6
 
-test6
-	movf RCREG,0,0
-	movwf PREINC0,0
-	clrf PREINC0,0
-	movff WREG,b
+test7
+	movf TMR1L,0,0
+	movff (TMR1L+1),(TMR0L+1)
+	movwf TMR0L,0
 	return
 
 test1
@@ -71,6 +75,13 @@ test5
 	movlw HIGH(0xff00)
 	movff WREG,(b+1)
 	movlw LOW(0xff00)
+	movff WREG,b
+	return
+
+test6
+	movf RCREG,0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
 	movff WREG,b
 	return
 

@@ -15,6 +15,10 @@ PREINC0 equ 0xfec
 
 WREG equ 0xfe8
 
+TMR0L equ 0xfd6
+
+TMR1L equ 0xfce
+
 RCREG equ 0xfae
 
 b equ 0x200
@@ -50,6 +54,9 @@ main
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff WREG,b
+	movf TMR1L,0,0
+	movff (TMR1L+1),(TMR0L+1)
+	movwf TMR0L,0
 	return
 
 ;---------------------------------------------------------
