@@ -1002,11 +1002,13 @@ def run(negate = False):
         compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
         return
       else:
-        # Let the regular treatment proceed with a negated value on
-        # the stack instead.
-        compiler.push(Negated(value))
+        # Let the regular treatment proceed with the value on the stack
+        compiler.push(value)
     compiler['>w'].run()
-    compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
+    if negate:
+      compiler.add_instruction('subwf', [addr, dst_f, access_bit(addr)])
+    else:
+      compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
   elif negate:
     compiler['op_c-!'].run()
   else:
@@ -1014,7 +1016,7 @@ def run(negate = False):
 
 @register('c-!')
 def run():
-  compiler['c+!'].run(negate = True)
+  compiler['c+!'].run(True)
 
 @register('lshift')
 def run():
