@@ -534,7 +534,7 @@ def run():
   name, params = compiler.last_instruction()
   if name in ['OP_PUSH', 'OP_DUP']:
     compiler.rewind()
-  elif name == 'OP_FETCH' and ram_addr(params[0]) and \
+  elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]) and \
        params[0].static_value() < 0xf60:
     # Regular memory read, can be safely removed
     compiler.rewind()
