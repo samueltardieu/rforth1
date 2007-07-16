@@ -5,4 +5,9 @@ code foo
   return
 ;code
 
-: main foo ;
+code bar
+  movff INDF0 RCREG
+  return ,s
+;code
+
+: main foo bar ;

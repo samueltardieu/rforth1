@@ -1584,8 +1584,8 @@ class Word(Named, LiteralValue):
       return False
     for n, p in self.opcodes[:-1]:
       if is_external_jump((n, p)):
-        return False
-    return True
+        return False      
+    return self.opcodes[-1] != ('return', [fast])
 
   def should_inline(self):
     if self.inlined or not self.from_source or \

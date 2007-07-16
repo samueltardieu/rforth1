@@ -21,6 +21,9 @@ RCREG equ 0xfae
 
 main
 	movff RCREG,INDF0
-	return
+
+bar
+	movff INDF0,RCREG
+	return 1
 
 END
