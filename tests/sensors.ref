@@ -41,10 +41,6 @@ INDF1 equ 0xfe7
 
 POSTINC1 equ 0xfe6
 
-POSTDEC1 equ 0xfe5
-
-PREINC1 equ 0xfe4
-
 FSR1H equ 0xfe2
 
 FSR1L equ 0xfe1
@@ -1220,27 +1216,27 @@ set_thresholds
 	clrf PREINC0,0
 	movlw HIGH(cream_white_threshold_eeprom)
 	movwf PREINC0,0
-	call op_store
+	call eeprom_EX_
 	movff can_msg_2,PREINC0
 	movff (can_msg_2+1),PREINC0
 	movlw LOW(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
 	movlw HIGH(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
-	call op_store
+	call eeprom_EX_
 
 read_from_eeprom
 	clrf PREINC0,0
 	movlw HIGH(cream_white_threshold_eeprom)
 	movwf PREINC0,0
-	call op_fetch_tos
+	call eeprom_AT_
 	movff POSTDEC0,(cream_white_threshold+1)
 	movff POSTDEC0,cream_white_threshold
 	movlw LOW(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
 	movlw HIGH(brown_cream_threshold_eeprom)
 	movwf PREINC0,0
-	call op_fetch_tos
+	call eeprom_AT_
 	movff POSTDEC0,(brown_cream_threshold+1)
 	movff POSTDEC0,brown_cream_threshold
 	return
@@ -1341,16 +1337,6 @@ op_dup
 	movlw -1
 	movff PLUSW0,PREINC0
 	movff PLUSW0,PREINC0
-	return
-
-op_store
-	btfsc INDF0,4,0
-	goto eeprom_EX_
-	movff POSTDEC0,FSR1H
-	movff POSTDEC0,FSR1L
-	movff POSTDEC0,PREINC1
-	movf POSTDEC1,0,0
-	movff POSTDEC0,INDF1
 	return
 
 op_fetch_tos
