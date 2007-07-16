@@ -31,6 +31,8 @@ init_runtime
 	movlb 1
 	clrf (a+1),1
 	clrf a,1
+	clrf (c__1+1),1
+	clrf c__1,1
 
 main
 	clrf (a+1),1
@@ -57,6 +59,15 @@ main
 	movf TMR1L,0,0
 	movff (TMR1L+1),(TMR0L+1)
 	movwf TMR0L,0
+	movff a,c__1
+	clrf (c__1+1),1
+	movf a,0,1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movwf c__1,1
+	clrf (c__1+1),1
+	movff a,c__1
+	movff c__1,(c__1+1)
 	return
 
 ;---------------------------------------------------------
@@ -64,5 +75,7 @@ main
 ;---------------------------------------------------------
 
 a equ 0x100
+
+c__1 equ 0x102
 
 END

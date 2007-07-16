@@ -1184,7 +1184,7 @@ def run():
       compiler.warning('you may be wanting to use c! here')
       compiler.rewind()
       write_w(addr)
-      write_literal(0, addr1)
+      write_literal(Number(0), addr1)
     elif name == 'OP_2>1':
       # Get content(LSB then MSB) and store it
       compiler.rewind()

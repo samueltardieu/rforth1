@@ -31,6 +31,8 @@ init_runtime
 	movlb 1
 	clrf (a+1),1
 	clrf a,1
+	clrf (c__1+1),1
+	clrf c__1,1
 
 main
 	call test1
@@ -39,11 +41,13 @@ main
 	call test4
 	call test5
 	call test6
+	call test7
+	call test8
+	call test9
 
-test7
-	movf TMR1L,0,0
-	movff (TMR1L+1),(TMR0L+1)
-	movwf TMR0L,0
+test10
+	movff a,c__1
+	movff c__1,(c__1+1)
 	return
 
 test1
@@ -85,10 +89,31 @@ test6
 	movff WREG,b
 	return
 
+test7
+	movf TMR1L,0,0
+	movff (TMR1L+1),(TMR0L+1)
+	movwf TMR0L,0
+	return
+
+test8
+	movff a,c__1
+	clrf (c__1+1),1
+	return
+
+test9
+	movf a,0,1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movwf c__1,1
+	clrf (c__1+1),1
+	return
+
 ;---------------------------------------------------------
 ; Section: memory
 ;---------------------------------------------------------
 
 a equ 0x100
+
+c__1 equ 0x102
 
 END
