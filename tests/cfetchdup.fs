@@ -1,0 +1,1 @@
+: main RCREG c@ dup ;
