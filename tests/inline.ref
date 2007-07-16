@@ -1,0 +1,37 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto main
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+bar
+	call op_dup
+	call op_dup
+	bra bar
+
+main
+	call bar
+	call bar
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+END
