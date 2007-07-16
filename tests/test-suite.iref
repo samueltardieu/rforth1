@@ -1,0 +1,1402 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+TBLPTRU equ 0xff8
+
+TBLPTRH equ 0xff7
+
+TBLPTRL equ 0xff6
+
+TABLAT equ 0xff5
+
+PRODH equ 0xff4
+
+PRODL equ 0xff3
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+WREG equ 0xfe8
+
+INDF1 equ 0xfe7
+
+POSTINC1 equ 0xfe6
+
+FSR1H equ 0xfe2
+
+FSR1L equ 0xfe1
+
+INDF2 equ 0xfdf
+
+POSTDEC2 equ 0xfdd
+
+PREINC2 equ 0xfdc
+
+FSR2H equ 0xfda
+
+FSR2L equ 0xfd9
+
+STATUS equ 0xfd8
+
+TXREG equ 0xfad
+
+EEADR equ 0xfa9
+
+EEDATA equ 0xfa8
+
+EECON1 equ 0xfa6
+
+PIR1 equ 0xf9e
+
+bl equ 0x20
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlb 1
+	clrf (x+1),1
+	clrf x,1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	movlw LOW((greetings_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((greetings_str+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	call _s
+	call cr
+	movlw 10
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test_abs
+	movlw LOW(-10)
+	movwf PREINC0,0
+	movlw HIGH(-10)
+	movwf PREINC0,0
+	call test_abs
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call test_abs
+	call _s
+	call cr
+	movlw LOW((test_plus_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_plus_str+0x8000))
+	movwf PREINC0,0
+	movlw 33
+	call type
+	movlw LOW((0x1234+0x103))
+	movwf PREINC0,0
+	movlw HIGH((0x1234+0x103))
+	movwf PREINC0,0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_minus_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_minus_str+0x8000))
+	movwf PREINC0,0
+	movlw 33
+	call type
+	movlw LOW((0x1337-0x1234))
+	movwf PREINC0,0
+	movlw HIGH((0x1337-0x1234))
+	movwf PREINC0,0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_plus_EX__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_plus_EX__str+0x8000))
+	movwf PREINC0,0
+	movlw 34
+	call type
+	movlw HIGH(0x103)
+	movwf (x+1),1
+	movlw LOW(0x103)
+	movwf x,1
+	movlw LOW(0x1234)
+	movwf PREINC0,0
+	movlw HIGH(0x1234)
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movf POSTDEC0,0,0
+	movf POSTINC0,0,0
+	addwf POSTINC1,1,0
+	movf POSTDEC0,0,0
+	addwfc INDF1,1,0
+	movf POSTDEC0,0,0
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_minus_EX__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_minus_EX__str+0x8000))
+	movwf PREINC0,0
+	movlw 41
+	call type
+	movlw HIGH(0x1337)
+	movwf (x+1),1
+	movlw LOW(0x1337)
+	movwf x,1
+	movlw LOW(0x1234)
+	movwf PREINC0,0
+	movlw HIGH(0x1234)
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw HIGH(x)
+	movwf PREINC0,0
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movf POSTDEC0,0,0
+	movf POSTINC0,0,0
+	subwf POSTINC1,1,0
+	movf POSTDEC0,0,0
+	subwfb INDF1,1,0
+	movf POSTDEC0,0,0
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_bool_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _LT_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call swap
+	call _GT__EQ_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__4+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__5+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__5+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_normalize
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__6+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__6+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _LT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__7+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__7+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call swap
+	call _GT__EQ_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__8+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__8+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__9+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__9+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__10+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__10+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__11+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__11+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	call op_normalize
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__12+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__12+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call op_zeroeq
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__13+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__13+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _0_LT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__14+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__14+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call negate
+	call _0_LT_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__15+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__15+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call negate
+	call _0_LT_
+	call op_zeroeq
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__16+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__16+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _0_LT_
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__17+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__17+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw LOW(-1)
+	movwf PREINC0,0
+	movlw HIGH(-1)
+	movwf PREINC0,0
+	call op_zeroeq
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__18+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__18+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw LOW(-1)
+	movwf PREINC0,0
+	movlw HIGH(-1)
+	movwf PREINC0,0
+	call _0_LT_
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__19+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__19+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movlw LOW(-1)
+	movwf PREINC0,0
+	movlw HIGH(-1)
+	movwf PREINC0,0
+	call negate
+	call _0_LT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__20+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__20+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw LOW(-1)
+	movwf PREINC0,0
+	movlw HIGH(-1)
+	movwf PREINC0,0
+	call negate
+	call _0_LT_
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__21+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__21+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movlw LOW(-1)
+	movwf PREINC0,0
+	movlw HIGH(-1)
+	movwf PREINC0,0
+	call _0_LT_
+	call op_zeroeq
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__22+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__22+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__23+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__23+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call _0_LT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__24+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__24+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	call type
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call negate
+	call _0_LT_
+	call cf
+	call _
+	call cr
+	movlw LOW((test_bool_str__25+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__25+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call negate
+	call _0_LT_
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	movlw LOW((test_bool_str__26+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_bool_str__26+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call _0_LT_
+	call op_zeroeq
+	call ct
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_swap_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_swap_str+0x8000))
+	movwf PREINC0,0
+	movlw 24
+	call type
+	movlw LOW(0x1234)
+	movwf PREINC0,0
+	movlw HIGH(0x1234)
+	movwf PREINC0,0
+	movlw LOW(0x5678)
+	movwf PREINC0,0
+	movlw HIGH(0x5678)
+	movwf PREINC0,0
+	call swap
+	call _
+	movlw bl
+	call emit
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_2_ST__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_2_ST__str+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	movlw LOW(0x1234)
+	movwf PREINC0,0
+	movlw HIGH(0x1234)
+	movwf PREINC0,0
+	call _2_ST_
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_2_SL__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_2_SL__str+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	movlw LOW(0x2468)
+	movwf PREINC0,0
+	movlw HIGH(0x2468)
+	movwf PREINC0,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call _
+	call cr
+	movlw LOW((test_2_SL__str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_2_SL__str__1+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	movlw LOW(0xfff0)
+	movwf PREINC0,0
+	movlw HIGH(0xfff0)
+	movwf PREINC0,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_mult_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_mult_str+0x8000))
+	movwf PREINC0,0
+	movlw 16
+	call type
+	movlw LOW((0x75*0x3a))
+	movwf PREINC0,0
+	movlw HIGH((0x75*0x3a))
+	movwf PREINC0,0
+	call _
+	call cr
+	call _s
+	call cr
+	movlw LOW((test_div_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_div_str+0x8000))
+	movwf PREINC0,0
+	movlw 18
+	call type
+	movlw LOW(1000)
+	movwf PREINC0,0
+	movlw HIGH(1000)
+	movwf PREINC0,0
+	movlw LOW(355)
+	movwf PREINC0,0
+	movlw HIGH(355)
+	movwf PREINC0,0
+	movlw 113
+	movwf PREINC0,0
+	clrf PREINC0,0
+	bcf math_flags,0,0
+	call normalize_tos
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call normalize_tos
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call normalize_tos
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,(temp_w+1)
+	movff POSTDEC0,temp_w
+	movff POSTDEC0,(temp_l+1)
+	movff POSTDEC0,temp_l
+	movf (temp_w+1),0,0
+	mulwf (temp_l+1),0
+	movff PRODH,(temp_e+1)
+	movff PRODL,temp_e
+	movf temp_w,0,0
+	mulwf temp_l,0
+	movff PRODH,temp_c3
+	movff PRODL,temp_w
+	mulwf (temp_l+1),0
+	movf PRODL,0,0
+	addwf temp_c3,1,0
+	movf PRODH,0,0
+	addwfc temp_e,1,0
+	clrf WREG,0
+	addwfc (temp_e+1),1,0
+	movf (temp_w+1),0,0
+	mulwf temp_l,0
+	movf PRODL,0,0
+	addwf temp_c3,0,0
+	movwf (temp_w+1),0
+	movf PRODH,0,0
+	addwfc temp_e,1,0
+	clrf WREG,0
+	addwfc (temp_e+1),1,0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC0,(temp_l+1)
+	movff POSTDEC0,temp_l
+	call div32
+	movff temp_w,PREINC0
+	movff (temp_w+1),PREINC0
+	btfsc math_flags,0,0
+	call negate
+	call _
+	call cr
+	call _s
+
+cr
+	movlw 0xa
+	call emit
+	movlw 0xd
+
+emit
+	btfss PIR1,4,0
+	bra emit
+	movwf TXREG,0
+	return
+
+cf
+	call op_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	return
+	movlw LOW((cf_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((cf_str+0x8000))
+	movwf PREINC0,0
+	movlw 9
+
+type
+	movwf PREINC2,0
+	iorlw 0
+	bz _lbl___298
+_lbl___300
+	call op_dup
+	call op_cfetch_tos
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___300
+_lbl___298
+	movf POSTDEC2,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+_GT__EQ_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___101
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call _0_LT_
+	goto op_zeroeq
+_lbl___101
+	call op_minus
+	call _0_LT_
+
+op_zeroeq
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+op_zeroeq_z
+	movlw -1
+	btfss STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+_GT_
+	call swap
+
+_LT_
+	call _2dupxor_GT_w
+	btfss WREG,7,0
+	bra _lbl___95
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto _0_LT_
+_lbl___95
+	call op_minus
+
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+_
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call emit_8
+
+emit_8
+	call op_dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	call emit
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	goto emit
+
+op_normalize
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+
+op_normalize_z
+	movlw -1
+	btfsc STATUS,2,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	return
+
+normalize_tos
+	call op_dup
+	call _0_LT_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	return
+	btg math_flags,0,0
+
+negate
+	comf POSTDEC0,1,0
+	negf POSTINC0,0
+	movlw 0
+	addwfc INDF0,1,0
+	return
+
+table_addr_EX_
+	clrf TBLPTRU,0
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_addr_EX_
+
+test_abs
+	movlw LOW((test_abs_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_abs_str+0x8000))
+	movwf PREINC0,0
+	movlw 16
+	call type
+	call op_dup
+	call _
+	movlw LOW((test_abs_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test_abs_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 2
+	call type
+	btfsc INDF0,7,0
+	call negate
+	call _
+	goto cr
+
+ct
+	call op_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfss STATUS,2,0
+	return
+	movlw LOW((ct_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((ct_str+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	goto type
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+op_fetch_tos
+	btfsc INDF0,7,0
+	goto flash_AT_
+	btfsc INDF0,4,0
+	goto eeprom_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff POSTINC1,PREINC0
+	movff INDF1,PREINC0
+	return
+
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+swap
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
+xor
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	xorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	xorwf INDF0,1,0
+	return
+
+_2dupxor_GT_w
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
+	return
+
+_2_ST_
+	bcf STATUS,0,0
+	movf POSTDEC0,0,0
+	rlcf POSTINC0,1,0
+	rlcf INDF0,1,0
+	return
+
+depth
+	movff (FSR0L+1),(temp_x1+1)
+	movff FSR0L,temp_x1
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movlw LOW((-0x5f))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-0x5f))
+	addwfc INDF0,1,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	return
+
+div32
+	clrf temp_c0,0
+	clrf temp_c1,0
+	clrf temp_c2,0
+	movlw -32
+	movwf temp_c3,0
+div322
+	bcf STATUS,0,0
+	rlcf temp_w,1,0
+	rlcf (temp_w+1),1,0
+	rlcf temp_e,1,0
+	rlcf (temp_e+1),1,0
+	rlcf temp_c2,1,0
+	rlcf temp_c1,1,0
+	rlcf temp_c0,1,0
+	movf temp_l,0,0
+	subwf temp_c2,1,0
+	movf (temp_l+1),0,0
+	subwfb temp_c1,0,0
+	bc div324
+	tstfsz temp_c0,0
+	bra div323
+	movf temp_l,0,0
+	addwf temp_c2,1,0
+	bra div325
+div323
+	decf temp_c0,1,0
+div324
+	movwf temp_c1,0
+	bsf temp_w,0,0
+	btfss temp_c3,4,0
+	bra div326
+div325
+	incfsz temp_c3,1,0
+	bra div322
+	movff temp_c2,temp_e
+	movff temp_c1,(temp_e+1)
+	return
+div326
+	movlw 0xff
+	movwf (temp_w+1),0
+	movwf temp_w,0
+	movwf (temp_e+1),0
+	movwf temp_e,0
+	return
+
+flashc_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+flash_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	tblrd*+
+	movff TABLAT,INDF0
+	return
+
+eeprom_addr_EX_
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	return
+
+eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call eeprom_addr_EX_
+	bsf EECON1,0,0
+	movff EEDATA,PREINC0
+	clrf PREINC0,0
+	return
+
+eeprom_AT_
+	call op_dup
+	call eepromc_AT_
+	call swap
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	call eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf INDF0,0
+	return
+
+_s
+	movlw 60
+	call emit
+	call depth
+	call op_dup
+	call _
+	movlw 62
+	call emit
+	call op_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___304
+	call op_dup
+	movlw 8
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call _GT_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___305
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((_s_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((_s_str+0x8000))
+	movwf PREINC0,0
+	movlw 4
+	call type
+	movlw 8
+	movwf PREINC0,0
+	clrf PREINC0,0
+_lbl___305
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf PREINC2,0
+	bz _lbl___306
+_lbl___308
+	movlw bl
+	call emit
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call negate
+	call depth
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movf temp_x1,0,0
+	addwfc INDF0,1,0
+	call _2_ST_
+	movlw LOW(0x5c)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(0x5c)
+	addwfc INDF0,1,0
+	call op_fetch_tos
+	call _
+	decfsz INDF2,1,0
+	bra _lbl___308
+_lbl___306
+	movf POSTDEC2,1,0
+	return
+_lbl___304
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+temp_w equ 0x7
+
+temp_l equ 0x9
+
+temp_e equ 0xb
+
+temp_c0 equ 0xd
+
+temp_c1 equ 0xe
+
+temp_c2 equ 0xf
+
+temp_c3 equ 0x10
+
+math_flags equ 0x11
+
+x equ 0x100
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+_s_str
+	db 32,46,46,46
+
+greetings_str
+	db 83,116,97,114,116,105,110,103
+	db 13,10
+
+test_abs_str
+	db 84,101,115,116,105,110,103,32
+	db 97,98,115,32,102,111,114,32
+
+test_abs_str__1
+	db 58,32
+
+test_plus_str
+	db 84,101,115,116,105,110,103,32
+	db 48,120,49,48,51,32,43,32
+	db 48,120,49,50,51,52,32,40
+	db 48,120,49,51,51,55,41,58
+	db 32
+
+test_minus_str
+	db 84,101,115,116,105,110,103,32
+	db 48,120,49,51,51,55,32,45
+	db 32,48,120,49,50,51,52,32
+	db 40,48,120,49,48,51,41,58
+	db 32
+
+test_plus_EX__str
+	db 65,100,100,105,110,103,32,48
+	db 120,49,50,51,52,32,116,111
+	db 32,48,120,49,48,51,32,105
+	db 110,32,109,101,109,111,114,121
+	db 58,32
+
+test_minus_EX__str
+	db 83,117,98,116,114,97,116,105
+	db 110,103,32,48,120,49,50,51
+	db 52,32,102,114,111,109,32,48
+	db 120,49,51,51,55,32,105,110
+	db 32,109,101,109,111,114,121,58
+	db 32
+
+cf_str
+	db 32,45,45,32,69,82,82,79
+	db 82
+
+ct_str
+	db 32,45,45,32,69,82,82,79
+	db 82
+
+test_bool_str
+	db 49,32,50,32,60,32,58,32
+
+test_bool_str__1
+	db 49,32,50,32,60,61,32,58
+	db 32
+
+test_bool_str__2
+	db 49,32,50,32,62,32,58,32
+
+test_bool_str__3
+	db 49,32,50,32,62,61,32,58
+	db 32
+
+test_bool_str__4
+	db 49,32,50,32,61,32,58,32
+
+test_bool_str__5
+	db 49,32,50,32,60,62,32,58
+	db 32
+
+test_bool_str__6
+	db 49,32,49,32,60,32,58,32
+
+test_bool_str__7
+	db 49,32,49,32,60,61,32,58
+	db 32
+
+test_bool_str__8
+	db 49,32,49,32,62,32,58,32
+
+test_bool_str__9
+	db 49,32,49,32,62,61,32,58
+	db 32
+
+test_bool_str__10
+	db 49,32,49,32,61,32,58,32
+
+test_bool_str__11
+	db 49,32,49,32,60,62,32,58
+	db 32
+
+test_bool_str__12
+	db 49,32,48,61,32,58,32
+
+test_bool_str__13
+	db 49,32,48,60,32,58,32
+
+test_bool_str__14
+	db 49,32,48,62,32,58,32
+
+test_bool_str__15
+	db 49,32,48,60,61,32,58,32
+
+test_bool_str__16
+	db 49,32,48,62,61,32,58,32
+
+test_bool_str__17
+	db 45,49,32,48,61,32,58,32
+
+test_bool_str__18
+	db 45,49,32,48,60,32,58,32
+
+test_bool_str__19
+	db 45,49,32,48,62,32,58,32
+
+test_bool_str__20
+	db 45,49,32,48,60,61,32,58
+	db 32
+
+test_bool_str__21
+	db 45,49,32,48,62,61,32,58
+	db 32
+
+test_bool_str__22
+	db 48,32,48,61,32,58,32
+
+test_bool_str__23
+	db 48,32,48,60,32,58,32
+
+test_bool_str__24
+	db 48,32,48,62,32,58,32
+
+test_bool_str__25
+	db 48,32,48,60,61,32,58,32
+
+test_bool_str__26
+	db 48,32,48,62,61,32,58,32
+
+test_swap_str
+	db 83,104,111,117,108,100,32,112
+	db 114,105,110,116,32,49,50,51
+	db 52,32,53,54,55,56,58,32
+
+test_2_ST__str
+	db 49,50,51,52,32,50,42,32
+	db 58,32
+
+test_2_SL__str
+	db 50,52,54,56,32,50,47,32
+	db 58,32
+
+test_2_SL__str__1
+	db 70,70,70,48,32,50,47,32
+	db 58,32
+
+test_mult_str
+	db 55,53,32,51,65,32,42,32
+	db 40,49,65,56,50,41,58,32
+
+test_div_str
+	db 49,48,48,48,32,80,73,32
+	db 42,32,40,48,67,52,53,41
+	db 58,32
+
+END

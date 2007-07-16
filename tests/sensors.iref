@@ -1,0 +1,1994 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+TBLPTRU equ 0xff8
+
+TBLPTRH equ 0xff7
+
+TBLPTRL equ 0xff6
+
+TABLAT equ 0xff5
+
+INTCON equ 0xff2
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+WREG equ 0xfe8
+
+INDF1 equ 0xfe7
+
+POSTINC1 equ 0xfe6
+
+POSTDEC1 equ 0xfe5
+
+PREINC1 equ 0xfe4
+
+FSR1H equ 0xfe2
+
+FSR1L equ 0xfe1
+
+INDF2 equ 0xfdf
+
+POSTINC2 equ 0xfde
+
+POSTDEC2 equ 0xfdd
+
+PREINC2 equ 0xfdc
+
+FSR2H equ 0xfda
+
+FSR2L equ 0xfd9
+
+STATUS equ 0xfd8
+
+TMR0L equ 0xfd6
+
+T0CON equ 0xfd5
+
+T1CON equ 0xfcd
+
+ADRESL equ 0xfc3
+
+ADCON0 equ 0xfc2
+
+ADCON1 equ 0xfc1
+
+RCREG equ 0xfae
+
+TXREG equ 0xfad
+
+EEADR equ 0xfa9
+
+EEDATA equ 0xfa8
+
+EECON2 equ 0xfa7
+
+EECON1 equ 0xfa6
+
+PIR2 equ 0xfa1
+
+PIR1 equ 0xf9e
+
+TRISB equ 0xf93
+
+TRISA equ 0xf92
+
+LATB equ 0xf8a
+
+LATA equ 0xf89
+
+CIOCON equ 0xf73
+
+BRGCON3 equ 0xf72
+
+BRGCON2 equ 0xf71
+
+BRGCON1 equ 0xf70
+
+CANCON equ 0xf6f
+
+CANSTAT equ 0xf6e
+
+RXB0D0 equ 0xf66
+
+RXB0DLC equ 0xf65
+
+RXB0SIDL equ 0xf62
+
+RXB0SIDH equ 0xf61
+
+RXB0CON equ 0xf60
+
+RXB1D0 equ 0xf56
+
+RXB1DLC equ 0xf55
+
+RXB1SIDL equ 0xf52
+
+RXB1SIDH equ 0xf51
+
+RXB1CON equ 0xf50
+
+TXB0D0 equ 0xf46
+
+TXB0DLC equ 0xf45
+
+TXB0SIDL equ 0xf42
+
+TXB0SIDH equ 0xf41
+
+TXB0CON equ 0xf40
+
+TXB1CON equ 0xf30
+
+TXB2CON equ 0xf20
+
+RXM0SIDL equ 0xf19
+
+RXM0SIDH equ 0xf18
+
+RXF0SIDL equ 0xf01
+
+RXF0SIDH equ 0xf00
+
+UNKNOWN equ 0
+
+CREAM equ 1
+
+BROWN equ 2
+
+WHITE equ 3
+
+COLORS_ARBITRATION equ 0x44
+
+VALUES_ARBITRATION equ 0x45
+
+SET_CALIBRATION_REQUEST equ 0x46
+
+CALIBRATION_ARBITRATION equ 0x47
+
+local_addr equ 0x0
+
+addr_mask equ 0x3e0
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+can_config
+	movlw 0x4
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+can_mode
+	call _5_LT__LT_
+	call op_dup
+	movf CANCON,0,0
+	andlw 0x1f
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call or
+	movf POSTDEC0,0,0
+	movff POSTDEC0,CANCON
+_lbl___436
+	call op_dup
+	movf CANSTAT,0,0
+	andlw 0xe0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___436
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+can_handle_message
+	call can_receive
+	movff can_arbitration,PREINC0
+	movff (can_arbitration+1),PREINC0
+	call op_dup
+	movlw SET_CALIBRATION_REQUEST
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___664
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movff can_msg_0,PREINC0
+	movff (can_msg_0+1),PREINC0
+	clrf PREINC0,0
+	movlw HIGH(cream_white_threshold_eeprom)
+	movwf PREINC0,0
+	call op_store
+	movff can_msg_2,PREINC0
+	movff (can_msg_2+1),PREINC0
+	movlw LOW(brown_cream_threshold_eeprom)
+	movwf PREINC0,0
+	movlw HIGH(brown_cream_threshold_eeprom)
+	movwf PREINC0,0
+	call op_store
+	goto read_from_eeprom
+_lbl___664
+	btfsc can_msg_flags,0,0
+	bra _lbl___667
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto can_unknown_msg
+_lbl___667
+	call op_dup
+	movlw COLORS_ARBITRATION
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___670
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto can_send_colors
+_lbl___670
+	call op_dup
+	movlw VALUES_ARBITRATION
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___673
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	clrf (can_arbitration+1),0
+	movlw VALUES_ARBITRATION
+	movwf can_arbitration,0
+	movlw 8
+	movwf can_msg_length,0
+	movff (current_value_0+1),(can_msg_0+1)
+	movff current_value_0,can_msg_0
+	movff (current_value_1+1),(can_msg_2+1)
+	movff current_value_1,can_msg_2
+	movff (current_value_2+1),(can_msg_4+1)
+	movff current_value_2,can_msg_4
+	movff (current_value_3+1),(can_msg_6+1)
+	movff current_value_3,can_msg_6
+	goto can_transmit
+_lbl___673
+	call op_dup
+	movlw CALIBRATION_ARBITRATION
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___678
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	clrf (can_arbitration+1),0
+	movlw CALIBRATION_ARBITRATION
+	movwf can_arbitration,0
+	movlw 4
+	movwf can_msg_length,0
+	movff (cream_white_threshold+1),(can_msg_0+1)
+	movff cream_white_threshold,can_msg_0
+	movff (brown_cream_threshold+1),(can_msg_2+1)
+	movff brown_cream_threshold,can_msg_2
+	goto can_transmit
+_lbl___678
+
+can_unknown_msg
+	movlw LOW((can_unknown_msg_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((can_unknown_msg_str+0x8000))
+	movwf PREINC0,0
+	movlw 37
+	call type
+	call _
+	movlw LOW((can_unknown_msg_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((can_unknown_msg_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	call type
+	btfsc can_msg_flags,0,0
+	bra _lbl___659
+	movlw LOW((can_unknown_msg_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((can_unknown_msg_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	call type
+_lbl___659
+	movlw LOW((can_unknown_msg_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((can_unknown_msg_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 3
+	call type
+
+cr
+	movlw 0xa
+	call emit
+	movlw 0xd
+
+emit
+	btfss PIR1,4,0
+	bra emit
+	movwf TXREG,0
+	return
+
+can_set_filter
+	movwf can_buffer,0
+	call _5_LT__LT_
+	call _1_GT_2
+	clrf PREINC0,0
+	movlw HIGH(RXF0SIDH)
+	movwf PREINC0,0
+	call m0_GT_mn
+	call op_cstore
+	movlw LOW(RXF0SIDL)
+	movwf PREINC0,0
+	movlw HIGH(RXF0SIDL)
+	movwf PREINC0,0
+	call m0_GT_mn
+
+op_cstore
+	btfsc INDF0,4,0
+	goto eepromc_EX_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movf POSTDEC0,0,0
+	movff POSTDEC0,INDF1
+	return
+
+tx0_GT_txn
+	movff can_offset,PREINC0
+	clrf PREINC0,0
+
+op_minus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	subwf POSTINC0,1,0
+	movf temp_x1,0,0
+	subwfb INDF0,1,0
+	return
+
+_
+	call _1_GT_2
+	call emit_8
+
+emit_8
+	call op_dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	call emit
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	goto emit
+
+_5_LT__LT_
+	call _2_ST_
+	call _4_ST_
+
+_4_ST_
+	call _2_ST_
+
+_2_ST_
+	bcf STATUS,0,0
+	movf POSTDEC0,0,0
+	rlcf POSTINC0,1,0
+	rlcf INDF0,1,0
+	return
+
+handle_key
+	call op_dup
+	movlw 48
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___718
+	movlw LOW((handle_key_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str+0x8000))
+	movwf PREINC0,0
+	movlw 11
+	call type
+	call op_dup
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
+	goto cr
+_lbl___718
+	call op_dup
+	movlw 49
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___721
+	movlw LOW((handle_key_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 11
+	call type
+	call op_dup
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
+	goto cr
+_lbl___721
+	call op_dup
+	movlw 50
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___724
+	movlw LOW((handle_key_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 11
+	call type
+	call op_dup
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
+	goto cr
+_lbl___724
+	call op_dup
+	movlw 51
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___727
+	movlw LOW((handle_key_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 11
+	call type
+	call op_dup
+	call channel_measure
+	call _
+	call channel_determine_color
+	call _
+	goto cr
+_lbl___727
+	call op_dup
+	movlw 113
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___730
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((handle_key_str__4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__4+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	movlw LOW((calibration_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str+0x8000))
+	movwf PREINC0,0
+	movlw 41
+	call type
+	call cr
+	call pause
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call channel_measure
+	movlw LOW((calibration_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 41
+	call type
+	call cr
+	call pause
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call channel_measure
+	call op_dup
+	movlw LOW((calibration_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 41
+	call type
+	call cr
+	call pause
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call channel_measure
+	call op_plus
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call op_dup
+	movlw LOW((calibration_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	call _
+	call cr
+	movff POSTDEC0,(cream_white_threshold+1)
+	movff POSTDEC0,cream_white_threshold
+	call op_plus
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call op_dup
+	movlw LOW((calibration_str__4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((calibration_str__4+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	call _
+	call cr
+	movff POSTDEC0,(brown_cream_threshold+1)
+	movff POSTDEC0,brown_cream_threshold
+	return
+_lbl___730
+	call op_dup
+	movlw 100
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___737
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((handle_key_str__5+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__5+0x8000))
+	movwf PREINC0,0
+	movlw 16
+	call type
+	movff (FSR0L+1),(temp_x1+1)
+	movff FSR0L,temp_x1
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movlw LOW((-0x5f))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-0x5f))
+	addwfc INDF0,1,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call _
+	goto cr
+_lbl___737
+	call op_dup
+	movlw 117
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___743
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call print_usage
+	call _
+	goto cr
+_lbl___743
+	call op_dup
+	movlw 108
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___746
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((handle_key_str__6+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__6+0x8000))
+	movwf PREINC0,0
+	movlw 11
+	call type
+	call cr
+	goto can_loopback
+_lbl___746
+	call op_dup
+	movlw 107
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___749
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((handle_key_str__7+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__7+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	call cr
+	goto can_normal
+_lbl___749
+	call op_dup
+	movlw 115
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___752
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto step
+_lbl___752
+	call op_dup
+	movlw 76
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___755
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	btg LATA,5,0
+	movlw LOW((handle_key_str__8+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((handle_key_str__8+0x8000))
+	movwf PREINC0,0
+	movlw 21
+	call type
+	goto cr
+_lbl___755
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+
+print_usage
+	movlw LOW((print_usage_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str+0x8000))
+	movwf PREINC0,0
+	movlw 6
+	call type
+	call cr
+	movlw LOW((print_usage_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 31
+	call type
+	call cr
+	movlw LOW((print_usage_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 48
+	call type
+	call cr
+	movlw LOW((print_usage_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 38
+	call type
+	call cr
+	movlw LOW((print_usage_str__4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__4+0x8000))
+	movwf PREINC0,0
+	movlw 43
+	call type
+	call cr
+	movlw LOW((print_usage_str__5+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__5+0x8000))
+	movwf PREINC0,0
+	movlw 39
+	call type
+	call cr
+	movlw LOW((print_usage_str__6+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__6+0x8000))
+	movwf PREINC0,0
+	movlw 35
+	call type
+	call cr
+	movlw LOW((print_usage_str__7+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__7+0x8000))
+	movwf PREINC0,0
+	movlw 55
+	call type
+	call cr
+	movlw LOW((print_usage_str__8+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__8+0x8000))
+	movwf PREINC0,0
+	movlw 61
+	call type
+	call cr
+	movlw LOW((print_usage_str__9+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_usage_str__9+0x8000))
+	movwf PREINC0,0
+	movlw 22
+	call type
+	goto cr
+
+m0_GT_mn
+	movff can_buffer,PREINC0
+	clrf PREINC0,0
+	call _4_ST_
+
+op_plus
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movf temp_x1,0,0
+	addwfc INDF0,1,0
+	return
+
+_LT_
+	movf POSTDEC0,1,0
+	movf POSTDEC0,1,0
+	movf POSTINC0,0,0
+	xorwf PREINC0,0,0
+	btfss WREG,7,0
+	bra _lbl___98
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto _0_LT_
+_lbl___98
+	call op_minus
+
+_0_LT_
+	movlw -1
+	btfss POSTDEC0,7,0
+	movlw 0
+	movwf POSTINC0,0
+	movwf INDF0,0
+	return
+
+table_addr_EX_
+	clrf TBLPTRU,0
+	call _1_GT_2
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+eeprom_EX_
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call _1_GT_2
+	movff POSTDEC2,PREINC0
+	movff POSTINC2,PREINC0
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	call eepromc_EX_
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+
+eepromc_EX_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	movf POSTDEC0,0,0
+	movff POSTDEC0,EEDATA
+	bsf EECON1,2,0
+	movlw 0x55
+	movwf EECON2,0
+	movlw 0xaa
+	movwf EECON2,0
+	bsf EECON1,1,0
+_lbl___230
+	btfsc EECON1,1,0
+	bra _lbl___230
+	bcf EECON1,2,0
+	bcf PIR2,4,0
+	return
+
+print_color
+	call op_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___683
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((print_color_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_color_str+0x8000))
+	movwf PREINC0,0
+	movlw 7
+	goto type
+_lbl___683
+	call op_dup
+	movlw CREAM
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___686
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((print_color_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_color_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	goto type
+_lbl___686
+	call op_dup
+	movlw BROWN
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___689
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((print_color_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_color_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	goto type
+_lbl___689
+	call op_dup
+	movlw WHITE
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___692
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((print_color_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_color_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	goto type
+_lbl___692
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((print_color_str__4+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((print_color_str__4+0x8000))
+	movwf PREINC0,0
+	movlw 16
+
+type
+	movwf PREINC2,0
+	iorlw 0
+	bz _lbl___274
+_lbl___276
+	call op_dup
+	call op_cfetch_tos
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___276
+_lbl___274
+	movf POSTDEC2,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+_5_GT__GT_
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	call _4_SL_
+
+_4_SL_
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	rlcf INDF0,0,0
+	rrcf POSTDEC0,1,0
+	rrcf POSTINC0,1,0
+	return
+
+can_choose_buffer
+	lfsr 1,TXB0CON
+	btfsc INDF1,3,0
+	bra _lbl___405
+	clrf PREINC0,0
+	clrf PREINC0,0
+	goto can_set_buffer
+_lbl___405
+	btfsc can_flags,0,0
+	bra can_choose_buffer
+	lfsr 1,TXB1CON
+	btfsc INDF1,3,0
+	bra _lbl___407
+	movlw 1
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto can_set_buffer
+_lbl___407
+	lfsr 1,TXB2CON
+	btfsc INDF1,3,0
+	bra can_choose_buffer
+	movlw 2
+	movwf PREINC0,0
+	clrf PREINC0,0
+
+can_set_buffer
+	movf POSTDEC0,0,0
+	movff POSTDEC0,can_buffer
+	movff can_buffer,PREINC0
+	clrf PREINC0,0
+	call _4_ST_
+	call _4_ST_
+	movf POSTDEC0,0,0
+	movff POSTDEC0,can_offset
+	return
+
+channel_determine_color
+	call channel_measure
+
+determine_color
+	call op_dup
+	movff brown_cream_threshold,PREINC0
+	movff (brown_cream_threshold+1),PREINC0
+	call _LT_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___587
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((brown_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((brown_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw 14
+	call type
+	call cr
+	movlw BROWN
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+_lbl___587
+	movff cream_white_threshold,PREINC0
+	movff (cream_white_threshold+1),PREINC0
+	call swap
+	call _LT_
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___592
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((white_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((white_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw 14
+	call type
+	call cr
+	movlw WHITE
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+_lbl___592
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movlw LOW((cream_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((cream_detected_str+0x8000))
+	movwf PREINC0,0
+	movlw 14
+	call type
+	call cr
+	movlw CREAM
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+maybe_send_colors
+	btfss PIR1,0,0
+	return
+	clrf PREINC0,0
+	clrf PREINC0,0
+	movlw 4
+	movwf PREINC2,0
+_lbl___641
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call op_dup
+	movlw LOW(current_colors)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(current_colors)
+	addwfc INDF0,1,0
+	call op_cfetch_tos
+	call swap
+	movlw LOW(previous_colors)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(previous_colors)
+	addwfc INDF0,1,0
+	call op_cfetch_tos
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___648
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call op_dup
+	movlw LOW(current_colors)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(current_colors)
+	addwfc INDF0,1,0
+	call op_cfetch_tos
+	call swap
+	movlw LOW(previous_colors)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(previous_colors)
+	addwfc INDF0,1,0
+	call op_cfetch_tos
+	call op_cstore
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+_lbl___648
+	decfsz INDF2,1,0
+	bra _lbl___641
+	movf POSTDEC2,1,0
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	return
+
+can_send_colors
+	clrf (can_arbitration+1),0
+	movlw COLORS_ARBITRATION
+	movwf can_arbitration,0
+	movlw 4
+	movwf can_msg_length,0
+	movff current_color_0,can_msg_0
+	movff current_color_1,can_msg_1
+	movff current_color_2,can_msg_2
+	movff current_color_3,can_msg_3
+	call can_transmit
+	clrf (TMR0L+1),0
+	clrf TMR0L,0
+	bcf PIR1,0,0
+	return
+
+init_runtime
+	movlb 1
+	clrf (calibrated_QM_+1),1
+	clrf calibrated_QM_,1
+	clrf (current_value_0+1),1
+	clrf current_value_0,1
+	clrf (current_value_1+1),1
+	clrf current_value_1,1
+	clrf (current_value_2+1),1
+	clrf current_value_2,1
+	clrf (current_value_3+1),1
+	clrf current_value_3,1
+	clrf current_color_0,1
+	clrf current_color_1,1
+	clrf current_color_2,1
+	clrf current_color_3,1
+	clrf (brown_cream_threshold+1),1
+	clrf brown_cream_threshold,1
+	clrf (cream_white_threshold+1),1
+	clrf cream_white_threshold,1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	movlw 0x81
+	movwf ADCON0,0
+	movlw 0xc2
+	movwf ADCON1,0
+	bcf TRISB,0,0
+	bcf TRISB,1,0
+	bsf TRISB,4,0
+	bcf TRISA,5,0
+	movlw 0x84
+	movwf T0CON,0
+	movlw 0x91
+	movwf T1CON,0
+	call read_from_eeprom
+	bsf LATB,0,0
+	bcf LATB,1,0
+	bsf TRISB,3,0
+	bcf TRISB,2,0
+	call can_config
+	movlw 0x9
+	movwf BRGCON1,0
+	movlw 0x90
+	movwf BRGCON2,0
+	movlw 0x2
+	movwf BRGCON3,0
+	movlw 0x40
+	movwf CIOCON,0
+	movlw LOW(0x7ff)
+	movwf PREINC0,0
+	movlw HIGH(0x7ff)
+	movwf PREINC0,0
+	movlw 0
+	call can_set_mask
+	movlw LOW(0x7ff)
+	movwf PREINC0,0
+	movlw HIGH(0x7ff)
+	movwf PREINC0,0
+	movlw 1
+	call can_set_mask
+	movlw 7
+	movwf PREINC2,0
+_lbl___818
+	movlw LOW(0x7ff)
+	movwf PREINC0,0
+	movlw HIGH(0x7ff)
+	movwf PREINC0,0
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call can_set_filter
+	decfsz INDF2,1,0
+	bra _lbl___818
+	movf POSTDEC2,1,0
+	call can_normal
+	call can_config
+	movlw LOW(addr_mask)
+	movwf PREINC0,0
+	movlw HIGH(addr_mask)
+	movwf PREINC0,0
+	movlw 0
+	call can_set_mask
+	clrf PREINC0,0
+	clrf PREINC0,0
+	movlw 0
+	call can_set_filter
+	call can_loopback
+	movlw LOW((greetings_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((greetings_str+0x8000))
+	movwf PREINC0,0
+	movlw 30
+	call type
+	call cr
+_lbl___826
+	call step
+	bra _lbl___826
+
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_addr_EX_
+
+can_normal
+	clrf PREINC0,0
+	clrf PREINC0,0
+	goto can_mode
+
+can_loopback
+	movlw 0x2
+	movwf PREINC0,0
+	clrf PREINC0,0
+	goto can_mode
+
+can_set_mask
+	movwf can_buffer,0
+	call _5_LT__LT_
+	call _1_GT_2
+	movlw LOW(RXM0SIDH)
+	movwf PREINC0,0
+	movlw HIGH(RXM0SIDH)
+	movwf PREINC0,0
+	call m0_GT_mn
+	call op_cstore
+	movlw LOW(RXM0SIDL)
+	movwf PREINC0,0
+	movlw HIGH(RXM0SIDL)
+	movwf PREINC0,0
+	call m0_GT_mn
+	goto op_cstore
+
+channel_measure
+	call _4_ST_
+	call _4_ST_
+	movf ADCON0,0,0
+	andlw 0xc7
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call or
+	movf POSTDEC0,0,0
+	movff POSTDEC0,ADCON0
+	bsf LATA,5,0
+	call wait_timer0
+	call _4_measures
+	bcf LATA,5,0
+	call wait_timer0
+	call _4_measures
+	goto op_minus
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+op_store
+	btfsc INDF0,4,0
+	goto eeprom_EX_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff POSTDEC0,PREINC1
+	movf POSTDEC1,0,0
+	movff POSTDEC0,INDF1
+	return
+
+op_fetch_tos
+	btfsc INDF0,7,0
+	goto flash_AT_
+	btfsc INDF0,4,0
+	goto eeprom_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff POSTINC1,PREINC0
+	movff INDF1,PREINC0
+	return
+
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+swap
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+or
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	iorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	iorwf INDF0,1,0
+	return
+
+xor
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	xorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	xorwf INDF0,1,0
+	return
+
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+flashc_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+flash_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	tblrd*+
+	movff TABLAT,INDF0
+	return
+
+eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	bsf EECON1,0,0
+	movff EEDATA,PREINC0
+	clrf PREINC0,0
+	return
+
+eeprom_AT_
+	call op_dup
+	call eepromc_AT_
+	call swap
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	call eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf INDF0,0
+	return
+
+memcpy
+	movff FSR2L,temp_x2
+	movff FSR2H,(temp_x2+1)
+	movff POSTDEC0,FSR2H
+	movff POSTDEC0,FSR2L
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+memcpy_loop
+	movff POSTINC1,POSTINC2
+	decfsz WREG,1,0
+	bra memcpy_loop
+	movff temp_x2,FSR2L
+	movff (temp_x2+1),FSR2H
+	return
+
+can_receive
+	btfss RXB0CON,7,0
+	bra _lbl___371
+	movf RXB0DLC,0,0
+	andlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movwf can_msg_length,0
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___373
+	movlw LOW(RXB0D0)
+	movwf PREINC0,0
+	movlw HIGH(RXB0D0)
+	movwf PREINC0,0
+	movlw can_msg
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movf can_msg_length,0,0
+	call memcpy
+_lbl___373
+	clrf can_msg_flags,0
+	btfsc RXB0DLC,6,0
+	bsf can_msg_flags,0,0
+	movff RXB0SIDL,PREINC0
+	movff RXB0SIDH,PREINC0
+	call _5_GT__GT_
+	movff POSTDEC0,(can_arbitration+1)
+	movff POSTDEC0,can_arbitration
+	bcf RXB0CON,7,0
+	return
+_lbl___371
+	lfsr 1,RXB1CON
+	btfss INDF1,7,0
+	bra can_receive
+	movff RXB1DLC,WREG
+	andlw 0xf
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movwf can_msg_length,0
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___380
+	movlw LOW(RXB1D0)
+	movwf PREINC0,0
+	movlw HIGH(RXB1D0)
+	movwf PREINC0,0
+	movlw can_msg
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movf can_msg_length,0,0
+	call memcpy
+_lbl___380
+	clrf can_msg_flags,0
+	lfsr 1,RXB1DLC
+	btfsc INDF1,6,0
+	bsf can_msg_flags,0,0
+	movff RXB1SIDL,PREINC0
+	movff RXB1SIDH,PREINC0
+	call _5_GT__GT_
+	movff POSTDEC0,(can_arbitration+1)
+	movff POSTDEC0,can_arbitration
+	lfsr 1,RXB1CON
+	bcf INDF1,7,0
+	return
+
+can_transmit
+	call can_choose_buffer
+	movff can_msg_length,PREINC0
+	clrf PREINC0,0
+	movlw LOW(TXB0DLC)
+	movwf PREINC0,0
+	movlw HIGH(TXB0DLC)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	call op_cstore
+	movff can_msg_length,PREINC0
+	clrf PREINC0,0
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___421
+	movlw can_msg
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movlw LOW(TXB0D0)
+	movwf PREINC0,0
+	movlw HIGH(TXB0D0)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	movf can_msg_length,0,0
+	call memcpy
+_lbl___421
+	movff can_arbitration,PREINC0
+	movff (can_arbitration+1),PREINC0
+	call _5_LT__LT_
+	call _1_GT_2
+	movlw LOW(TXB0SIDH)
+	movwf PREINC0,0
+	movlw HIGH(TXB0SIDH)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	call op_cstore
+	movlw LOW(TXB0SIDL)
+	movwf PREINC0,0
+	movlw HIGH(TXB0SIDL)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	call op_cstore
+	movlw LOW(TXB0DLC)
+	movwf PREINC0,0
+	movlw HIGH(TXB0DLC)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	bcf INDF1,6,0
+	movlw LOW(TXB0CON)
+	movwf PREINC0,0
+	movlw HIGH(TXB0CON)
+	movwf PREINC0,0
+	call tx0_GT_txn
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	bsf INDF1,3,0
+	return
+
+wait_timer0
+	clrf PREINC0,0
+	movlw HIGH(0x400)
+	movwf PREINC0,0
+	comf POSTDEC0,1,0
+	negf POSTINC0,0
+	movlw 0
+	addwfc INDF0,1,0
+	movff POSTDEC0,(TMR0L+1)
+	movff POSTDEC0,TMR0L
+	bcf INTCON,2,0
+_lbl___545
+	btfsc INTCON,2,0
+	return
+	bra _lbl___545
+
+_4_measures
+	clrf PREINC0,0
+	clrf PREINC0,0
+	movlw 4
+	movwf PREINC2,0
+_lbl___563
+	bsf ADCON0,2,0
+_lbl___565
+	btfsc ADCON0,2,0
+	bra _lbl___565
+	movff ADRESL,PREINC0
+	movff (ADRESL+1),PREINC0
+	call op_plus
+	decfsz INDF2,1,0
+	bra _lbl___563
+	movf POSTDEC2,1,0
+	return
+
+read_from_eeprom
+	clrf PREINC0,0
+	movlw HIGH(cream_white_threshold_eeprom)
+	movwf PREINC0,0
+	call op_fetch_tos
+	movff POSTDEC0,(cream_white_threshold+1)
+	movff POSTDEC0,cream_white_threshold
+	movlw LOW(brown_cream_threshold_eeprom)
+	movwf PREINC0,0
+	movlw HIGH(brown_cream_threshold_eeprom)
+	movwf PREINC0,0
+	call op_fetch_tos
+	movff POSTDEC0,(brown_cream_threshold+1)
+	movff POSTDEC0,brown_cream_threshold
+	return
+
+pause
+	btfss PIR1,5,0
+	bra pause
+	movf RCREG,0,0
+	return
+
+step
+	movlw -1
+	btfss RXB0CON,7,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	lfsr 1,RXB1CON
+	movlw -1
+	btfss INDF1,7,0
+	addlw 1
+	movwf PREINC0,0
+	movwf PREINC0,0
+	call or
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfss STATUS,2,0
+	call can_handle_message
+	call maybe_send_colors
+	movlw 4
+	movwf PREINC2,0
+_lbl___772
+	movlw LOW((serial_dump_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((serial_dump_str+0x8000))
+	movwf PREINC0,0
+	movlw 8
+	call type
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call _
+	movlw LOW((serial_dump_str__1+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((serial_dump_str__1+0x8000))
+	movwf PREINC0,0
+	movlw 2
+	call type
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	movlw LOW(current_colors)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(current_colors)
+	addwfc INDF0,1,0
+	call op_cfetch_tos
+	call print_color
+	movlw LOW((serial_dump_str__2+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((serial_dump_str__2+0x8000))
+	movwf PREINC0,0
+	movlw 2
+	call type
+	movff INDF2,PREINC0
+	clrf PREINC0,0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	movlw LOW(current_values)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(current_values)
+	addwfc INDF0,1,0
+	call op_fetch_tos
+	call _
+	movlw LOW((serial_dump_str__3+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((serial_dump_str__3+0x8000))
+	movwf PREINC0,0
+	movlw 1
+	call type
+	call cr
+	decfsz INDF2,1,0
+	bra _lbl___772
+	movf POSTDEC2,1,0
+	btfss PIR1,5,0
+	return
+_lbl___783
+	btfss PIR1,5,0
+	bra _lbl___783
+	movff RCREG,PREINC0
+	clrf PREINC0,0
+	movlw 109
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfss STATUS,2,0
+	return
+_lbl___791
+	btfss PIR1,5,0
+	bra _lbl___791
+	movff RCREG,PREINC0
+	clrf PREINC0,0
+	call handle_key
+	bra _lbl___791
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+temp_x2 equ 0x2
+
+can_msg equ 0x12
+
+can_msg_0 equ 0x12
+
+can_msg_1 equ 0x13
+
+can_msg_2 equ 0x14
+
+can_msg_3 equ 0x15
+
+can_msg_4 equ 0x16
+
+can_msg_6 equ 0x18
+
+can_msg_length equ 0x1a
+
+can_msg_flags equ 0x1b
+
+can_buffer equ 0x1c
+
+can_offset equ 0x1d
+
+can_arbitration equ 0x1e
+
+can_flags equ 0x20
+
+calibrated_QM_ equ 0x100
+
+current_values equ 0x102
+
+current_value_0 equ 0x102
+
+current_value_1 equ 0x104
+
+current_value_2 equ 0x106
+
+current_value_3 equ 0x108
+
+current_colors equ 0x10a
+
+current_color_0 equ 0x10a
+
+current_color_1 equ 0x10b
+
+current_color_2 equ 0x10c
+
+current_color_3 equ 0x10d
+
+previous_colors equ 0x10e
+
+cream_white_threshold_eeprom equ 0x1000
+
+brown_cream_threshold_eeprom equ 0x1002
+
+brown_cream_threshold equ 0x112
+
+cream_white_threshold equ 0x114
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+brown_detected_str
+	db 98,114,111,119,110,32,100,101
+	db 116,101,99,116,101,100
+
+white_detected_str
+	db 119,104,105,116,101,32,100,101
+	db 116,101,99,116,101,100
+
+cream_detected_str
+	db 99,114,101,97,109,32,100,101
+	db 116,101,99,116,101,100
+
+can_unknown_msg_str
+	db 85,110,107,110,111,119,110,32
+	db 67,65,78,32,109,101,115,115
+	db 97,103,101,32,119,105,116,104
+	db 32,97,114,98,105,116,114,97
+	db 116,105,111,110,32
+
+can_unknown_msg_str__1
+	db 32,97,110,100,32
+
+can_unknown_msg_str__2
+	db 110,111,32
+
+can_unknown_msg_str__3
+	db 82,84,82
+
+print_color_str
+	db 117,110,107,110,111,119,110
+
+print_color_str__1
+	db 99,114,101,97,109
+
+print_color_str__2
+	db 98,114,111,119,110
+
+print_color_str__3
+	db 119,104,105,116,101
+
+print_color_str__4
+	db 60,105,110,116,101,114,110,97
+	db 108,32,101,114,114,111,114,62
+
+serial_dump_str
+	db 67,104,97,110,110,101,108,32
+
+serial_dump_str__1
+	db 58,32
+
+serial_dump_str__2
+	db 32,40
+
+serial_dump_str__3
+	db 41
+
+print_usage_str
+	db 85,115,97,103,101,58
+
+print_usage_str__1
+	db 32,32,32,115,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,101,120,101,99,117
+	db 116,101,32,115,116,101,112
+
+print_usage_str__2
+	db 32,32,32,48,46,46,46,51
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,112,114,105,110,116
+	db 32,65,47,68,32,118,97,108
+	db 117,101,32,102,111,114,32,99
+	db 104,97,110,110,101,108,32,120
+
+print_usage_str__3
+	db 32,32,32,100,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,112,114,105,110,116
+	db 32,115,116,97,99,107,39,115
+	db 32,100,101,112,116,104
+
+print_usage_str__4
+	db 32,32,32,76,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,116,111,103,103,108
+	db 101,32,116,104,101,32,115,101
+	db 110,115,111,114,115,39,32,108
+	db 101,100,115
+
+print_usage_str__5
+	db 32,32,32,108,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,67,65,78,32,108
+	db 111,111,112,98,97,99,107,32
+	db 109,111,100,101,32,111,110
+
+print_usage_str__6
+	db 32,32,32,107,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,67,65,78,32,108
+	db 111,111,112,98,97,99,107,32
+	db 111,102,102
+
+print_usage_str__7
+	db 32,32,32,114,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,83,101,110,100,32
+	db 97,32,67,65,78,32,99,111
+	db 109,109,97,110,100,32,116,111
+	db 32,114,101,113,117,101,115,116
+	db 32,118,97,108,117,101,115
+
+print_usage_str__8
+	db 32,32,32,99,32,32,32,32
+	db 32,32,32,32,32,32,32,32
+	db 32,32,32,83,101,110,100,32
+	db 97,32,67,65,78,32,99,111
+	db 109,109,97,110,100,32,116,111
+	db 32,114,101,113,117,101,115,116
+	db 32,99,111,108,111,114,32,118
+	db 97,108,117,101,115
+
+print_usage_str__9
+	db 32,32,32,113,32,32,32,32
+	db 32,32,32,82,101,99,97,108
+	db 105,98,114,97,116,101
+
+calibration_str
+	db 83,101,110,115,111,114,115,32
+	db 111,110,32,66,82,79,87,78
+	db 32,40,112,114,101,115,115,32
+	db 97,32,107,101,121,32,119,104
+	db 101,110,32,114,101,97,100,121
+	db 41
+
+calibration_str__1
+	db 83,101,110,115,111,114,115,32
+	db 111,110,32,67,82,69,65,77
+	db 32,40,112,114,101,115,115,32
+	db 97,32,107,101,121,32,119,104
+	db 101,110,32,114,101,97,100,121
+	db 41
+
+calibration_str__2
+	db 83,101,110,115,111,114,115,32
+	db 111,110,32,87,72,73,84,69
+	db 32,40,112,114,101,115,115,32
+	db 97,32,107,101,121,32,119,104
+	db 101,110,32,114,101,97,100,121
+	db 41
+
+calibration_str__3
+	db 99,114,101,97,109,45,119,104
+	db 105,116,101,61
+
+calibration_str__4
+	db 98,114,111,119,110,45,99,114
+	db 101,97,109,61
+
+handle_key_str
+	db 67,104,97,110,110,101,108,48
+	db 32,58,32
+
+handle_key_str__1
+	db 67,104,97,110,110,101,108,49
+	db 32,58,32
+
+handle_key_str__2
+	db 67,104,97,110,110,101,108,50
+	db 32,58,32
+
+handle_key_str__3
+	db 67,104,97,110,110,101,108,51
+	db 32,58,32
+
+handle_key_str__4
+	db 67,97,108,105,98,114,97,116
+	db 105,111,110,32
+
+handle_key_str__5
+	db 83,116,97,99,107,39,115,32
+	db 100,101,112,116,104,32,58,32
+
+handle_key_str__6
+	db 76,111,111,112,98,97,99,107
+	db 32,111,110
+
+handle_key_str__7
+	db 76,111,111,112,98,97,99,107
+	db 32,111,102,102
+
+handle_key_str__8
+	db 83,101,110,115,111,114,115,39
+	db 32,108,101,100,115,32,116,111
+	db 103,103,108,101,100
+
+greetings_str
+	db 87,101,108,99,111,109,101,32
+	db 116,111,32,116,104,101,32,115
+	db 101,110,115,111,114,115,32,112
+	db 114,111,103,114,97,109
+
+END

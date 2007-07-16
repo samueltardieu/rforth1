@@ -1,0 +1,45 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	goto _high
+	org 0x2018
+	goto _low
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlb 1
+	clrf (a+1),1
+	clrf a,1
+	clrf w_save,1
+
+main
+	return
+
+_high
+	clrf (a+1),1
+	movlw 1
+	movwf a,1
+	retfie 1
+
+_low
+	movwf w_save,1
+	clrf (a+1),1
+	movlw 2
+	movwf a,1
+	movf w_save,0,1
+	retfie 0
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+a equ 0x100
+
+w_save equ 0x102
+
+END

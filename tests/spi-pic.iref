@@ -1,0 +1,380 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+TBLPTRU equ 0xff8
+
+TBLPTRH equ 0xff7
+
+TBLPTRL equ 0xff6
+
+TABLAT equ 0xff5
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+INDF1 equ 0xfe7
+
+FSR1H equ 0xfe2
+
+FSR1L equ 0xfe1
+
+POSTINC2 equ 0xfde
+
+POSTDEC2 equ 0xfdd
+
+PREINC2 equ 0xfdc
+
+FSR2H equ 0xfda
+
+FSR2L equ 0xfd9
+
+STATUS equ 0xfd8
+
+SSPBUF equ 0xfc9
+
+SSPSTAT equ 0xfc7
+
+SSPCON1 equ 0xfc6
+
+EEADR equ 0xfa9
+
+EEDATA equ 0xfa8
+
+EECON2 equ 0xfa7
+
+EECON1 equ 0xfa6
+
+PIR2 equ 0xfa1
+
+PIR1 equ 0xf9e
+
+TRISC equ 0xf94
+
+TRISA equ 0xf92
+
+PORTA equ 0xf80
+
+write_command equ 0x0
+
+read_command equ 0x1
+
+bit_change_command equ 0x2
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+table_addr_EX_
+	clrf TBLPTRU,0
+	call _1_GT_2
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+init_runtime
+	movlb 1
+	clrf current_command,1
+	clrf current_mode,1
+	clrf (current_address+1),1
+	clrf current_address,1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	bcf TRISC,5,0
+	bsf TRISC,3,0
+	bsf TRISA,5,0
+	movlw 0x40
+	movwf SSPSTAT,0
+	movlw 0x24
+	movwf SSPCON1,0
+_lbl___509
+	call handle_command
+	bra _lbl___509
+
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_addr_EX_
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+op_cstore
+	btfsc INDF0,4,0
+	goto eepromc_EX_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movf POSTDEC0,0,0
+	movff POSTDEC0,INDF1
+	return
+
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+xor
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	xorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	xorwf INDF0,1,0
+	return
+
+_1_GT_2
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	return
+
+flashc_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	bsf EECON1,0,0
+	movff EEDATA,PREINC0
+	clrf PREINC0,0
+	return
+
+eepromc_EX_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	movf POSTDEC0,0,0
+	movff POSTDEC0,EEDATA
+	bsf EECON1,2,0
+	movlw 0x55
+	movwf EECON2,0
+	movlw 0xaa
+	movwf EECON2,0
+	bsf EECON1,1,0
+_lbl___217
+	btfsc EECON1,1,0
+	bra _lbl___217
+	bcf EECON1,2,0
+	bcf PIR2,4,0
+	return
+
+receive_byte
+	btfss PIR1,3,0
+	bra receive_byte
+	movff SSPBUF,PREINC0
+	clrf PREINC0,0
+	return
+
+send_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
+_lbl___455
+	call op_dup
+	call op_cfetch_tos
+_lbl___456
+	btfss PORTA,5,0
+	bra _lbl___457
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+_lbl___457
+	btfsc PIR1,3,0
+	bra _lbl___456
+	movf POSTDEC0,0,0
+	movff POSTDEC0,SSPBUF
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	bra _lbl___455
+
+receive_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
+_lbl___464
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+_lbl___466
+	btfss PORTA,5,0
+	bra _lbl___467
+	movf POSTDEC2,1,0
+	movf POSTDEC2,1,0
+	return
+_lbl___467
+	btfss PIR1,3,0
+	bra _lbl___466
+	movff SSPBUF,PREINC0
+	clrf PREINC0,0
+	movff POSTDEC2,PREINC0
+	movff POSTINC2,PREINC0
+	call op_cstore
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	bra _lbl___464
+
+receive_masks_bytes
+	movff current_address,PREINC0
+	movff (current_address+1),PREINC0
+_lbl___475
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+_lbl___477
+	btfss PORTA,5,0
+	bra _lbl___478
+	movf POSTDEC2,1,0
+	movf POSTDEC2,1,0
+	return
+_lbl___478
+	btfss PIR1,3,0
+	bra _lbl___477
+	movff SSPBUF,PREINC0
+	clrf PREINC0,0
+	comf POSTDEC0,1,0
+	comf POSTINC0,1,0
+	movff POSTDEC2,PREINC0
+	movff POSTINC2,PREINC0
+	call op_cfetch_tos
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	andwf POSTINC0,1,0
+	movf temp_x1,0,0
+	andwf INDF0,1,0
+_lbl___484
+	btfss PORTA,5,0
+	bra _lbl___485
+	movf POSTDEC2,1,0
+	movf POSTDEC2,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+_lbl___485
+	btfss PIR1,3,0
+	bra _lbl___484
+	movff SSPBUF,PREINC0
+	clrf PREINC0,0
+	movff POSTDEC0,temp_x1
+	movf POSTDEC0,0,0
+	movf POSTDEC0,1,0
+	iorwf POSTINC0,1,0
+	movf temp_x1,0,0
+	iorwf INDF0,1,0
+	movff POSTDEC2,PREINC0
+	movff POSTINC2,PREINC0
+	call op_cstore
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	bra _lbl___475
+
+handle_command
+	call receive_byte
+	call receive_byte
+	movf POSTDEC0,0,0
+	movff POSTDEC0,current_address
+	call receive_byte
+	movf POSTDEC0,0,0
+	movff POSTDEC0,(1+current_address)
+	call op_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___494
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto send_bytes
+_lbl___494
+	call op_dup
+	movlw read_command
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___497
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	goto receive_bytes
+_lbl___497
+	call op_dup
+	movlw bit_change_command
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___500
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call receive_masks_bytes
+_lbl___500
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+current_command equ 0x100
+
+current_mode equ 0x101
+
+current_address equ 0x102
+
+END

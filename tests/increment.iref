@@ -1,0 +1,36 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlb 1
+	clrf (a+1),1
+	clrf a,1
+	clrf (b+1),1
+	clrf b,1
+
+main
+	infsnz a,1
+	incf (a+1),1
+	infsnz b,1
+	incf (b+1),1
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+a equ 0x100
+
+b equ 0x102
+
+END

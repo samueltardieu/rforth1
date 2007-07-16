@@ -1,0 +1,372 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+TBLPTRU equ 0xff8
+
+TBLPTRH equ 0xff7
+
+TBLPTRL equ 0xff6
+
+TABLAT equ 0xff5
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+INDF1 equ 0xfe7
+
+FSR1H equ 0xfe2
+
+FSR1L equ 0xfe1
+
+INDF2 equ 0xfdf
+
+POSTDEC2 equ 0xfdd
+
+PREINC2 equ 0xfdc
+
+FSR2H equ 0xfda
+
+FSR2L equ 0xfd9
+
+STATUS equ 0xfd8
+
+TXREG equ 0xfad
+
+EEADR equ 0xfa9
+
+EEDATA equ 0xfa8
+
+EECON1 equ 0xfa6
+
+PIR1 equ 0xf9e
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlb 1
+	clrf (x+1),1
+	clrf x,1
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	movlw LOW(0x1234)
+	movwf PREINC0,0
+	movlw HIGH(0x1234)
+	movwf PREINC0,0
+	call tests
+	movlw LOW(0x20ff)
+	movwf PREINC0,0
+	movlw HIGH(0x20ff)
+	movwf PREINC0,0
+	call tests
+	clrf PREINC0,0
+	movlw HIGH(0x2000)
+	movwf PREINC0,0
+
+tests
+	movlw LOW((init_str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((init_str+0x8000))
+	movwf PREINC0,0
+	movlw 5
+	call type
+	call op_dup
+	call _
+	call cr
+	movff POSTDEC0,(x+1)
+	movff POSTDEC0,x
+	movlw LOW((test1_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test1_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test2_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test2_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movlw LOW(2)
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH(2)
+	addwfc INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test1__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test1__str+0x8000))
+	movwf PREINC0,0
+	movlw 9
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movlw LOW((-1))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-1))
+	addwfc INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test2__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test2__str+0x8000))
+	movwf PREINC0,0
+	movlw 10
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movlw LOW((-2))
+	movf POSTDEC0,1,0
+	addwf POSTINC0,1,0
+	movlw HIGH((-2))
+	addwfc INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test100_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test100_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	incf INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test200_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test200_PL__str+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movlw HIGH(0x200)
+	addwf INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test100__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test100__str+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	decf INDF0,1,0
+	call _
+	call cr
+	movlw LOW((test200__str+0x8000))
+	movwf PREINC0,0
+	movlw HIGH((test200__str+0x8000))
+	movwf PREINC0,0
+	movlw 12
+	call type
+	movff x,PREINC0
+	movff (x+1),PREINC0
+	movlw HIGH((-0x200))
+	addwf INDF0,1,0
+	call _
+
+cr
+	movlw 0xa
+	call emit
+	movlw 0xd
+
+emit
+	btfss PIR1,4,0
+	bra emit
+	movwf TXREG,0
+	return
+
+_
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call emit_8
+
+emit_8
+	call op_dup
+	movf POSTDEC0,0,0
+	swapf POSTINC0,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	call emit
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	andlw 0xf
+	addlw 0xf6
+	btfsc STATUS,0,0
+	addlw 7
+	addlw 0x3a
+	goto emit
+
+table_addr_EX_
+	clrf TBLPTRU,0
+	movf INDF0,0,0
+	clrf INDF0,0
+	movwf PREINC0,0
+	clrf PREINC0,0
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRH
+	movf POSTDEC0,0,0
+	movff POSTDEC0,TBLPTRL
+	bcf EECON1,6,0
+	return
+
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+	bra table_addr_EX_
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+op_cfetch_tos
+	btfsc INDF0,7,0
+	goto flashc_AT_
+	btfsc INDF0,4,0
+	goto eepromc_AT_
+	movff POSTDEC0,FSR1H
+	movff POSTDEC0,FSR1L
+	movff INDF1,PREINC0
+	clrf PREINC0,0
+	return
+
+flashc_AT_
+	call flash_addr_EX_
+	tblrd*+
+	movff TABLAT,PREINC0
+	clrf PREINC0,0
+	return
+
+eeprom_addr_EX_
+	movwf EEADR,0
+	bcf EECON1,7,0
+	bcf EECON1,6,0
+	return
+
+eepromc_AT_
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call eeprom_addr_EX_
+	bsf EECON1,0,0
+	movff EEDATA,PREINC0
+	clrf PREINC0,0
+	return
+
+type
+	movwf PREINC2,0
+	iorlw 0
+	bz _lbl___260
+_lbl___262
+	call op_dup
+	call op_cfetch_tos
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call emit
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	decfsz INDF2,1,0
+	bra _lbl___262
+_lbl___260
+	movf POSTDEC2,1,0
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+x equ 0x100
+
+;---------------------------------------------------------
+; Section: static data
+;---------------------------------------------------------
+
+init_str
+	db 120,32,60,45,32
+
+test1_PL__str
+	db 120,32,64,32,49,43,32,61
+	db 32
+
+test2_PL__str
+	db 120,32,64,32,50,32,43,32
+	db 61,32
+
+test1__str
+	db 120,32,64,32,49,45,32,61
+	db 32
+
+test2__str
+	db 120,32,64,32,50,32,45,32
+	db 61,32
+
+test100_PL__str
+	db 120,32,64,32,49,48,48,32
+	db 43,32,61,32
+
+test200_PL__str
+	db 120,32,64,32,50,48,48,32
+	db 43,32,61,32
+
+test100__str
+	db 120,32,64,32,49,48,48,32
+	db 45,32,61,32
+
+test200__str
+	db 120,32,64,32,50,48,48,32
+	db 45,32,61,32
+
+END

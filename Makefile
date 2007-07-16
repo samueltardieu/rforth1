@@ -5,6 +5,8 @@ TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
             tests/lshift.cmp tests/interrupts2.cmp tests/address_of.cmp \
             tests/cfor.cmp tests/switchw.cmp tests/retlw.cmp
 
+ITESTCASES = ${TESTCASES:.cmp=.icmp}
+
 COMPILER = rforth.py
 
 PREDEFINED = lib/core.fs lib/sfrnames.fs lib/primitives.fs lib/arithmetic.fs \
@@ -21,7 +23,7 @@ PYTHON ?= python
 TEXI2PDF ?= texi2pdf
 TEXI2HTML ?= texi2html
 
-tests: ${TESTCASES}
+tests: ${TESTCASES} ${ITESTCASES}
 
 never::
 
@@ -51,10 +53,18 @@ clean:
 	${MAKE} ${@:.cmp=.asm} OPTS="--no-comments" 2> /dev/null
 	diff -u ${@:.cmp=.ref} ${@:.cmp=.asm}
 
+%.icmp: %.iref never
+	${RM} ${@:.icmp=.asm}
+	${MAKE} ${@:.icmp=.asm} OPTS="--no-comments -a" 2> /dev/null
+	diff -u ${@:.icmp=.iref} ${@:.icmp=.asm}
+
 %.newref: never
 	${RM} ${@:.newref=.asm}
 	${MAKE} ${@:.newref=.asm} OPTS="--no-comments" 2> /dev/null
 	cp -p ${@:.newref=.asm} ${@:.newref=.ref}
+	${RM} ${@:.newref=.asm}
+	${MAKE} ${@:.newref=.asm} OPTS="--no-comments -a" 2> /dev/null
+	cp -p ${@:.newref=.asm} ${@:.newref=.iref}
 
 %.load: %.hex
 	${PYTHON} utils/monitor.py --program --port=${PORT} --speed=${SPEED} $<
