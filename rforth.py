@@ -163,6 +163,9 @@ def eeprom_addr(addr):
 def is_static_push(opcode):
   return opcode[0] == 'OP_PUSH' and opcode[1][0].static_value() is not None
 
+def is_ram_fetch(opcode):
+  return opcode[0] == 'OP_FETCH' and ram_addr(opcode[1][0])
+
 class Named:
 
   immediate = True
@@ -2621,11 +2624,17 @@ class Compiler:
       name, params = self.last_instruction()
       self.rewind()
       self.add_instruction('lfsr', [Number(fsr), params[0]])
+    elif is_ram_fetch(self.last_instruction()):
+      name, params = self.last_instruction()
+      self.rewind()
+      self.add_instruction('movff', [params[0], self['FSR%dL' % fsr]])
+      self.add_instruction('movff', [Add(params[0], Number(1)),
+                                     self['FSR%dH' % fsr]])
     else:
       self.add_instruction('movff', [self['POSTDEC0'],
-                                      self['FSR%dH' % fsr]])
+                                     self['FSR%dH' % fsr]])
       self.add_instruction('movff', [self['POSTDEC0'],
-                                      self['FSR%dL' % fsr]])
+                                     self['FSR%dL' % fsr]])
     
   def last_instruction(self):
     try:
