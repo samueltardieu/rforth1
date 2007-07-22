@@ -2639,13 +2639,13 @@ class Compiler:
   def last_instruction(self):
     try:
       return self.current_object.opcodes[-1]
-    except:
+    except IndexError:
       return None, []
 
   def before_last_instruction(self):
     try:
       return self.current_object.opcodes[-2]
-    except:
+    except IndexError:
       return None, []
     
   def rewind(self):
