@@ -1646,7 +1646,7 @@ class Word(Named, LiteralValue):
              self.opcodes[o+1][1][0] == no_fast:
         # Replace call by goto and skip over return
         target = self.opcodes[o][1][0]
-        if isinstance(target, Label):
+        if isinstance(target, Label) or target == self:
           new.append(('bra', [target]))
         else:
           new.append(('goto', [target]))
@@ -1854,15 +1854,20 @@ class Word(Named, LiteralValue):
     self.opcodes = new
 
   def replace_label(self, source, target):
+    """Replace a goto/bra to the source label by a bra to the target and
+    a call to the source by a call to the target."""
     for i in range(len(self.opcodes)):
-      if self.opcodes[i] == ('goto', [source]):
-        self.opcodes[i] = ('goto', [target])
-      elif self.opcodes[i] == ('bra', [source]):
+      if self.opcodes[i][0] in ['goto', 'bra'] and \
+          self.opcodes[i][1][0] == source:
         self.opcodes[i] = ('bra', [target])
+      elif self.opcodes[i][0] == 'call' and \
+          self.opcodes[i][1][0] == source:
+        self.opcodes[i] = ('call', [target] + self.opcodes[i][1][1:])
 
   def optimize_duplicate_labels(self):
     """If two labels follow each other, use the first one in place of
-    the second one to ease reading by a human."""
+    the second one to ease reading by a human. Do the same thing if
+    a label is the first line of a word."""
     # If first instruction is a label, dismiss it
     if self.opcodes[0][0] == 'LABEL':
       self.replace_label(self.opcodes[0][1][0], self)

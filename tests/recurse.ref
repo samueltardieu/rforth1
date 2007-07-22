@@ -41,8 +41,7 @@ bar
 	call foo
 
 foo
-_lbl___433
-	call _lbl___433
+	call foo
 	bra foo
 
 _GT__EQ_
@@ -97,7 +96,6 @@ _lbl___452
 _lbl___453
 
 fact
-_lbl___445
 	call op_dup
 	movlw 1
 	movwf PREINC0,0
@@ -113,7 +111,7 @@ _lbl___445
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _lbl___445
+	call fact
 
 op__ST_
 	movff POSTDEC0,(temp_x1+1)
@@ -165,9 +163,8 @@ _2dupxor_GT_w
 	return
 
 bar2
-_lbl___440
-	call _lbl___440
-	call _lbl___440
+	call bar2
+	call bar2
 _lbl___442
 	call _lbl___442
 	bra _lbl___442

@@ -64,26 +64,24 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-foo
-_lbl___435
-	call _lbl___435
-	bra foo
-
 init_runtime
 	movlw 0x5f
 	movwf FSR0L,0
 	clrf FSR0H,0
 
 main
-	call foo
-	call foo
-_lbl___457
-	call _lbl___457
-	call _lbl___457
-_lbl___458
-	call _lbl___458
-	call _lbl___458
+	call main
+	call main
 _lbl___460
+	call _lbl___460
+	call _lbl___460
+_lbl___463
+	call _lbl___463
+	call _lbl___463
+_lbl___464
+	call _lbl___464
+	call _lbl___464
+_lbl___466
 	call op_dup
 	movlw 1
 	movwf PREINC0,0
@@ -91,17 +89,16 @@ _lbl___460
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___461
+	bz _lbl___467
 	call op_dup
 	movlw LOW((-1))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _lbl___460
+	call _lbl___466
 	call op__ST_
-_lbl___461
-_lbl___463
+_lbl___467
 	call op_dup
 	movlw 1
 	movwf PREINC0,0
@@ -117,7 +114,7 @@ _lbl___463
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _lbl___463
+	call _lbl___467
 
 op__ST_
 	movff POSTDEC0,(temp_x1+1)
