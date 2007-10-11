@@ -17,13 +17,18 @@
 
 needs lib/tty-rs232.fs
 
-create channels 512 allot
 variable highest
 variable index
 variable current
 cvariable step
 variable assignment-device
 cvariable assignment-value
+
+\ It is best to create this large area in the last position to allow
+\ other variables to be placed in bank 1 which is addressable through
+\ the BSR. Access to channels are always indirect so this can only
+\ be a net gain.
+create channels 512 allot
 
 PORTB 0 bit DMXOUT
 
