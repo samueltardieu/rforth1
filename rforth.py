@@ -1384,7 +1384,7 @@ def run():
 
 @register('no-inline')
 def run():
-  compiler.current_object.not_inlineable = True
+  compiler.current_object.not_inlinable = True
 
 @register('low-interrupt')
 def run():
@@ -2471,9 +2471,11 @@ class Compiler:
       else:
         # If this words ends with a goto to a word already in r and the
         # previous word is not a fallback, insert it before and remove the
-        # final instruction to get a fallback.
+        # final instruction to get a fallthrough. However, if a word is
+        # explicitely mark as not being inlinable, do not fall through it
+        # as it may have been done for timing reasons.
         name, params = i.opcodes[-1]
-        if name == 'goto' and params[0] in r:
+        if name == 'goto' and params[0] in r and not params[0].not_inlinable:
           n = r.index(params[0])
           if n == 0 or last_goto(r[n-1]):
             del i.opcodes[-1]
