@@ -96,14 +96,14 @@ PORTB 0 bit DMXOUT
 
 : set-output ( b -- ) if DMXOUT bit-set else DMXOUT bit-clr then ;
 
-\ Set output line according to high bit of W and shift it left in 10 cycles
+\ Set output line according to low bit of W and shift it right in 10 cycles
 \ 8 cycles are used before bit is set on the line and 2 after for return
 
 : set-zero ( -- ) nop DMXOUT bit-clr ; no-inline
 : set-one ( -- ) DMXOUT bit-set ; no-inline
 
 code set-bit
-  WREG ,w ,a rlcf
+  WREG ,w ,a rrcf
   C ,a btfss
   set-zero goto
   set-one goto
@@ -159,7 +159,7 @@ code set-bit
   set-bit     \ 2 + 30 + 8 = 40, 2 elapsed
   nop30
   set-bit     \ 2 + 30 + 8 = 40, 2 elapsed
-  1 >w        \ 2 + 1 = 3
+  255 >w      \ 2 + 1 = 3
   nop29
   set-bit     \ 2 + 1 + 29 + 8 = 40, 2 elapsed
   transmit-stop
