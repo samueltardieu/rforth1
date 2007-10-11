@@ -30,10 +30,9 @@ PORTB 0 bit DMXOUT
 : set-channel ( data channel -- ) channels 1 - + c! ;
 
 : reset-channels ( -- )
+  255 cfor 0 cr@ 2dup set-channel 256 + set-channel cnext
   0 0 set-channel
-  255 cfor 0 cr@ set-channel cnext
   0 256 set-channel
-  255 cfor 0 cr@ 256 + set-channel cnext
   0 highest !
 ;
 
