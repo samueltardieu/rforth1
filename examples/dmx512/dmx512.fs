@@ -30,7 +30,7 @@ cvariable assignment-value         \ Value to set to channel (state machine)
 \ be a net gain.
 create channels 512 allot
 
-PORTB 0 bit DMXOUT                 \ Shortcut to the port to use
+LATB 0 bit DMXOUT                  \ Shortcut to the port to use
 
 \ Set a channel to a given value
 : set-channel ( value channel -- ) channels 1- + c! ;
