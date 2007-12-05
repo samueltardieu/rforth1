@@ -13,40 +13,50 @@
 @node Top, Introduction, (dir), (dir)
 
 @menu
-* Introduction::                
-* Prerequisites::               
-* Conventions::                 
+* Introduction::
+* Conventions::
 
 @detailmenu
  --- The Detailed Node Listing ---
 
+Introduction
+
+* Prerequisites::
+
 Conventions
 
-* Integer literals::            
-* Bit operations::              
-* Declaring variables::         
+* Integer literals::
+* Bit operations::
+* Declaring variables::
+* Declaring constants::
 
 @end detailmenu
 @end menu
 
-@node Introduction, Prerequisites, Top, Top
+@node Introduction, Conventions, Top, Top
 @chapter Introduction
 
 rforth1 is a 16 bits Forth compiler for Microchip PIC18Fxyz microcontrollers
-family, where @code{x} is @code{4} or @code{5}.
+family, where @code{x} is @code{2}, @code{4}, or @code{5}.
 
-@node Prerequisites, Conventions, Introduction, Top
+@menu
+* Prerequisites::
+@end menu
+
+@node Prerequisites,  , Introduction, Introduction
 @section Prerequisites
 
-To run rforth1, you need to have Python 2.3 or greater installed.
+To run rforth1, you need to have Python 2.4 or greater installed as well
+as the gputils package for the gpasm program.
 
-@node Conventions,  , Prerequisites, Top
+@node Conventions,  , Introduction, Top
 @chapter Conventions
 
 @menu
-* Integer literals::            
-* Bit operations::              
-* Declaring variables::         
+* Integer literals::
+* Bit operations::
+* Declaring variables::
+* Declaring constants::
 @end menu
 
 @node Integer literals, Bit operations, Conventions, Conventions
@@ -93,11 +103,41 @@ led bit-set
 @end example
 to manipulate the individual bit.
 
-@node Declaring variables,  , Bit operations, Conventions
+@node Declaring constants,  , Declaring variables, Conventions
+@section Declaring constants
+
+Constants are declared using @code{constant}. Constants are propagated
+throughout the compilation process and do not require any extra memory.
+
+@example
+10 constant x
+x                 \ Push 10
+@end example
+
+@node Declaring variables, Declaring constants, Bit operations, Conventions
 @section Declaring variables
 
-16 bits variables may be declared using the @code{variable} defining word.
-8 bits variables may be declared using the @code{cvariable} defining word.
+Variables are declared using @code{variable} (16 bits) or
+@code{cvariable} (8 bits). Variables are initialized to zero when the
+program starts.
+
+@example
+variable x
+cvariable c
+x @@               \ Push the content of x
+0x7f x !          \ Set x content to 7f (hexa)
+c c@@              \ Push the content of c
+3 x c!            \ Set c content to 3
+@end example
+
+16 bits variables with an initial value are declared using @code{value}
+and then modified using @code{to}.
+
+@example
+10 value x
+x                 \ Push the content of x
+127 to x          \ Set x content to 127
+@end example
 
 @contents
 @bye
