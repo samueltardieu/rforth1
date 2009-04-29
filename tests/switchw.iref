@@ -91,20 +91,20 @@ main
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___519
+	bra _lbl___525
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
 	call op_zeroeq
-	bra _lbl___522
-_lbl___519
+	bra _lbl___528
+_lbl___525
 	call op_minus
 	call _0_LT_
 	call op_zeroeq
-_lbl___522
+_lbl___528
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___523
+	bz _lbl___529
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 223
@@ -115,18 +115,18 @@ _lbl___522
 	addwf POSTINC0,1,0
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
-	bra _lbl___524
-_lbl___523
+	bra _lbl___530
+_lbl___529
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-48))
 	addwfc INDF0,1,0
-_lbl___524
+_lbl___530
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	xorlw 0
-	bnz _lbl___527
+	bnz _lbl___533
 	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str+0x8000))
@@ -134,9 +134,9 @@ _lbl___524
 	movlw 3
 	call type
 	bra main
-_lbl___527
+_lbl___533
 	xorlw 1
-	bnz _lbl___528
+	bnz _lbl___534
 	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__1+0x8000))
@@ -144,9 +144,9 @@ _lbl___527
 	movlw 3
 	call type
 	bra main
-_lbl___528
+_lbl___534
 	xorlw 3
-	bnz _lbl___529
+	bnz _lbl___535
 	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__2+0x8000))
@@ -154,7 +154,7 @@ _lbl___528
 	movlw 3
 	call type
 	bra main
-_lbl___529
+_lbl___535
 	movlw LOW((handle_key_str__3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__3+0x8000))
@@ -256,8 +256,8 @@ eepromc_AT_
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___251
-_lbl___253
+	bz _lbl___257
+_lbl___259
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -267,8 +267,8 @@ _lbl___253
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___253
-_lbl___251
+	bra _lbl___259
+_lbl___257
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

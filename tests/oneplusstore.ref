@@ -136,9 +136,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___205
+_lbl___211
 	btfsc EECON1,1,0
-	bra _lbl___205
+	bra _lbl___211
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return

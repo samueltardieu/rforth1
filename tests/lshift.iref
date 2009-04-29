@@ -60,15 +60,15 @@ main
 	movff (a+1),PREINC0
 	movf b,0,1
 	movwf PREINC2,0
-	bz _lbl___425
-_lbl___427
+	bz _lbl___431
+_lbl___433
 	bcf STATUS,0,0
 	movf POSTDEC0,0,0
 	rlcf POSTINC0,1,0
 	rlcf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___427
-_lbl___425
+	bra _lbl___433
+_lbl___431
 	movf POSTDEC2,1,0
 	movlw (3<<4)
 	movwf PREINC0,0

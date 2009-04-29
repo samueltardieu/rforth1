@@ -147,7 +147,7 @@ can_prepare_buffer
 	clrf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___465
+	bz _lbl___471
 	movlw can_msg
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -158,7 +158,7 @@ can_prepare_buffer
 	call tx0_GT_txn
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___465
+_lbl___471
 	movff can_arbitration,PREINC0
 	movff (can_arbitration+1),PREINC0
 	call _5_LT__LT_
@@ -218,7 +218,7 @@ main
 	call can_set_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___595
+_lbl___601
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -234,7 +234,7 @@ _lbl___595
 	movf POSTDEC0,0,0
 	call can_set_filter
 	decfsz INDF2,1,0
-	bra _lbl___595
+	bra _lbl___601
 	movf POSTDEC2,1,0
 	clrf PREINC0,0
 	clrf PREINC0,0
@@ -491,21 +491,21 @@ _4_SL_
 can_choose_buffer
 	lfsr 1,TXB0CON
 	btfsc INDF1,3,0
-	bra _lbl___459
+	bra _lbl___465
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto can_set_buffer
-_lbl___459
+_lbl___465
 	btfsc can_flags,0,0
 	bra can_choose_buffer
 	lfsr 1,TXB1CON
 	btfsc INDF1,3,0
-	bra _lbl___461
+	bra _lbl___467
 	movlw 1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	goto can_set_buffer
-_lbl___461
+_lbl___467
 	lfsr 1,TXB2CON
 	btfsc INDF1,3,0
 	bra can_choose_buffer
@@ -544,7 +544,7 @@ can_mode
 	iorwf INDF0,1,0
 	movf POSTDEC0,0,0
 	movff POSTDEC0,CANCON
-_lbl___483
+_lbl___489
 	call op_dup
 	movf CANSTAT,0,0
 	andlw 0xe0
@@ -553,7 +553,7 @@ _lbl___483
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___483
+	bnz _lbl___489
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
@@ -724,9 +724,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___261
+_lbl___267
 	btfsc EECON1,1,0
-	bra _lbl___261
+	bra _lbl___267
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
@@ -734,8 +734,8 @@ _lbl___261
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___314
-_lbl___316
+	bz _lbl___320
+_lbl___322
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -745,8 +745,8 @@ _lbl___316
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___316
-_lbl___314
+	bra _lbl___322
+_lbl___320
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -763,7 +763,7 @@ _s
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___320
+	bz _lbl___326
 	call op_dup
 	movlw 8
 	movwf PREINC0,0
@@ -781,18 +781,18 @@ _s
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___326
+	bra _lbl___332
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
-	bra _lbl___328
-_lbl___326
+	bra _lbl___334
+_lbl___332
 	call op_minus
 	call _0_LT_
-_lbl___328
+_lbl___334
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___330
+	bz _lbl___336
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((_s_str+0x8000))
@@ -804,12 +804,12 @@ _lbl___328
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___330
+_lbl___336
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___331
-_lbl___333
+	bz _lbl___337
+_lbl___339
 	movlw bl
 	call emit
 	movff INDF2,PREINC0
@@ -834,11 +834,11 @@ _lbl___333
 	call op_fetch_tos
 	call _
 	decfsz INDF2,1,0
-	bra _lbl___333
-_lbl___331
+	bra _lbl___339
+_lbl___337
 	movf POSTDEC2,1,0
 	return
-_lbl___320
+_lbl___326
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
@@ -860,7 +860,7 @@ memcpy_loop
 
 can_receive
 	btfss RXB0CON,7,0
-	bra _lbl___425
+	bra _lbl___431
 	movf RXB0DLC,0,0
 	andlw 0xf
 	movwf PREINC0,0
@@ -868,7 +868,7 @@ can_receive
 	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___427
+	bz _lbl___433
 	movlw LOW(RXB0D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB0D0)
@@ -878,7 +878,7 @@ can_receive
 	clrf PREINC0,0
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___427
+_lbl___433
 	clrf can_msg_flags,0
 	btfsc RXB0DLC,6,0
 	bsf can_msg_flags,0,0
@@ -889,7 +889,7 @@ _lbl___427
 	movff POSTDEC0,can_arbitration
 	bcf RXB0CON,7,0
 	return
-_lbl___425
+_lbl___431
 	lfsr 1,RXB1CON
 	btfss INDF1,7,0
 	bra can_receive
@@ -900,7 +900,7 @@ _lbl___425
 	movwf can_msg_length,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___434
+	bz _lbl___440
 	movlw LOW(RXB1D0)
 	movwf PREINC0,0
 	movlw HIGH(RXB1D0)
@@ -910,7 +910,7 @@ _lbl___425
 	clrf PREINC0,0
 	movf can_msg_length,0,0
 	call memcpy
-_lbl___434
+_lbl___440
 	clrf can_msg_flags,0
 	lfsr 1,RXB1DLC
 	btfsc INDF1,6,0

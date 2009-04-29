@@ -1,50 +1,20 @@
 	processor pic18f248
 	radix dec
 	org 0x2000
-	goto init_runtime
+	goto main
 	org 0x2008
 	reset
 	org 0x2018
 	reset
 
 ;---------------------------------------------------------
-; Section: constants
-;---------------------------------------------------------
-
-PCLATU equ 0xffb
-
-PCL equ 0xff9
-
-POSTDEC0 equ 0xfed
-
-PREINC0 equ 0xfec
-
-FSR0H equ 0xfea
-
-FSR0L equ 0xfe9
-
-;---------------------------------------------------------
 ; Section: code
 ;---------------------------------------------------------
 
-init_runtime
-	movlw 0x5f
-	movwf FSR0L,0
-	clrf FSR0H,0
+foo
+	return
 
 main
-	movlw LOW(foo)
-	movwf PREINC0,0
-	movlw HIGH(foo)
-	movwf PREINC0,0
-
-execute
-	clrf PCLATU,0
-	movff POSTDEC0,(PCL+1)
-	movf POSTDEC0,0,0
-	movwf PCL,0
-
-foo
 	return
 
 END
