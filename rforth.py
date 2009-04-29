@@ -730,6 +730,15 @@ def run():
 def run():
   compiler.push(compiler.find(compiler.parse_word()))
 
+@register('execute')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    compiler.rewind()
+    compiler.add_call(params[0])
+  else:
+    compiler['(execute)'].run()
+
 @register('jump')
 def run():
   compiler.add_instruction ('clrf', [compiler['PCLATU'], access])

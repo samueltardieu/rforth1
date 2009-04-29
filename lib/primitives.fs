@@ -244,6 +244,6 @@ code cr@
 
 : nip swap drop ;
 
-: execute jump ; no-inline
+: (execute) jump ; no-inline
 
 : rot >r swap r> swap ;
