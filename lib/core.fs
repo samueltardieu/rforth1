@@ -1,5 +1,6 @@
 needs lib/sfrnames.fs
 needs lib/primitives.fs
+needs lib/combinators.fs
 needs lib/arithmetic.fs
 needs lib/math.fs
 needs lib/tables.fs

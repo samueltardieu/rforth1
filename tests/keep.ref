@@ -1,0 +1,130 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PCLATU equ 0xffb
+
+PCL equ 0xff9
+
+INDF0 equ 0xfef
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+POSTDEC2 equ 0xfdd
+
+PREINC2 equ 0xfdc
+
+FSR2H equ 0xfda
+
+FSR2L equ 0xfd9
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+	movlw 0xbf
+	movwf FSR2L,0
+	clrf FSR2H,0
+
+main
+	movlw 3
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call test1
+	bra _lbl___433
+_lbl___432
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	return
+_lbl___433
+	movlw LOW(_lbl___432)
+	movwf PREINC0,0
+	movlw HIGH(_lbl___432)
+	movwf PREINC0,0
+
+_OP_keep_CP_
+	call over
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call _OP_execute_CP_
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+over
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call op_dup
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+
+swap
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	movff temp_x1,PREINC0
+	movff (temp_x1+1),PREINC0
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	return
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+_OP_execute_CP_
+	clrf PCLATU,0
+	movff POSTDEC0,(PCL+1)
+	movf POSTDEC0,0,0
+	movwf PCL,0
+
+test1
+	bra _lbl___425
+_lbl___424
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	return
+_lbl___425
+	call op_dup
+	movff POSTDEC0,PREINC2
+	movff POSTDEC0,PREINC2
+	call _lbl___424
+	movff POSTDEC2,PREINC0
+	movff POSTDEC2,PREINC0
+	bra _lbl___424
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+END

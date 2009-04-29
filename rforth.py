@@ -596,6 +596,19 @@ def run():
     compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
     compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
 
+@register('keep')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    compiler.rewind()
+    compiler['dup'].run()
+    compiler['>r'].run()
+    compiler.add_call(params[0])
+    compiler['r>'].run()
+    compiler.add_call(params[0])
+  else:
+    compiler['(keep)'].run()
+
 @register('cfor')
 def run():
   name, params = compiler.last_instruction()
