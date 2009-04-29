@@ -90,6 +90,9 @@ class LiteralValue:
       return None
     return v & 0xffff
 
+  def makes_reference_to(self, l):
+    return False
+
 class Number(LiteralValue):
 
   def __init__(self, value, base = 10):
@@ -198,6 +201,9 @@ class Named:
   def can_inline(self):
     """Return True if this word can be inlined."""
     return False
+
+  def makes_reference_to(self, l):
+    return False
   
   def deep_references(self, stack):
     self.referenced_by += 1
@@ -276,6 +282,9 @@ class Binary(LiteralValue):
     else:
       return None    
 
+  def makes_reference_to(self, l):
+    return self.v1.makes_reference_to(l) or self.v2.makes_reference_to(l)
+
 class Add(Binary):
 
   op = '+'
@@ -321,6 +330,9 @@ class Unary(LiteralValue):
 
   def deep_references(self, stack):
     return self.value.deep_references(stack)
+
+  def makes_reference_to(self, l):
+    return self.value.makes_reference_to(l)
 
 class Low(Unary):
 
@@ -378,7 +390,9 @@ class NamedReference(Named):
     return None
 
 class Label(NamedReference):
-  pass
+
+  def makes_reference_to(self, l):
+    return self == l
 
 class FlashData(NamedReference):
 
@@ -1717,7 +1731,7 @@ class Word(Named, LiteralValue):
         label = o[1][0]
         used = False
         for i in self.opcodes:
-          if i != o and i[1] and i[1][0] == label:
+          if i != o and i[1] and i[1][0].makes_reference_to(label):
             used = True
             break
         if used:
@@ -1737,7 +1751,7 @@ class Word(Named, LiteralValue):
           # a forward reference.
           label = self.opcodes[o][1][0]
           for no in new:
-            if no[1] and no[1][0] == label:
+            if no[1] and no[1][0].makes_reference_to(label):
               dead = False
               break
           else:
@@ -1748,7 +1762,7 @@ class Word(Named, LiteralValue):
             for oo in self.opcodes[o+1:]:
               if oo[0] == 'LABEL':
                 hit_label = True
-              elif hit_label and oo[1] and oo[1][0] == label:
+              elif hit_label and oo[1] and oo[1][0].makes_reference_to(label):
                 dead = False
                 exit
         if not dead:
