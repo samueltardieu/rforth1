@@ -633,6 +633,19 @@ def run():
       compiler.add_instruction('bz', [label_uncfor])
   compiler['begin'].run()
 
+@register('[[')
+def run():
+  label = Label()
+  compiler.ct_push(label)
+  compiler['ahead'].run()
+  compiler.add_instruction('LABEL', [label])
+
+@register(']]')
+def run():
+  compiler['exit'].run()
+  compiler['then'].run()
+  compiler.push(compiler.ct_pop())
+
 @register('ahead')
 def run():
   label = Label()
