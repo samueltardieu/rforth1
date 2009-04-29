@@ -306,8 +306,8 @@ eepromc_AT_
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___264
-_lbl___266
+	bz _lbl___251
+_lbl___253
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -317,8 +317,8 @@ _lbl___266
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___266
-_lbl___264
+	bra _lbl___253
+_lbl___251
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

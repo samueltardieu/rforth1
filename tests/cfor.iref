@@ -120,13 +120,13 @@ main
 	call h
 	movlw 4
 	movwf PREINC2,0
-_lbl___655
+_lbl___628
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___655
+	bra _lbl___628
 	movf POSTDEC2,1,0
 	call _s
 	call cr
@@ -143,13 +143,13 @@ _lbl___655
 	clrf PREINC0,0
 	movlw 4
 	movwf PREINC2,0
-_lbl___662
+_lbl___635
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___662
+	bra _lbl___635
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -167,15 +167,15 @@ _lbl___662
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___672
-_lbl___669
+	bz _lbl___645
+_lbl___642
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___669
-_lbl___672
+	bra _lbl___642
+_lbl___645
 	movf POSTDEC2,1,0
 	call _s
 	call cr
@@ -196,15 +196,15 @@ _lbl___672
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___679
-_lbl___676
+	bz _lbl___652
+_lbl___649
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___676
-_lbl___679
+	bra _lbl___649
+_lbl___652
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -414,8 +414,8 @@ eeprom_AT_
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___333
-_lbl___335
+	bz _lbl___308
+_lbl___310
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -425,8 +425,8 @@ _lbl___335
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___335
-_lbl___333
+	bra _lbl___310
+_lbl___308
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -443,7 +443,7 @@ _s
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___339
+	bz _lbl___314
 	call op_dup
 	movlw 8
 	movwf PREINC0,0
@@ -461,18 +461,18 @@ _s
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___346
+	bra _lbl___320
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
-	bra _lbl___348
-_lbl___346
+	bra _lbl___322
+_lbl___320
 	call op_minus
 	call _0_LT_
-_lbl___348
+_lbl___322
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___350
+	bz _lbl___324
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movlw LOW((_s_str+0x8000))
@@ -484,12 +484,12 @@ _lbl___348
 	movlw 8
 	movwf PREINC0,0
 	clrf PREINC0,0
-_lbl___350
+_lbl___324
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movwf PREINC2,0
-	bz _lbl___351
-_lbl___353
+	bz _lbl___325
+_lbl___327
 	movlw bl
 	call emit
 	movff INDF2,PREINC0
@@ -522,11 +522,11 @@ _lbl___353
 	call op_fetch_tos
 	call _
 	decfsz INDF2,1,0
-	bra _lbl___353
-_lbl___351
+	bra _lbl___327
+_lbl___325
 	movf POSTDEC2,1,0
 	return
-_lbl___339
+_lbl___314
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
@@ -542,15 +542,15 @@ test7
 	call h
 	movf a,0,1
 	movwf PREINC2,0
-	bz _lbl___624
-_lbl___626
+	bz _lbl___597
+_lbl___599
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___626
-_lbl___624
+	bra _lbl___599
+_lbl___597
 	movf POSTDEC2,1,0
 	return
 
@@ -565,15 +565,15 @@ test8
 	call h
 	movf a,0,1
 	movwf PREINC2,0
-	bz _lbl___632
-_lbl___634
+	bz _lbl___605
+_lbl___607
 	movff INDF2,PREINC0
 	clrf PREINC0,0
 	call _
 	call cr
 	decfsz INDF2,1,0
-	bra _lbl___634
-_lbl___632
+	bra _lbl___607
+_lbl___605
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

@@ -90,9 +90,9 @@ an_
 	movf POSTDEC0,0,0
 	movff POSTDEC0,ADCON0
 	bsf ADCON0,2,0
-_lbl___511
+_lbl___498
 	btfsc ADCON0,2,0
-	bra _lbl___511
+	bra _lbl___498
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	movf INDF0,0,0
@@ -146,9 +146,9 @@ main
 	movwf ADCON0,0
 	movlw 0xc2
 	movwf ADCON1,0
-_lbl___529
+_lbl___516
 	btfss PIR1,5,0
-	bra _lbl___529
+	bra _lbl___516
 	movf RCREG,0,0
 	movlw LOW((disp0_str+0x8000))
 	movwf PREINC0,0
@@ -179,7 +179,7 @@ _lbl___529
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call an_
-	bra _lbl___529
+	bra _lbl___516
 
 flash_addr_EX_
 	bcf INDF0,7,0
@@ -256,8 +256,8 @@ eepromc_AT_
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___264
-_lbl___266
+	bz _lbl___251
+_lbl___253
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -267,8 +267,8 @@ _lbl___266
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___266
-_lbl___264
+	bra _lbl___253
+_lbl___251
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0

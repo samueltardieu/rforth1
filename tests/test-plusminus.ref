@@ -322,8 +322,8 @@ nibble_to_hex
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___254
-_lbl___256
+	bz _lbl___241
+_lbl___243
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -333,8 +333,8 @@ _lbl___256
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___256
-_lbl___254
+	bra _lbl___243
+_lbl___241
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
