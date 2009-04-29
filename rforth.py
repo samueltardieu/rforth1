@@ -609,6 +609,16 @@ def run():
   else:
     compiler['(keep)'].run()
 
+@register('bi')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    compiler.rewind()
+    compiler['keep'].run()
+    compiler.add_call(params[0])
+  else:
+    compiler['(bi)'].run()
+
 @register('cfor')
 def run():
   name, params = compiler.last_instruction()
