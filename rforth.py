@@ -571,6 +571,17 @@ def run():
   else:
     compiler['op_and'].run()
 
+@register('>r')
+def run():
+  name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    compiler.rewind()
+    compiler.add_instruction('movff', [high(params[0]), compiler['PREINC2']])
+    compiler.add_instruction('movff', [low(params[0]), compiler['PREINC2']])
+  else:
+    compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
+    compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
+
 @register('cfor')
 def run():
   name, params = compiler.last_instruction()
