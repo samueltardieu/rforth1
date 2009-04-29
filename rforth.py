@@ -1710,6 +1710,7 @@ class Word(Named, LiteralValue):
         for i in self.opcodes:
           if i != o and i[1] and i[1][0] == label:
             used = True
+            break
         if used:
           new.append(o)
       else:
