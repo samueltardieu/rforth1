@@ -344,7 +344,7 @@ all_leds_off:
 	clrf	PORTA
 	return
 
-cblock
+cblock 0
 	counter_bytes,counter_blocks,nibble,nibble_tmp,put_str_tmp,buffer:64
 endc
 
