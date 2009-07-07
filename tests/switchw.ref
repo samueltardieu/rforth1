@@ -87,12 +87,12 @@ main
 _GT__EQ_
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___105
+	bra _lbl___108
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___105
+_lbl___108
 	call op_minus
 	call _0_LT_
 
@@ -120,32 +120,32 @@ table_addr_EX_
 
 handle_key
 	xorlw 0
-	bnz _lbl___442
+	bnz _lbl___445
 	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___442
+_lbl___445
 	xorlw 1
-	bnz _lbl___443
+	bnz _lbl___446
 	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___443
+_lbl___446
 	xorlw 3
-	bnz _lbl___444
+	bnz _lbl___447
 	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___444
+_lbl___447
 	movlw LOW((handle_key_str__3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__3+0x8000))
@@ -155,8 +155,8 @@ _lbl___444
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___247
-_lbl___249
+	bz _lbl___250
+_lbl___252
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -166,8 +166,8 @@ _lbl___249
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___249
-_lbl___247
+	bra _lbl___252
+_lbl___250
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -260,7 +260,7 @@ read4
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___262
+	bz _lbl___265
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 223
@@ -272,7 +272,7 @@ read4
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___262
+_lbl___265
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0

@@ -43,12 +43,12 @@ _GT__EQ_
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___107
+	bra _lbl___110
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
 	goto op_zeroeq
-_lbl___107
+_lbl___110
 	call op_minus
 	call _0_LT_
 
@@ -72,16 +72,16 @@ init_runtime
 main
 	call main
 	call main
-_lbl___453
-	call _lbl___453
-	call _lbl___453
 _lbl___456
 	call _lbl___456
 	call _lbl___456
-_lbl___457
-	call _lbl___457
-	call _lbl___457
 _lbl___459
+	call _lbl___459
+	call _lbl___459
+_lbl___460
+	call _lbl___460
+	call _lbl___460
+_lbl___462
 	call op_dup
 	movlw 1
 	movwf PREINC0,0
@@ -89,16 +89,16 @@ _lbl___459
 	call _GT__EQ_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___460
+	bz _lbl___463
 	call op_dup
 	movlw LOW((-1))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _lbl___459
+	call _lbl___462
 	call op__ST_
-_lbl___460
+_lbl___463
 	call op_dup
 	movlw 1
 	movwf PREINC0,0
@@ -114,7 +114,7 @@ _lbl___460
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
-	call _lbl___460
+	call _lbl___463
 
 op__ST_
 	movff POSTDEC0,(temp_x1+1)

@@ -116,9 +116,9 @@ main
 	movwf SSPSTAT,0
 	movlw 0x24
 	movwf SSPCON1,0
-_lbl___504
+_lbl___507
 	call handle_command
-	bra _lbl___504
+	bra _lbl___507
 
 flash_addr_EX_
 	bcf INDF0,7,0
@@ -199,9 +199,9 @@ eepromc_EX_
 	movlw 0xaa
 	movwf EECON2,0
 	bsf EECON1,1,0
-_lbl___215
+_lbl___218
 	btfsc EECON1,1,0
-	bra _lbl___215
+	bra _lbl___218
 	bcf EECON1,2,0
 	bcf PIR2,4,0
 	return
@@ -216,42 +216,42 @@ receive_byte
 send_bytes
 	movff current_address,PREINC0
 	movff (current_address+1),PREINC0
-_lbl___452
+_lbl___455
 	call op_dup
 	call op_cfetch_tos
-_lbl___453
+_lbl___456
 	btfss PORTA,5,0
-	bra _lbl___454
+	bra _lbl___457
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
-_lbl___454
+_lbl___457
 	btfsc PIR1,3,0
-	bra _lbl___453
+	bra _lbl___456
 	movf POSTDEC0,0,0
 	movff POSTDEC0,SSPBUF
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___452
+	bra _lbl___455
 
 receive_bytes
 	movff current_address,PREINC0
 	movff (current_address+1),PREINC0
-_lbl___461
+_lbl___464
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___462
+_lbl___465
 	btfss PORTA,5,0
-	bra _lbl___463
+	bra _lbl___466
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___463
+_lbl___466
 	btfss PIR1,3,0
-	bra _lbl___462
+	bra _lbl___465
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
@@ -262,23 +262,23 @@ _lbl___463
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___461
+	bra _lbl___464
 
 receive_masks_bytes
 	movff current_address,PREINC0
 	movff (current_address+1),PREINC0
-_lbl___471
+_lbl___474
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-_lbl___472
+_lbl___475
 	btfss PORTA,5,0
-	bra _lbl___473
+	bra _lbl___476
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	return
-_lbl___473
+_lbl___476
 	btfss PIR1,3,0
-	bra _lbl___472
+	bra _lbl___475
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	comf POSTDEC0,1,0
@@ -292,17 +292,17 @@ _lbl___473
 	andwf POSTINC0,1,0
 	movf temp_x1,0,0
 	andwf INDF0,1,0
-_lbl___479
+_lbl___482
 	btfss PORTA,5,0
-	bra _lbl___480
+	bra _lbl___483
 	movf POSTDEC2,1,0
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return
-_lbl___480
+_lbl___483
 	btfss PIR1,3,0
-	bra _lbl___479
+	bra _lbl___482
 	movff SSPBUF,PREINC0
 	clrf PREINC0,0
 	movff POSTDEC0,temp_x1
@@ -319,7 +319,7 @@ _lbl___480
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
-	bra _lbl___471
+	bra _lbl___474
 
 handle_command
 	call receive_byte
@@ -332,25 +332,13 @@ handle_command
 	call op_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___489
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	goto send_bytes
-_lbl___489
-	call op_dup
-	movlw read_command
-	movwf PREINC0,0
-	clrf PREINC0,0
-	call xor
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
 	bnz _lbl___492
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	goto receive_bytes
+	goto send_bytes
 _lbl___492
 	call op_dup
-	movlw bit_change_command
+	movlw read_command
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call xor
@@ -359,8 +347,20 @@ _lbl___492
 	bnz _lbl___495
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	call receive_masks_bytes
+	goto receive_bytes
 _lbl___495
+	call op_dup
+	movlw bit_change_command
+	movwf PREINC0,0
+	clrf PREINC0,0
+	call xor
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bnz _lbl___498
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	call receive_masks_bytes
+_lbl___498
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	return

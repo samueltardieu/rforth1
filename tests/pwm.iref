@@ -194,7 +194,7 @@ main
 	movwf (pulse1+1),1
 	movlw LOW(-6000)
 	movwf pulse1,1
-_lbl___598
+_lbl___601
 	call pwm
 	call key
 	movwf PREINC0,0
@@ -207,7 +207,7 @@ _lbl___598
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___600
+	bnz _lbl___603
 	call read16
 	movff POSTDEC0,(pulse0+1)
 	movff POSTDEC0,pulse0
@@ -217,7 +217,7 @@ _lbl___598
 	movwf PREINC0,0
 	movlw 1
 	call type
-_lbl___600
+_lbl___603
 	call op_dup
 	movlw 49
 	movwf PREINC0,0
@@ -225,7 +225,7 @@ _lbl___600
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___602
+	bnz _lbl___605
 	call read16
 	movff POSTDEC0,(pulse1+1)
 	movff POSTDEC0,pulse1
@@ -235,7 +235,7 @@ _lbl___600
 	movwf PREINC0,0
 	movlw 1
 	call type
-_lbl___602
+_lbl___605
 	call op_dup
 	movlw 112
 	movwf PREINC0,0
@@ -243,7 +243,7 @@ _lbl___602
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___604
+	bnz _lbl___607
 	movlw LOW((main_loop_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((main_loop_str__2+0x8000))
@@ -264,7 +264,7 @@ _lbl___602
 	movff (pulse1+1),PREINC0
 	call _
 	call cr
-_lbl___604
+_lbl___607
 	call op_dup
 	movlw 43
 	movwf PREINC0,0
@@ -272,7 +272,7 @@ _lbl___604
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___606
+	bnz _lbl___609
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW(delta)
@@ -292,7 +292,7 @@ _lbl___604
 	movff (pulse1+1),PREINC0
 	call _
 	call cr
-_lbl___606
+_lbl___609
 	call op_dup
 	movlw 45
 	movwf PREINC0,0
@@ -300,7 +300,7 @@ _lbl___606
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___608
+	bnz _lbl___611
 	movff pulse1,PREINC0
 	movff (pulse1+1),PREINC0
 	movlw LOW((-delta))
@@ -320,10 +320,10 @@ _lbl___606
 	movff (pulse1+1),PREINC0
 	call _
 	call cr
-_lbl___608
+_lbl___611
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	bra _lbl___598
+	bra _lbl___601
 
 flash_addr_EX_
 	bcf INDF0,7,0
@@ -411,8 +411,8 @@ eepromc_AT_
 type
 	movwf PREINC2,0
 	iorlw 0
-	bz _lbl___300
-_lbl___302
+	bz _lbl___303
+_lbl___305
 	call op_dup
 	call op_cfetch_tos
 	movf POSTDEC0,0,0
@@ -422,8 +422,8 @@ _lbl___302
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	decfsz INDF2,1,0
-	bra _lbl___302
-_lbl___300
+	bra _lbl___305
+_lbl___303
 	movf POSTDEC2,1,0
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
@@ -443,20 +443,20 @@ read4
 	movf POSTINC0,0,0
 	xorwf PREINC0,0,0
 	btfss WREG,7,0
-	bra _lbl___318
+	bra _lbl___321
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
 	call op_zeroeq
-	bra _lbl___321
-_lbl___318
+	bra _lbl___324
+_lbl___321
 	call op_minus
 	call _0_LT_
 	call op_zeroeq
-_lbl___321
+_lbl___324
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___323
+	bz _lbl___326
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	andlw 223
@@ -468,7 +468,7 @@ _lbl___321
 	movlw HIGH((-55))
 	addwfc INDF0,1,0
 	return
-_lbl___323
+_lbl___326
 	movlw LOW((-48))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
@@ -518,10 +518,10 @@ set_tmr0_wait
 	movf POSTDEC0,0,0
 	movff POSTDEC0,TMR0L
 	bcf INTCON,2,0
-_lbl___555
+_lbl___558
 	btfsc INTCON,2,0
 	return
-	bra _lbl___555
+	bra _lbl___558
 
 set_tmr1
 	call _1_GT_2
@@ -560,12 +560,12 @@ pwm
 	movlw HIGH(main_time)
 	movwf PREINC0,0
 	call set_tmr1
-_lbl___566
+_lbl___569
 	btfsc PIR1,5,0
 	return
 	btfsc PIR1,0,0
 	bra pwm
-	bra _lbl___566
+	bra _lbl___569
 
 ;---------------------------------------------------------
 ; Section: memory

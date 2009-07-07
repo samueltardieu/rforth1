@@ -570,7 +570,7 @@ def run():
   elif name == 'movf' and params[1] == dst_w:
     compiler.rewind()
     compiler.push(params[0])
-    compiler['c@'].run()
+    compiler.eval('c@')
   else:
     compiler.add_instruction('OP_PUSH_W', [])
 
@@ -579,11 +579,11 @@ def run():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH' and octet(params[0].static_value()):
     compiler.rewind()
-    compiler['>w'].run()
+    compiler.eval('>w')
     compiler.add_instruction('andlw', params)
-    compiler['w>'].run()
+    compiler.eval('w>')
   else:
-    compiler['op_and'].run()
+    compiler.eval('op_and')
 
 @register('>r')
 def run():
@@ -601,23 +601,22 @@ def run():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
-    compiler['dup'].run()
-    compiler['>r'].run()
+    compiler.eval('dup >r')
     compiler.add_call(params[0])
-    compiler['r>'].run()
+    compiler.eval('r>')
     compiler.add_call(params[0])
   else:
-    compiler['(keep)'].run()
+    compiler.eval('(keep)')
 
 @register('bi')
 def run():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
-    compiler['keep'].run()
+    compiler.eval('keep')
     compiler.add_call(params[0])
   else:
-    compiler['(bi)'].run()
+    compiler.eval('(bi)')
 
 @register('cfor')
 def run():
@@ -646,7 +645,7 @@ def run():
         compiler.error('loop limit does not fit in a byte')
       elif value is not None:
         bound_checks = False
-    compiler['>w'].run()
+    compiler.eval('>w')
     compiler.add_instruction('movwf',
                                    [compiler['PREINC2'], access])
     if bound_checks:
@@ -654,19 +653,18 @@ def run():
       if name != 'OP_POP_W':
         compiler.add_instruction('iorlw', [Number(0)])
       compiler.add_instruction('bz', [label_uncfor])
-  compiler['begin'].run()
+  compiler.eval('begin')
 
 @register('[[')
 def run():
   label = Label()
   compiler.ct_push(label)
-  compiler['ahead'].run()
+  compiler.eval('ahead')
   compiler.add_instruction('LABEL', [label])
 
 @register(']]')
 def run():
-  compiler['exit'].run()
-  compiler['then'].run()
+  compiler.eval('exit then')
   compiler.push(compiler.ct_pop())
 
 @register('ahead')
@@ -685,7 +683,7 @@ def run():
   compiler['again'].run(True)
   counter = compiler.ct_pop()
   for _ in range(counter):
-    compiler['then'].run()
+    compiler.eval('then')
 
 @register('if')
 def run(invert = False):
@@ -720,7 +718,7 @@ def run(invert = False):
   else:
     ins = 'btfsc'
   compiler.add_instruction(ins, [value, bit, acc])
-  compiler['ahead'].run()
+  compiler.eval('ahead')
 
 @register('?if')
 def run():
@@ -728,7 +726,7 @@ def run():
   compiler.add_instruction('iorwf', [compiler['POSTINC0'], dst_w, access])
   value, bit = compiler['Z']
   compiler.add_instruction('btfsc', [value, bit, access])
-  compiler['ahead'].run()
+  compiler.eval('ahead')
 
 @register('switchw')
 # Structure of the switch statement on the compile stack is:
@@ -795,13 +793,13 @@ def run():
     compiler.rewind()
     compiler.add_call(params[0])
   else:
-    compiler['(execute)'].run()
+    compiler.eval('(execute)')
 
 @register('jump')
 def run():
   compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
   compiler.push(compiler['PCL'])
-  compiler['!'].run()
+  compiler.eval('!')
 
 @register('while')
 def run(is_until = False):
@@ -814,13 +812,13 @@ def run(is_until = False):
 @register('until')
 def run():
   compiler['while'].run(True)
-  compiler['repeat'].run()
+  compiler.eval('repeat')
 
 @register('cnext')
 def run():
   compiler.add_instruction('decfsz',
                                  [compiler['INDF2'], dst_f, access])
-  compiler['again'].run()
+  compiler.eval('again')
   label = compiler.ct_pop()
   compiler.add_instruction('LABEL', [label])
   compiler.add_instruction('movf',
@@ -830,9 +828,9 @@ def run():
 
 @register('else')
 def run():
-  compiler['ahead'].run()
+  compiler.eval('ahead')
   compiler.ct_swap()
-  compiler['then'].run()
+  compiler.eval('then')
 
 @register('0<>')
 def run():
@@ -845,7 +843,7 @@ def run():
   name, params = compiler.last_instruction()
   if name == 'OP_0=':
     compiler.rewind()
-    compiler['0<>'].run()
+    compiler.eval('0<>')
     return
   if name == 'OP_NORMALIZE':
     compiler.rewind()
@@ -877,11 +875,11 @@ def bitop(kind): # kind can be 'set', 'clear' or 'toggle'
   else:
     # Resort to a library function
     if kind == 'set':
-      compiler['op_bit_set'].run()
+      compiler.eval('op_bit_set')
     elif kind == 'clear':
-      compiler['op_bit_clr'].run()
+      compiler.eval('op_bit_clr')
     else:
-      compiler['op_bit_toggle'].run()
+      compiler.eval('op_bit_toggle')
 
 @register('bit-set')
 def run():
@@ -920,9 +918,9 @@ def run(invert = False):
   else:
     # Resort to a library function
     if invert:
-      compiler['op_bit_clr_q'].run()
+      compiler.eval('op_bit_clr_q')
     else:
-      compiler['op_bit_set_q'].run()
+      compiler.eval('op_bit_set_q')
 
 @register('bit-clr?')
 def run():
@@ -937,7 +935,7 @@ def run():
     compiler.push(LeftShift(Number(1), params[0]))
   else:
     # Default primitive
-    compiler['op_bit_mask'].run()
+    compiler.eval('op_bit_mask')
 
 @register('\\')
 def run():
@@ -973,7 +971,7 @@ def run():
       elif v == 0:
         pass
       elif v == 1:
-        compiler['op_1+'].run()
+        compiler.eval('op_1+')
       elif v == 0x0100:
         compiler.add_instruction('incf', [compiler['INDF0'], dst_f, access])
       elif v == 0xff00:
@@ -992,7 +990,7 @@ def run():
         compiler.add_instruction('addwfc', [compiler['INDF0'],
                                              dst_f, access])
     else:
-      compiler['op_plus'].run()
+      compiler.eval('op_plus')
   else:
     x2 = compiler.ct_pop()
     x1 = compiler.ct_pop()
@@ -1012,9 +1010,9 @@ def run():
       value = compiler.last_instruction()[1][0]
       compiler.rewind()
       compiler.push(Negated(value))
-      compiler['+'].run()
+      compiler.eval('+')
     else:
-      compiler['op_minus'].run()
+      compiler.eval('op_minus')
   else:
     x2 = compiler.ct_pop()
     x1 = compiler.ct_pop()
@@ -1031,7 +1029,7 @@ def run():
       compiler.rewind()
       compiler.push(res)
     else:
-      compiler['op_*'].run()
+      compiler.eval('op_*')
   else:
     x2 = compiler.ct_pop()
     x1 = compiler.ct_pop()
@@ -1040,12 +1038,12 @@ def run():
 @register('1+')
 def run():
   compiler.push(Number(1))
-  compiler['+'].run()
+  compiler.eval('+')
 
 @register('1-')
 def run():
   compiler.push(Number(1))
-  compiler['-'].run()
+  compiler.eval('-')
 
 @register('1+!')
 def run():
@@ -1057,11 +1055,7 @@ def run():
     compiler.add_instruction('infsnz', [addr, dst_f])
     compiler.add_instruction('incf', [Add(addr, Number(1)), dst_f])
   else:
-    compiler['dup'].run()
-    compiler['@'].run()
-    compiler['1+'].run()
-    compiler['swap'].run()
-    compiler['!'].run()
+    compiler.eval('dup @ 1+ swap !')
 
 @register('c+!')
 def run(negate = False):
@@ -1087,15 +1081,15 @@ def run(negate = False):
       else:
         # Let the regular treatment proceed with the value on the stack
         compiler.push(value)
-    compiler['>w'].run()
+    compiler.eval('>w')
     if negate:
       compiler.add_instruction('subwf', [addr, dst_f, access_bit(addr)])
     else:
       compiler.add_instruction('addwf', [addr, dst_f, access_bit(addr)])
   elif negate:
-    compiler['op_c-!'].run()
+    compiler.eval('op_c-!')
   else:
-    compiler['op_c+!'].run()
+    compiler.eval('op_c+!')
 
 @register('c-!')
 def run():
@@ -1112,9 +1106,7 @@ def run():
       compiler.rewind()
       compiler.push(LeftShift(operand[0], nsteps[0]))
     else:
-      compiler['cfor'].run()
-      compiler['2*'].run()
-      compiler['cnext'].run()
+      compiler.eval('cfor 2* cnext')
   else:
     nsteps = compiler.ct_pop()
     operand = compiler.ct_pop()
@@ -1125,9 +1117,9 @@ def run():
   if is_static_push(compiler.last_instruction()) and \
      compiler.last_instruction()[1][0].static_value() == 0:
     compiler.rewind()
-    compiler['0='].run()
+    compiler.eval('0=')
   else:
-    compiler['op_='].run()
+    compiler.eval('op_=')
 
 @register(':')
 def run():
@@ -1244,13 +1236,12 @@ def run():
       # internal latches.
       if is_special_register(addr) and is_special_register(params[0]):
         compiler.push(params[0])
-        compiler['c@'].run()
-        compiler['>w'].run()
+        compiler.eval('c@ >w')
         compiler.add_instruction('movff', [Add(params[0], Number(1)),
                                            addr1])
-        compiler['w>'].run()
+        compiler.eval('w>')
         compiler.push(addr)
-        compiler['c!'].run()
+        compiler.eval('c!')
       else:
         compiler.add_instruction('movff', 
                                  [Add(params[0],
@@ -1279,7 +1270,7 @@ def run():
     compiler.add_call(compiler['eeprom!'])
   else:
     # Any address and content
-    compiler['op_store'].run()
+    compiler.eval('op_store')
 
 @register('c!')
 def run():
@@ -1311,7 +1302,7 @@ def run():
     compiler.add_call(compiler['eepromc!'])
   else:
     # Any address and content
-    compiler['op_cstore'].run()
+    compiler.eval('op_cstore')
 
 @register('allot')
 def run():
@@ -1339,9 +1330,9 @@ class Variable(Constant):
       compiler.push(initial_value)
       compiler.push(self)
       if size == 1:
-        compiler['c!'].run()
+        compiler.eval('c!')
       else:
-        compiler['!'].run()
+        compiler.eval('!')
       compiler.pop_object()
 
 @register('create')
@@ -1358,7 +1349,7 @@ class Value(Variable):
 
   def run(self):
     compiler.push(self)
-    compiler['@'].run()
+    compiler.eval('@')
 
 @register('cvariable')
 def run():
@@ -1436,7 +1427,7 @@ def run():
 def run():
   name = compiler.parse_word()
   compiler.push(compiler.find(name))
-  compiler['!'].run()
+  compiler.eval('!')
 
 @register('2>1')
 def run():
@@ -1454,7 +1445,7 @@ def run():
       compiler.add_instruction('movff', [msb, compiler['INDF0']])
   else:
     # Resort to library routine
-    compiler['op_2>1'].run()
+    compiler.eval('op_2>1')
 
 @register('inline')
 def run():
@@ -2745,6 +2736,11 @@ class Compiler:
       raise Compiler.INTERNAL_ERROR, \
             "%s: cannot find internal entity %s" % (self.current_location(),
                                                     item)
+
+  def eval(self, str):
+    """Eval a string after parsing it into words."""
+    for w in str.split():
+      self[w].run()
 
 def set_start_cb(option, opt, value, parser):
   s = parse_number(value)
