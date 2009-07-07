@@ -1,0 +1,100 @@
+	processor pic18f248
+	radix dec
+	org 0x2000
+	goto init_runtime
+	org 0x2008
+	reset
+	org 0x2018
+	reset
+
+;---------------------------------------------------------
+; Section: constants
+;---------------------------------------------------------
+
+PRODH equ 0xff4
+
+PRODL equ 0xff3
+
+POSTINC0 equ 0xfee
+
+POSTDEC0 equ 0xfed
+
+PREINC0 equ 0xfec
+
+PLUSW0 equ 0xfeb
+
+FSR0H equ 0xfea
+
+FSR0L equ 0xfe9
+
+STATUS equ 0xfd8
+
+;---------------------------------------------------------
+; Section: code
+;---------------------------------------------------------
+
+init_runtime
+	movlw 0x5f
+	movwf FSR0L,0
+	clrf FSR0H,0
+
+main
+	call _QM_2dup
+
+loop
+	call foobar
+	bra loop
+
+_QM_2dup
+	call _QM_dup
+
+_QM_dup
+	movf POSTDEC0,0,0
+	iorwf POSTINC0,0,0
+	btfsc STATUS,2,0
+	return
+
+op_dup
+	movlw -1
+	movff PLUSW0,PREINC0
+	movff PLUSW0,PREINC0
+	return
+
+foobar
+	call _QM_dup
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	btfsc STATUS,2,0
+	return
+	call op_dup
+
+op__ST_
+	movff POSTDEC0,(temp_x1+1)
+	movff POSTDEC0,temp_x1
+	movff POSTDEC0,(temp_x2+1)
+	movff POSTDEC0,temp_x2
+	movf temp_x1,0,0
+	mulwf temp_x2,0
+	movff PRODL,PREINC0
+	movff PRODH,temp_x3
+	mulwf (temp_x2+1),0
+	movf PRODL,0,0
+	addwf temp_x3,1,0
+	movf (temp_x1+1),0,0
+	mulwf temp_x2,0
+	movf PRODL,0,0
+	addwfc temp_x3,0,0
+	movwf PREINC0,0
+	return
+
+;---------------------------------------------------------
+; Section: memory
+;---------------------------------------------------------
+
+temp_x1 equ 0x0
+
+temp_x2 equ 0x2
+
+temp_x3 equ 0x4
+
+END
