@@ -722,6 +722,14 @@ def run(invert = False):
   compiler.add_instruction(ins, [value, bit, acc])
   compiler['ahead'].run()
 
+@register('?if')
+def run():
+  compiler.add_instruction('movf', [compiler['POSTDEC0'], dst_w, access])
+  compiler.add_instruction('iorwf', [compiler['POSTINC0'], dst_w, access])
+  value, bit = compiler['Z']
+  compiler.add_instruction('btfsc', [value, bit, access])
+  compiler['ahead'].run()
+
 @register('switchw')
 # Structure of the switch statement on the compile stack is:
 #   - next label or None for the first case

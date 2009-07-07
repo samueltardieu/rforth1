@@ -32,15 +32,6 @@ code op_dup
       return
 ;code
 
-code ?dup
-     POSTDEC0 ,w ,a movf
-     POSTINC0 ,w ,a iorwf
-     Z ,a btfsc
-     return
-     op_dup call
-     return
-;code
-
 code 2dup
       -3 movlw
       PLUSW0 PREINC0 movff
@@ -256,3 +247,5 @@ code cr@
 : (execute) jump ; no-inline
 
 : rot >r swap r> swap ;
+
+: ?dup ?if dup then ;

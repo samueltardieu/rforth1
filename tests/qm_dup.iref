@@ -53,11 +53,11 @@ init_runtime
 main
 	call _QM_dup
 	call _QM_dup
-_lbl___450
+_lbl___452
 	call _QM_dup
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___450
+	bz _lbl___452
 	call op_dup
 	movff POSTDEC0,(temp_x1+1)
 	movff POSTDEC0,temp_x1
@@ -75,7 +75,7 @@ _lbl___450
 	movf PRODL,0,0
 	addwfc temp_x3,0,0
 	movwf PREINC0,0
-	bra _lbl___450
+	bra _lbl___452
 
 ;---------------------------------------------------------
 ; Section: memory
