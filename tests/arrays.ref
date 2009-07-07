@@ -31,6 +31,8 @@ FSR0H equ 0xfea
 
 FSR0L equ 0xfe9
 
+STATUS equ 0xfd8
+
 EECON1 equ 0xfa6
 
 ;---------------------------------------------------------
@@ -84,6 +86,7 @@ flashc_AT_
 	return
 
 word_nth
+	call _2_ST_
 	movlw LOW(words_array)
 	movwf PREINC0,0
 	movlw HIGH(words_array)
@@ -120,6 +123,13 @@ _1_GT_2
 	clrf PREINC0,0
 	return
 
+_2_ST_
+	bcf STATUS,0,0
+	movf POSTDEC0,0,0
+	rlcf POSTINC0,1,0
+	rlcf INDF0,1,0
+	return
+
 ;---------------------------------------------------------
 ; Section: memory
 ;---------------------------------------------------------
@@ -131,8 +141,8 @@ temp_x1 equ 0x0
 ;---------------------------------------------------------
 
 words_array
-	db 0,1,0,2,0,3,0,4
-	db 3,8
+	db 1,0,2,0,3,0,4,0
+	db 15,0,232,3
 
 bytes_array
 	db 41,42,43

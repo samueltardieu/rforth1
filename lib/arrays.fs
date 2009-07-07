@@ -13,6 +13,7 @@ def parse_array():
     return data
 
 def insert_data(data, kind):
+    data = [d & 0xff for d in data]
     ref = FlashData(data, "a %s array" % kind, compiler.current_object.name + "_array")
     ref.from_source = False
     compiler.push(ref)
@@ -22,8 +23,8 @@ class Array (Primitive):
     def run(self):
         d = []
         for i in parse_array():
-            d.append((i >> 8) & 0xf)
-            d.append(i & 0xf)
+            d.append(i)
+            d.append(i >> 8)
         insert_data(d, "words")
 
 class CArray (Primitive):
