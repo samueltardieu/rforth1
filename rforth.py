@@ -688,6 +688,18 @@ def run():
 @register('if')
 def run(invert = False):
   name, params = compiler.last_instruction()
+  if name == 'OP_PUSH':
+    value = params[0].static_value()
+    if value == 0:
+      compiler.rewind()
+      compiler.warning('constant 0 will never execute')
+      compiler.eval('ahead')
+    else:
+      compiler.rewind()
+      compiler.warning('constant non-zero will always execute')
+      label = Label()
+      compiler.ct_push(label)
+    return
   if name == 'OP_NORMALIZE':
     compiler.rewind()
     return compiler['if'].run(invert)
