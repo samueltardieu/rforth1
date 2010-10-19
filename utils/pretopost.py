@@ -23,7 +23,7 @@ def main ():
             if x:
                 l = "%s%s %s%s%s" % (x.group (1), x.group (3), x.group (2),
                                      x.group (4), comment)
-        print l
+        print(l)
 
 if __name__ == '__main__': main ()
             

@@ -64,7 +64,7 @@ class Config:
 
     def print_config (self):
         for i in [x for x, y in Config.params]:
-            print "%12s = %04x" % (i, self.get_value (i))
+            print("%12s = %04x" % (i, self.get_value (i)))
 
 class Snooper:
 
@@ -72,7 +72,7 @@ class Snooper:
         self.fd = fd
 
     def write (self, data):
-        print ">>> %s" % data
+        print(">>> %s" % data)
         self.fd.write (data)
         self.fd.flush ()
 
@@ -81,7 +81,7 @@ class Snooper:
 	  data = self.fd.read ()
 	else:
 	  data = self.fd.read (l)
-        print "<<< %s" % data
+        print("<<< %s" % data)
         return data
 
     def close (self):
@@ -130,7 +130,7 @@ def makeup_lines (options):
         line = flash [a:a+64]
         if line != [0xff] * 64:
             if a < 0x200 and not options.force:
-                raise PermissionDenied, 'Set force flag to True'
+                raise PermissionDenied('Set force flag to True')
             lines.append ((a, line))
     return lines
 
@@ -159,43 +159,43 @@ def sync_device (fd):
 
 def program_device (fd, options):
     """Program the device."""
-    print "Switching to bootloader mode"
+    print("Switching to bootloader mode")
     if options.sync: sync_device (fd)
     for addr, data in makeup_lines(options):
-        print "Programming flash starting at %06X" % addr
+        print("Programming flash starting at %06X" % addr)
         writefd (fd, "W%06X" % addr)
         for i in data: writefd (fd, "%02X" % i)
         wait_for_prompt (fd)
 
 def load_hex_file (file):
     """Load a hex file in memory."""
-    print "Loading %s" % file
+    print("Loading %s" % file)
     for l in open (file, 'r'):
         l = l.rstrip('\r\n')
         if l[:1] == ':': handle_hex_line (l)
 
 def open_port (options):
-    print "Opening %s at %s bps" % (options.port, options.speed)
+    print("Opening %s at %s bps" % (options.port, options.speed))
     fd = serial.Serial (options.port, options.speed)
     if options.snoop:
-        print "Activating snooper"
+        print("Activating snooper")
         fd = Snooper (fd)
     if options.sync: sync_device (fd)
     if options.can:
-        print "Connecting to remote CAN device %03x" % int (options.can, 16)
+        print("Connecting to remote CAN device %03x" % int (options.can, 16))
         writefd (fd, ":%03x" % int (options.can, 16))
         if options.sync: sync_device (fd)
     return fd
 
 def close_port (fd, options):
     if options.can:
-        print "Disconnecting from remote CAN deviec"
+        print("Disconnecting from remote CAN deviec")
         writefd (fd, chr (27))
 
 def check_argv (args, n):
     if len (args) != n:
-        print "Error: this mode requires a different number of arguments " \
-              "(%d instead of %d given)" % (n, len (args))
+        print("Error: this mode requires a different number of arguments " \
+              "(%d instead of %d given)" % (n, len (args)))
         sys.exit (1)
 
 def action_dump (options, args):
@@ -247,8 +247,8 @@ def action_client (options, args):
         host, port = options.server_addr, options.server_port
         if host == 'auto': host = 'localhost'
         s.connect((host, port))
-        print "Connected to", host
-        print "Sending file %s" % args[0]	
+        print("Connected to", host)
+        print("Sending file %s" % args[0])	
         for l in open (args[0],'r').readlines():
             while l[-1:] in ['\r', '\n']:
                 l = l[:-1]
@@ -263,7 +263,7 @@ def action_client (options, args):
                 raise TransmissionWithServerFailed 	
             if data == "bye":
                 break
-            print data
+            print(data)
     finally:
         s.close()
 		
@@ -279,11 +279,11 @@ def action_server (options, args):
         s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
         s.bind(addr)
         s.listen(1)
-        print "Listening on ", addr
+        print("Listening on ", addr)
 
         while 1:
             client,addr = s.accept()
-            print "Connection from ", addr
+            print("Connection from ", addr)
             handle_client (client)
             send_line(client, "Hex file loaded")
             fd = open_port (options)

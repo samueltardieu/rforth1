@@ -24,15 +24,15 @@ def split (lines):
         del lines[0]
 
 def output_regs (lines):
-    print
-    print "\\ Registers names"
-    print
+    print()
+    print("\\ Registers names")
+    print()
     for l in lines:
         x = reg.match (l)
         if x:
             name, addr = x.group(1), x.group(2)
             all_regs.append (name)
-            print "0x%s constant %s" % (addr.lower (), name)
+            print("0x%s constant %s" % (addr.lower (), name))
 
 def output_bits (lines):
     regname = bits.match(lines[0]).group(1).split()[0]
@@ -51,9 +51,9 @@ def output_bits (lines):
         output_bits_for_reg (regname, lines)
 
 def output_bits_for_reg (regname, lines, prefix = ''):
-    print
-    print "\\ %s bits" % regname
-    print
+    print()
+    print("\\ %s bits" % regname)
+    print()
     for l in lines:
         x = reg.match (l)
         if not x: x = port.match (l)
@@ -66,13 +66,13 @@ def output_bits_for_reg (regname, lines, prefix = ''):
             all_bits.append (name)
             d = "%s %d bit %s%s" % (regname, bit, prefix, name)
             if comment:
-                print "%-30s    \ %s" % (d, comment)
+                print("%-30s    \ %s" % (d, comment))
             else:
-                print d
+                print(d)
 
 def output (lines):
-    print '\ This file has been automatically generated'
-    print '\ Do not edit by hand'
+    print('\ This file has been automatically generated')
+    print('\ Do not edit by hand')
     while lines:
         if not lines: break
         before, lines = split (lines)

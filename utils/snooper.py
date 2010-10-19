@@ -4,7 +4,7 @@ class Snooper:
         self.fd = fd
 
     def write (self, data):
-        print ">>> %s" % data
+        print(">>> %s" % data)
         self.fd.write (data)
         self.fd.flush ()
 
@@ -13,7 +13,7 @@ class Snooper:
 	  data = self.fd.read ()
 	else:
 	  data = self.fd.read (l)
-        print "<<< %s" % data
+        print("<<< %s" % data)
         return data
 
     def close (self):
