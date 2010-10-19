@@ -1,6 +1,6 @@
 \ Usage: at prompt, send the 'C' character, then 4 nibbles for
 \ high-delay and 4 hex nibbles for low-delay (that is 16 bits each).
-\ Each delay corresponds to (4/20MHz)*2 = 0,4µs. You can also use 'P'
+\ Each delay corresponds to (4/20MHz)*2 = 0,4Âµs. You can also use 'P'
 \ and 2 nibbles for the patterns (default 1 and 6).
 \
 \ For example, to get a 30Hz signal, one has to wait (1/30Hz)/2 = 16.666ms

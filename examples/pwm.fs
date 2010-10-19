@@ -1,6 +1,6 @@
 needs lib/tty-rs232.fs
 
-\ 20 ms à 16 Mhz => 80 000 ticks
+\ 20 ms Ã  16 Mhz => 80 000 ticks
 \ prescaler de 2 dans T1 donc :
 \ largeur totale du pulse : 40 000
 
