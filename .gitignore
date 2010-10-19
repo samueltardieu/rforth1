@@ -1,0 +1,7 @@
+*.hex
+*.asm
+*.cod
+*.lst
+*.pyc
+*.pyo
+*~
