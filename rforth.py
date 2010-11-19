@@ -28,6 +28,8 @@ Memory usage:
 
 import optparse, os, re, string, sys
 
+compiler = None
+
 # Setup Forth search path. The search path is the current directory
 # then the directories in RFORTH1_PATH (if any) then rforth1 directory
 forth_search_path = ['.']
@@ -443,70 +445,65 @@ class Forward(Label):
   def can_inline(self):
     return False
 
-_primitives = []
+def make_primitive(runfunc):
+  class _primitive(Primitive):
+    def run(self, *args):
+      runfunc(*args)
+  return _primitive
 
-def register(prim_name):
-  def build(f):
-    class _primitive(Primitive):
-      def run(self, *args):
-        f(*args)
-    _primitives.append((prim_name, _primitive))
-    return _primitive
-  return build
+def register_primitives():
+  return [(data.__doc__ or name[10:], make_primitive(data))
+          for (name, data) in globals().items()
+          if name.startswith('primitive_')]
 
-@register('label')
-def run():
+def primitive_label():
   label = Label(compiler.parse_word())
   compiler.add_instruction('LABEL', [label])
 
-@register('forward')
-def run():
+def primitive_forward():
   Forward(compiler.parse_word())
 
-@register('intr-protect')
-def run():
+def primitive_intr_protect():
+  "intr-protect"
   compiler.add_instruction('OP_INTR_PROTECT', [])
 
-@register('intr-unprotect')
-def run():
+def primitive_intr_unprotect():
+  "intr-unprotect"
   compiler.add_instruction('OP_INTR_UNPROTECT', [])
 
-@register('[char]')
-def run():
+def primitive_literal_char():
+  "[char]"
   char = Number(ord(compiler.parse_word()[0]))
   if compiler.state:
     compiler.push(char)
   else:
     compiler.ct_push(char)
 
-@register('begin')
-def run():
+def primitive_begin():
   compiler.ct_push(0)
   label = Label()
   compiler.ct_push(label)
   compiler.add_instruction('LABEL', [label])
 
-@register('again')
-def run(do_not_pop_counter = False):
+def primitive_again(do_not_pop_counter = False):
   label = compiler.ct_pop()
   compiler.add_instruction('bra', [label])
   if not do_not_pop_counter:
     assert(compiler.ct_pop() == 0)
 
-@register('[')
-def run():
+def primitive_ob():
+  "["
   compiler.state = 0
 
-@register(']')
-def run():
+def primitive_cb():
+  "]"
   compiler.state = 1
 
-@register('literal')
-def run():
+def primitive_literal():
   compiler.push(compiler.ct_pop())
 
-@register('>w')
-def run(warn = True):
+def primitive_to_w(warn = True):
+  ">w"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
@@ -534,8 +531,7 @@ def run(warn = True):
   else:
     compiler.add_instruction('OP_POP_W', [])
 
-@register('dup')
-def run():
+def primitive_dup():
   name, params = compiler.last_instruction()
   if name in ['OP_PUSH', 'OP_PUSH_W']:
     compiler.add_instruction(name, params)
@@ -548,8 +544,7 @@ def run():
   else:
     compiler.add_instruction('OP_DUP')
 
-@register('drop')
-def run():
+def primitive_drop():
   name, params = compiler.last_instruction()
   if name in ['OP_PUSH', 'OP_DUP']:
     compiler.rewind()
@@ -560,8 +555,8 @@ def run():
   else:
     compiler['>w'].run(False)
 
-@register('w>')
-def run():
+def primitive_from_w():
+  "w>"
   name, params = compiler.last_instruction()
   if name == 'OP_POP_W':
     compiler.rewind()
@@ -574,8 +569,7 @@ def run():
   else:
     compiler.add_instruction('OP_PUSH_W', [])
 
-@register('and')
-def run():
+def primitive_and():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH' and octet(params[0].static_value()):
     compiler.rewind()
@@ -585,8 +579,8 @@ def run():
   else:
     compiler.eval('op_and')
 
-@register('>r')
-def run():
+def primitive_to_r():
+  ">r"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
@@ -596,8 +590,7 @@ def run():
     compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
     compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
 
-@register('keep')
-def run():
+def primitive_keep():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
@@ -608,8 +601,7 @@ def run():
   else:
     compiler.eval('(keep)')
 
-@register('bi')
-def run():
+def primitive_bi():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
@@ -618,8 +610,7 @@ def run():
   else:
     compiler.eval('(bi)')
 
-@register('cfor')
-def run():
+def primitive_cfor():
   name, params = compiler.last_instruction()
   label_uncfor = Label()
   label_noloop = Label()
@@ -655,38 +646,34 @@ def run():
       compiler.add_instruction('bz', [label_uncfor])
   compiler.eval('begin')
 
-@register('[[')
-def run():
+def primitive_ob_ob():
+  "[["
   label = Label()
   compiler.ct_push(label)
   compiler.eval('ahead')
   compiler.add_instruction('LABEL', [label])
 
-@register(']]')
-def run():
+def primitive_cb_cb():
+  "]]"
   compiler.eval('exit then')
   compiler.push(compiler.ct_pop())
 
-@register('ahead')
-def run():
+def primitive_ahead():
   label = Label()
   compiler.ct_push(label)
   compiler.add_instruction('bra', [label])
 
-@register('then')
-def run():
+def primitive_then():
   label = compiler.ct_pop()
   compiler.add_instruction('LABEL', [label])
 
-@register('repeat')
-def run():
+def primitive_repeat():
   compiler['again'].run(True)
   counter = compiler.ct_pop()
   for _ in range(counter):
     compiler.eval('then')
 
-@register('if')
-def run(invert = False):
+def primitive_if(invert = False):
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     value = params[0].static_value()
@@ -732,26 +719,24 @@ def run(invert = False):
   compiler.add_instruction(ins, [value, bit, acc])
   compiler.eval('ahead')
 
-@register('?if')
-def run():
+def primitive_question_if():
+  "?if"
   compiler.add_instruction('movf', [compiler['POSTDEC0'], dst_w, access])
   compiler.add_instruction('iorwf', [compiler['POSTINC0'], dst_w, access])
   value, bit = compiler['Z']
   compiler.add_instruction('btfsc', [value, bit, access])
   compiler.eval('ahead')
 
-@register('switchw')
 # Structure of the switch statement on the compile stack is:
 #   - next label or None for the first case
 #   - switch end label
 #   - xored value
-def run():
+def primitive_switchw():
   compiler.ct_push(None)
   compiler.ct_push(Label())
   compiler.ct_push(0)
 
-@register('casew')
-def run(is_default = False):
+def primitive_casew(is_default = False):
   if not is_default:
     name, params = compiler.last_instruction()
     if name != 'OP_PUSH':
@@ -777,28 +762,24 @@ def run(is_default = False):
   else:
     compiler.ct_push(xored)
 
-@register('endcasew')
-def run():
+def primitive_endcasew():
   pass
 
-@register('defaultw')
-def run():
+def primitive_defaultw():
   compiler['casew'].run(True)
 
-@register('endswitchw')
-def run():
+def primitive_endswitchw():
   xored = compiler.ct_pop()
   label = compiler.ct_pop()
   nlabel = compiler.ct_pop()
   compiler.add_instruction('LABEL', [nlabel])
   compiler.add_instruction('LABEL', [label])
 
-@register("[']")
-def run():
+def primitive_literal_address():
+  "[']"
   compiler.push(compiler.find(compiler.parse_word()))
 
-@register('execute')
-def run():
+def primitive_execute():
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     compiler.rewind()
@@ -806,27 +787,23 @@ def run():
   else:
     compiler.eval('(execute)')
 
-@register('jump')
-def run():
+def primitive_jump():
   compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
   compiler.push(compiler['PCL'])
   compiler.eval('!')
 
-@register('while')
-def run(is_until = False):
+def primitive_while(is_until = False):
   flabel = compiler.ct_pop()
   counter = compiler.ct_pop()
   compiler['if'].run(is_until)
   compiler.ct_push(counter+1)
   compiler.ct_push(flabel)
 
-@register('until')
-def run():
+def primitive_until():
   compiler['while'].run(True)
   compiler.eval('repeat')
 
-@register('cnext')
-def run():
+def primitive_cnext():
   compiler.add_instruction('decfsz',
                                  [compiler['INDF2'], dst_f, access])
   compiler.eval('again')
@@ -837,20 +814,19 @@ def run():
   label = compiler.ct_pop()
   compiler.add_instruction('LABEL', [label])
 
-@register('else')
-def run():
+def primitive_else():
   compiler.eval('ahead')
   compiler.ct_swap()
   compiler.eval('then')
 
-@register('0<>')
-def run():
+def primitive_0_not_equal():
+  "0<>"
   name, params = compiler.last_instruction()
   if name != 'OP_NORMALIZE':
     compiler.add_instruction('OP_NORMALIZE', [])
 
-@register('0=')
-def run():
+def primitive_0_equal():
+  "0="
   name, params = compiler.last_instruction()
   if name == 'OP_0=':
     compiler.rewind()
@@ -892,20 +868,20 @@ def bitop(kind): # kind can be 'set', 'clear' or 'toggle'
     else:
       compiler.eval('op_bit_toggle')
 
-@register('bit-set')
-def run():
+def primitive_bit_set():
+  "bit-set"
   bitop('set')
 
-@register('bit-clr')
-def run():
+def primitive_bit_clr():
+  "bit-clr"
   bitop('clear')
 
-@register('bit-toggle')
-def run():
+def primitive_bit_toggle():
+  "bit-toggle"
   bitop('toggle')
 
-@register('bit-set?')
-def run(invert = False):
+def primitive_bit_is_set(invert = False):
+  "bit-set?"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     # The bit to test is statically known
@@ -933,12 +909,12 @@ def run(invert = False):
     else:
       compiler.eval('op_bit_set_q')
 
-@register('bit-clr?')
-def run():
+def primitive_bit_is_clr():
+  "bit-clr?"
   compiler['bit-set?'].run(True)
 
-@register('bit-mask')
-def run():
+def primitive_bit_mask():
+  "bit-mask"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH':
     # The bit is known, compute a left shift
@@ -948,28 +924,25 @@ def run():
     # Default primitive
     compiler.eval('op_bit_mask')
 
-@register('\\')
-def run():
+def primitive_comment():
+  "\\"
   compiler.input_buffer = ''
 
-@register('(')
-def run():
+def primitive_op():
+  "("
   compiler.parse(')')
 
-@register('include')
-def run():
+def primitive_include():
   compiler.include(compiler.parse_word())
 
-@register('needs')
-def run():
+def primitive_needs():
   compiler.needs(compiler.parse_word())
 
-@register('exit')
-def run():
+def primitive_exit():
   compiler.add_instruction('goto', [compiler.current_object.end_label])
 
-@register('+')
-def run():
+def primitive_plus():
+  "+"
   if compiler.state:
     name, params = compiler.last_instruction()
     if is_static_push((name, params)):
@@ -1007,8 +980,8 @@ def run():
     x1 = compiler.ct_pop()
     compiler.ct_push(Add(x1, x2))
 
-@register('-')
-def run():
+def primitive_minus():
+  "-"
   if compiler.state:
     if is_static_push(compiler.last_instruction()) and \
        is_static_push(compiler.before_last_instruction()):
@@ -1029,8 +1002,8 @@ def run():
     x1 = compiler.ct_pop()
     compiler.ct_push(Sub(x1, x2))
 
-@register('*')
-def run():
+def primitive_times():
+  "*"
   if compiler.state:
     if is_static_push(compiler.last_instruction()) and \
        is_static_push(compiler.before_last_instruction()):
@@ -1046,18 +1019,18 @@ def run():
     x1 = compiler.ct_pop()
     compiler.ct_push(Mult(x1, x2))
 
-@register('1+')
-def run():
+def primitive_1_plus():
+  "1+"
   compiler.push(Number(1))
   compiler.eval('+')
 
-@register('1-')
-def run():
+def primitive_1_minus():
+  "1-"
   compiler.push(Number(1))
   compiler.eval('-')
 
-@register('1+!')
-def run():
+def primitive_1_plus_store():
+  "1+!"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH' and ram_addr(params[0]):
     # Increment a statically known RAM address
@@ -1068,8 +1041,8 @@ def run():
   else:
     compiler.eval('dup @ 1+ swap !')
 
-@register('c+!')
-def run(negate = False):
+def primitive_c_plus_store(negate = False):
+  "c+!"
   name, params = compiler.last_instruction()
   if is_static_push((name, params)):
     compiler.rewind()
@@ -1102,12 +1075,11 @@ def run(negate = False):
   else:
     compiler.eval('op_c+!')
 
-@register('c-!')
-def run():
+def primitive_c_minus_store():
+  "c-!"
   compiler['c+!'].run(True)
 
-@register('lshift')
-def run():
+def primitive_lshift():
   if compiler.state:
     if is_static_push(compiler.last_instruction()) and \
        is_static_push(compiler.before_last_instruction()):
@@ -1123,8 +1095,8 @@ def run():
     operand = compiler.ct_pop()
     compiler.ct_push(LeftShift(operand, nsteps))
 
-@register('=')
-def run():
+def primitive_equal():
+  "="
   if is_static_push(compiler.last_instruction()) and \
      compiler.last_instruction()[1][0].static_value() == 0:
     compiler.rewind()
@@ -1132,26 +1104,24 @@ def run():
   else:
     compiler.eval('op_=')
 
-@register(':')
-def run():
+def primitive_colon():
+  ":"
   compiler.state = 1
   name = compiler.parse_word()
   Word(name).end_label = Label()
 
-@register(';')
-def run():
+def primitive_semicolon():
+  ";"
   compiler.add_instruction('LABEL', [compiler.current_object.end_label])
   compiler.add_instruction('return', [no_fast])
   compiler.enter()
   compiler.state = 0
 
-@register('recurse')
-def run():
+def primitive_recurse():
   assert(compiler.current_object.opcodes[0][0] == 'LABEL')
   compiler.add_call(compiler.current_object.opcodes[0][1][0])
 
-@register('constant')
-def run():
+def primitive_constant():
   name = compiler.parse_word()
   Constant(name, compiler.ct_pop())
 
@@ -1198,8 +1168,7 @@ class Bit(Constant):
   def static_value(self):
     raise Compiler.INTERNAL_ERROR("in Bit.static_value")
 
-@register('bit')
-def run():
+def primitive_bit():
   name = compiler.parse_word()
   bit = compiler.ct_pop()
   addr = compiler.ct_pop()
@@ -1224,8 +1193,8 @@ def write_literal(value, addr):
     compiler.add_instruction('movlw', [value])
     compiler.add_instruction('movff', [compiler['WREG'], addr])
 
-@register('!')
-def run():
+def primitive_store():
+  "!"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH' and ram_addr(params[0]):
     # The store tries to write at a statically known RAM address
@@ -1283,8 +1252,8 @@ def run():
     # Any address and content
     compiler.eval('op_store')
 
-@register('c!')
-def run():
+def primitive_c_store():
+  "c!"
   name, params = compiler.last_instruction()
   if name == 'OP_PUSH' and ram_addr(params[0]):
     # The store tries to write at a statically known address in RAM
@@ -1315,8 +1284,7 @@ def run():
     # Any address and content
     compiler.eval('op_cstore')
 
-@register('allot')
-def run():
+def primitive_allot():
   compiler.allot(compiler.ct_pop().static_value())
 
 class Variable(Constant):
@@ -1346,13 +1314,11 @@ class Variable(Constant):
         compiler.eval('!')
       compiler.pop_object()
 
-@register('create')
-def run():
+def primitive_create():
   name = compiler.parse_word()
   Variable(name, 0)
 
-@register('variable')
-def run():
+def primitive_variable():
   name = compiler.parse_word()
   Variable(name, 2)
 
@@ -1362,23 +1328,19 @@ class Value(Variable):
     compiler.push(self)
     compiler.eval('@')
 
-@register('cvariable')
-def run():
+def primitive_cvariable():
   name = compiler.parse_word()
   Variable(name, 1)
 
-@register('eevariable')
-def run():
+def primitive_eevariable():
   name = compiler.parse_word()
   Variable(name, 2, 'NO_INIT', 'EEPROM')
 
-@register('eecvariable')
-def run():
+def primitive_eecvariable():
   name = compiler.parse_word()
   Variable(name, 1, 'NO_INIT', 'EEPROM')
 
-@register('value')
-def run():
+def primitive_value():
   value = compiler.ct_pop()
   name = compiler.parse_word()
   Value(name, 2, value)
@@ -1397,12 +1359,12 @@ class Comma(Primitive):
     name = '_unnamed_%d' % self.next_count()
     Variable(name, size, value)
 
-@register('c,')
-def run():
+def primitive_c_comma():
+  "c,"
   compiler[','].run(size = 1)
 
-@register('@')
-def run():
+def primitive_at():
+  "@"
   if compiler.state:
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH' and ram_addr(params[0]):
@@ -1416,8 +1378,8 @@ def run():
   else:
     raise Compiler.FATAL_ERROR("%s: cannot fetch while interpreting" % compiler.current_location)
 
-@register('c@')
-def run():
+def primitive_c_at():
+  "c@"
   if compiler.state:
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH' and ram_addr(params[0]):
@@ -1432,14 +1394,13 @@ def run():
     raise Compiler.FATAL_ERROR("%s: cannot fetch byte while interpreting" % \
           compiler.current_location)
 
-@register('to')
-def run():
+def primitive_to():
   name = compiler.parse_word()
   compiler.push(compiler.find(name))
   compiler.eval('!')
 
-@register('2>1')
-def run():
+def primitive_2_to_1():
+  "2>1"
   name, params = compiler.last_instruction()
   if name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]):
     compiler.rewind()
@@ -1456,45 +1417,40 @@ def run():
     # Resort to library routine
     compiler.eval('op_2>1')
 
-@register('inline')
-def run():
+def primitive_inline():
   compiler.current_object.inlined = True
 
-@register('no-inline')
-def run():
+def primitive_no_inline():
+  "no-inline"
   compiler.current_object.not_inlinable = True
 
-@register('low-interrupt')
-def run():
+def primitive_low_interrupt():
+  "low-interrupt"
   compiler.check_interrupts()
   compiler.low_interrupt = compiler.current_object
   compiler.rewind()
   compiler.add_instruction('retfie', [no_fast])
 
-@register('high-interrupt')
-def run():
+def primitive_high_interrupt():
+  "high-interrupt"
   compiler.check_interrupts()
   compiler.high_interrupt = compiler.current_object
   compiler.rewind()
   compiler.add_instruction('retfie', [no_fast])
 
-@register('fast')
-def run():
+def primitive_fast():
   name, params = compiler.last_instruction()
   if params == [no_fast]:
     compiler.rewind()
     compiler.add_instruction(name, [fast])
 
-@register('inw')
-def run():
+def primitive_inw():
   compiler.current_object.inw = True
 
-@register('outw')
-def run():
+def primitive_outw():
   compiler.current_object.outw = True
 
-@register('outz')
-def run():
+def primitive_outz():
   compiler.current_object.outz = True
 
 def is_internal_jump(opcode):
@@ -1571,16 +1527,13 @@ def PICIns_reset():
 
 PICIns_reset()
 
-@register('code')
-def run():
+def primitive_code():
   name = compiler.parse_word()
   Word(name)
   compiler.state = 0
   PICIns.ct_depth = len(compiler.data_stack)
 
-@register('python')
-def run():
-  """Include everything up to ;python in the default context."""
+def primitive_python():
   lines = []
   while True:
     compiler.refill()
@@ -1591,37 +1544,35 @@ def run():
   compiler.input_buffer = ''
   exec('\n'.join(lines), globals())
 
-@register(';code')
-def run():
+def primitive_colon_code():
+  ";code"
   compiler.enter()
   if len(compiler.data_stack) != PICIns.ct_depth:
     compiler.warning('wrong count on items on compiler '
                      'stack (%d instead of %d)' %
                      (len(compiler.data_stack), PICIns.ct_depth))
 
-@register(',a')
-def run():
+def primitive_comma_a():
+  ",a"
   PICIns.a = 0
-@register(',0')
-def run():
+def primitive_comma_0():
+  ",0"
   PICIns.a = 0
-@register(',1')
-def run():
+def primitive_comma_1():
+  ",1"
   PICIns.a = 1
-@register(',w')
-def run():
+def primitive_comma_w():
+  ",w"
   PICIns.f = 0
-@register(',f')
-def run():
+def primitive_comma_f():
+  ",f"
   PICIns.f = 1
-@register(',s')
-def run():
+def primitive_comma_s():
+  ",s"
   PICIns.s = 1
-@register('prefix')
-def run():
+def primitive_prefix():
   PICIns.prefix = True
-@register('postfix')
-def run():
+def primitive_postfix():
   PICIns.prefix = False
 
 class Word(Named, LiteralValue):
@@ -2252,7 +2203,7 @@ class Compiler:
     self.initialize_variables = True
 
   def add_primitives(self):
-    for name, cls in _primitives:
+    for name, cls in register_primitives():
       self.add_primitive(name, cls)
     self.add_primitive(',', Comma)
     self.add_primitive('char', compiler['[char]'].__class__)
