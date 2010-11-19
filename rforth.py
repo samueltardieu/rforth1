@@ -769,7 +769,7 @@ def primitive_defaultw():
   compiler['casew'].run(True)
 
 def primitive_endswitchw():
-  xored = compiler.ct_pop()
+  _xored = compiler.ct_pop()
   label = compiler.ct_pop()
   nlabel = compiler.ct_pop()
   compiler.add_instruction('LABEL', [nlabel])
@@ -821,13 +821,13 @@ def primitive_else():
 
 def primitive_0_not_equal():
   "0<>"
-  name, params = compiler.last_instruction()
+  name, _params = compiler.last_instruction()
   if name != 'OP_NORMALIZE':
     compiler.add_instruction('OP_NORMALIZE', [])
 
 def primitive_0_equal():
   "0="
-  name, params = compiler.last_instruction()
+  name, _params = compiler.last_instruction()
   if name == 'OP_0=':
     compiler.rewind()
     compiler.eval('0<>')
@@ -1083,9 +1083,9 @@ def primitive_lshift():
   if compiler.state:
     if is_static_push(compiler.last_instruction()) and \
        is_static_push(compiler.before_last_instruction()):
-      name, nsteps = compiler.last_instruction()
+      _name, nsteps = compiler.last_instruction()
       compiler.rewind()
-      name, operand = compiler.last_instruction()
+      _name, operand = compiler.last_instruction()
       compiler.rewind()
       compiler.push(LeftShift(operand[0], nsteps[0]))
     else:
@@ -2649,11 +2649,11 @@ class Compiler:
 
   def pop_to_fsr(self, fsr):
     if is_static_push(self.last_instruction()):
-      name, params = self.last_instruction()
+      _name, params = self.last_instruction()
       self.rewind()
       self.add_instruction('lfsr', [Number(fsr), params[0]])
     elif is_ram_fetch(self.last_instruction()):
-      name, params = self.last_instruction()
+      _name, params = self.last_instruction()
       self.rewind()
       self.add_instruction('movff', [params[0], self['FSR%dL' % fsr]])
       self.add_instruction('movff', [Add(params[0], Number(1)),
@@ -2756,7 +2756,7 @@ def main():
     if os.fork() == 0:
       os.execlp('gpasm', 'gpasm', '-o', hexfile, asmfile)
     else:
-      pid, status = os.wait()
+      _pid, status = os.wait()
       if status != 0:
         sys.exit(1)
 
