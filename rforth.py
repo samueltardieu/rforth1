@@ -2761,10 +2761,4 @@ def main():
         sys.exit(1)
 
 if __name__ == '__main__':
-  if os.getenv('RFORTH_CODE_COVERAGE') is None:
-    try:
-      import psyco
-      psyco.full()
-    except:
-      pass
   main()
