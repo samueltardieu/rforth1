@@ -3,7 +3,7 @@
 code flash-addr!
     INDF0 7 ,a bcf  \ Clear high bit -- usable addresses are 0x0000 to 0x7FFF
     EEPGD ,a bsf
-    table-addr! bra
+    table-addr! goto
 ;code
 
 : tablec@+ ( -- c ) tblrd*+ TABLAT c@ ; inline

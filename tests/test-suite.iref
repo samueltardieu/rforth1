@@ -906,6 +906,10 @@ negate
 	addwfc INDF0,1,0
 	return
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	movf INDF0,0,0
@@ -918,11 +922,6 @@ table_addr_EX_
 	movff POSTDEC0,TBLPTRL
 	bcf EECON1,6,0
 	return
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 test_abs
 	movlw LOW((test_abs_str+0x8000))

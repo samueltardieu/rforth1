@@ -804,6 +804,10 @@ _0_LT_
 	movwf INDF0,0
 	return
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -1243,11 +1247,6 @@ _lbl___804
 _lbl___812
 	call step
 	bra _lbl___812
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 can_normal
 	clrf PREINC0,0

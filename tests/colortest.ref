@@ -129,6 +129,10 @@ _2_ST_
 	rlcf INDF0,1,0
 	return
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -174,11 +178,6 @@ _lbl___464
 	call disp1
 	call disp2
 	bra _lbl___464
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 disp1
 	movlw LOW((disp1_str+0x8000))

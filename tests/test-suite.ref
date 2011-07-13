@@ -304,6 +304,10 @@ op_fetch_tos
 	movff INDF1,PREINC0
 	return
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -323,11 +327,6 @@ normalize_tos
 	return
 	btg math_flags,0,0
 	goto negate
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 _space
 	movlw bl

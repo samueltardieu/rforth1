@@ -113,6 +113,10 @@ emit
 	movwf TXREG,0
 	return
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	movf INDF0,0,0
@@ -180,11 +184,6 @@ _lbl___525
 	clrf PREINC0,0
 	call an_
 	bra _lbl___525
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 emit_8
 	call op_dup

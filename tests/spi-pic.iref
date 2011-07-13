@@ -85,6 +85,10 @@ bit_change_command equ 0x2
 ; Section: code
 ;---------------------------------------------------------
 
+flash_addr_EX_
+	bcf INDF0,7,0
+	bsf EECON1,7,0
+
 table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
@@ -119,11 +123,6 @@ main
 _lbl___507
 	call handle_command
 	bra _lbl___507
-
-flash_addr_EX_
-	bcf INDF0,7,0
-	bsf EECON1,7,0
-	bra table_addr_EX_
 
 op_dup
 	movlw -1
