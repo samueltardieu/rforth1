@@ -17,5 +17,14 @@ class Config(Primitive):
     compiler.current_object.refers_to(item)
     compiler.pop_object()
 
+class Processor(Primitive):
+  def run(self):
+    processor = compiler.parse_word()
+    if compiler.processor is None:
+      compiler.processor = processor
+    elif compiler.processor != processor:
+      compiler.error("Conflicting `%s' and `%s' processor types" % (compiler.processor, processor))
+
 compiler.add_primitive('config', Config)
+compiler.add_primitive('processor', Processor)
 ;python

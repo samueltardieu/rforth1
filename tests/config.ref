@@ -1,4 +1,4 @@
-	processor pic18f248
+	processor pic18f458
 	radix dec
 	org 0x2000
 	goto main
