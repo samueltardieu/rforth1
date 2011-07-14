@@ -1620,7 +1620,7 @@ class Word(Named, LiteralValue):
 
   def should_inline(self):
     if self.inlined or not self.from_source or \
-           self == compiler.find(compiler.main):
+           self == compiler.find_main():
       return None
     actual_length = len(self.opcodes) + self.referenced_by
     projected_length = len(self.opcodes) * self.referenced_by
@@ -2318,6 +2318,12 @@ class Compiler:
     except:
       return None
 
+  def find_main(self, signal_error = False):
+    main = self.find(self.main)
+    if signal_error and main is None:
+      self.error("cannot find `%s' word" % self.main)
+    return main
+
   def enter_object(self, object):
     object.order = self.order
     self.order += 1
@@ -2419,7 +2425,7 @@ class Compiler:
     self.current_object = self['init_runtime']
     self.state = 1
     inlinable = [x for x in self.all_entities if x.can_inline()]
-    refs = self.find(self.main).deep_references([])
+    refs = self.find_main(True).deep_references([])
     for i in refs:
       i.check_real()
     if self.automatic_inlining:
