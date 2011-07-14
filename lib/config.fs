@@ -23,7 +23,7 @@ class Processor(Primitive):
     if compiler.processor is None:
       compiler.processor = processor
     elif compiler.processor != processor:
-      compiler.error("Conflicting `%s' and `%s' processor types" % (compiler.processor, processor))
+      compiler.error("conflicting `%s' and `%s' processor types" % (compiler.processor, processor))
 
 compiler.add_primitive('config', Config)
 compiler.add_primitive('processor', Processor)
