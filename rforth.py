@@ -30,6 +30,8 @@ import optparse, os, re, string, sys
 
 compiler = None
 
+DEFAULT_PROCESSOR = '18f248'
+
 # Setup Forth search path. The search path is the current directory
 # then the directories in RFORTH1_PATH (if any) then rforth1 directory
 forth_search_path = ['.']
@@ -2541,7 +2543,7 @@ class Compiler:
     outfd.write('\n;%s\n; Section: %s\n;%s\n' % (t, name, t))
 
   def output_prologue(self, outfd):
-    outfd.write("\tprocessor pic%s\n" % self.processor)
+    outfd.write("\tprocessor pic%s\n" % (self.processor or DEFAULT_PROCESSOR))
     outfd.write("\tradix dec\n")
     outfd.write("\torg %s\n" % self.start)
     outfd.write("\tgoto %s\n" % self['init_runtime'])
@@ -2723,8 +2725,8 @@ def main():
   parser.add_option('-o', '--output', metavar = 'FILE', dest = 'outfile',
                      help = 'set output file name', default = None)
   parser.add_option('-p', '--processor', metavar = 'MODEL',
-                     default = '18f248',
-                     help = 'set processor type [18f248]')
+                     default = None,
+                     help = 'set processor type [%s]' % DEFAULT_PROCESSOR)
   parser.add_option('-s', '--start', default = parse_number('0x2000'),
                      action = 'callback', callback = set_start_cb,
                      metavar = 'ADDR', type = 'string', dest = 'start',
