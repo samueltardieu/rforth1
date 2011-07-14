@@ -2400,6 +2400,8 @@ class Compiler:
         if object.immediate:
           try:
             object.run()
+          except Compiler.COMPILATION_ERROR:
+            raise
           except:
             error('internal error in object.run()')
             raise
