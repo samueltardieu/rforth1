@@ -134,7 +134,7 @@ main_loop
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___484
+	bnz _lbl___486
 	call leds_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -142,7 +142,7 @@ main_loop
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___484
+_lbl___486
 	call op_dup
 	movlw 80
 	movwf PREINC0,0
@@ -150,7 +150,7 @@ _lbl___484
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___487
+	bnz _lbl___489
 	call leds_off
 	call read4
 	movf POSTDEC0,0,0
@@ -158,7 +158,7 @@ _lbl___484
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_2
-_lbl___487
+_lbl___489
 	call op_dup
 	movlw 83
 	movwf PREINC0,0
@@ -166,7 +166,7 @@ _lbl___487
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___490
+	bnz _lbl___492
 	call leds_off
 	movf T0CON,0,0
 	andlw 0xf0
@@ -176,7 +176,7 @@ _lbl___487
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___490
+_lbl___492
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	bra main_loop
@@ -475,11 +475,11 @@ timer_reached_QM_
 	call neighbour_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___453
+	bz _lbl___455
 	clrf PREINC0,0
 	clrf PREINC0,0
 	goto _GT__EQ_
-_lbl___453
+_lbl___455
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	clrf PREINC0,0
@@ -488,11 +488,11 @@ _lbl___453
 
 timer_wait
 	call timer_set
-_lbl___459
+_lbl___461
 	call timer_reached_QM_
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___459
+	bz _lbl___461
 	return
 
 timer_reset
@@ -504,7 +504,7 @@ timer_reset
 
 pwm
 	call timer_reset
-_lbl___473
+_lbl___475
 	call alt_1
 	movff ondelay,PREINC0
 	movff (ondelay+1),PREINC0
@@ -515,7 +515,7 @@ _lbl___473
 	call timer_wait
 	btfsc PIR1,5,0
 	return
-	bra _lbl___473
+	bra _lbl___475
 
 init_ports
 	movlw 0xb8

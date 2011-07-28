@@ -148,9 +148,9 @@ an
 
 measure
 	bsf ADCON0,2,0
-_lbl___448
+_lbl___450
 	btfsc ADCON0,2,0
-	bra _lbl___448
+	bra _lbl___450
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	return
@@ -172,12 +172,12 @@ main
 	call type
 	call cr
 	call init_adc
-_lbl___464
+_lbl___466
 	call key
 	call disp0
 	call disp1
 	call disp2
-	bra _lbl___464
+	bra _lbl___466
 
 disp1
 	movlw LOW((disp1_str+0x8000))

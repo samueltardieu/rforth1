@@ -124,32 +124,32 @@ table_addr_EX_
 
 handle_key
 	xorlw 0
-	bnz _lbl___445
+	bnz _lbl___447
 	movlw LOW((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___445
+_lbl___447
 	xorlw 1
-	bnz _lbl___446
+	bnz _lbl___448
 	movlw LOW((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__1+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___446
+_lbl___448
 	xorlw 3
-	bnz _lbl___447
+	bnz _lbl___449
 	movlw LOW((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__2+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___447
+_lbl___449
 	movlw LOW((handle_key_str__3+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((handle_key_str__3+0x8000))

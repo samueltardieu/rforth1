@@ -262,14 +262,14 @@ test_set
 	movwf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___473
+	bz _lbl___475
 	movlw LOW((test_set_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_set_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___473
+_lbl___475
 	movlw LOW((test_set_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_set_str__1+0x8000))
@@ -355,14 +355,14 @@ test_clr
 	movwf PREINC0,0
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___478
+	bz _lbl___480
 	movlw LOW((test_clr_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_clr_str+0x8000))
 	movwf PREINC0,0
 	movlw 3
 	goto type
-_lbl___478
+_lbl___480
 	movlw LOW((test_clr_str__1+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((test_clr_str__1+0x8000))

@@ -218,7 +218,7 @@ main
 	call can_set_mask
 	movlw 7
 	movwf PREINC2,0
-_lbl___604
+_lbl___606
 	movlw LOW(0x7ff)
 	movwf PREINC0,0
 	movlw HIGH(0x7ff)
@@ -234,7 +234,7 @@ _lbl___604
 	movf POSTDEC0,0,0
 	call can_set_filter
 	decfsz INDF2,1,0
-	bra _lbl___604
+	bra _lbl___606
 	movf POSTDEC2,1,0
 	clrf PREINC0,0
 	clrf PREINC0,0

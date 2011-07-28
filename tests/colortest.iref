@@ -90,9 +90,9 @@ an_
 	movf POSTDEC0,0,0
 	movff POSTDEC0,ADCON0
 	bsf ADCON0,2,0
-_lbl___507
+_lbl___509
 	btfsc ADCON0,2,0
-	bra _lbl___507
+	bra _lbl___509
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
 	movf INDF0,0,0
@@ -150,9 +150,9 @@ main
 	movwf ADCON0,0
 	movlw 0xc2
 	movwf ADCON1,0
-_lbl___525
+_lbl___527
 	btfss PIR1,5,0
-	bra _lbl___525
+	bra _lbl___527
 	movf RCREG,0,0
 	movlw LOW((disp0_str+0x8000))
 	movwf PREINC0,0
@@ -183,7 +183,7 @@ _lbl___525
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call an_
-	bra _lbl___525
+	bra _lbl___527
 
 emit_8
 	call op_dup

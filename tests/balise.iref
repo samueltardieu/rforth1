@@ -186,7 +186,7 @@ main
 	movwf PREINC0,0
 	movlw 15
 	call type
-_lbl___593
+_lbl___595
 	movlw LOW((prompt_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((prompt_str+0x8000))
@@ -197,7 +197,7 @@ _lbl___593
 	clrf TMR0L,0
 	clrf (nexttimer+1),1
 	clrf nexttimer,1
-_lbl___597
+_lbl___599
 	movff pattern_1,PREINC0
 	clrf PREINC0,0
 	call alt_EX_
@@ -211,7 +211,7 @@ _lbl___597
 	movff (offdelay+1),PREINC0
 	call timer_wait
 	btfss PIR1,5,0
-	bra _lbl___597
+	bra _lbl___599
 	call key
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -223,7 +223,7 @@ _lbl___597
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___603
+	bnz _lbl___605
 	call leds_off
 	call read16
 	movff POSTDEC0,(ondelay+1)
@@ -231,7 +231,7 @@ _lbl___597
 	call read16
 	movff POSTDEC0,(offdelay+1)
 	movff POSTDEC0,offdelay
-_lbl___603
+_lbl___605
 	call op_dup
 	movlw 80
 	movwf PREINC0,0
@@ -239,7 +239,7 @@ _lbl___603
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___605
+	bnz _lbl___607
 	call leds_off
 	call read4
 	movf POSTDEC0,0,0
@@ -247,7 +247,7 @@ _lbl___603
 	call read4
 	movf POSTDEC0,0,0
 	movff POSTDEC0,pattern_2
-_lbl___605
+_lbl___607
 	call op_dup
 	movlw 83
 	movwf PREINC0,0
@@ -255,7 +255,7 @@ _lbl___605
 	call xor
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bnz _lbl___607
+	bnz _lbl___609
 	call leds_off
 	movf T0CON,0,0
 	andlw 0xf0
@@ -265,10 +265,10 @@ _lbl___605
 	call or
 	movf POSTDEC0,0,0
 	movff POSTDEC0,T0CON
-_lbl___607
+_lbl___609
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
-	bra _lbl___593
+	bra _lbl___595
 
 op_dup
 	movlw -1
@@ -449,7 +449,7 @@ timer_wait
 	movf POSTDEC0,0,0
 	addwfc INDF1,1,0
 	movf POSTDEC0,0,0
-_lbl___522
+_lbl___524
 	movff TMR0L,PREINC0
 	movff TMR0H,PREINC0
 	movff nexttimer,PREINC0
@@ -463,31 +463,31 @@ _lbl___522
 	movwf PREINC0,0
 	call _2dupxor_GT_w
 	btfss WREG,7,0
-	bra _lbl___529
+	bra _lbl___531
 	movf POSTDEC0,0,0
 	movf POSTDEC0,0,0
 	call _0_LT_
-	bra _lbl___531
-_lbl___529
+	bra _lbl___533
+_lbl___531
 	call op_minus
 	call _0_LT_
-_lbl___531
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
-	bz _lbl___532
-	clrf PREINC0,0
-	clrf PREINC0,0
-	call _GT__EQ_
-	bra _lbl___533
-_lbl___532
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	clrf PREINC0,0
-	clrf PREINC0,0
 _lbl___533
 	movf POSTDEC0,0,0
 	iorwf POSTDEC0,0,0
-	bz _lbl___522
+	bz _lbl___534
+	clrf PREINC0,0
+	clrf PREINC0,0
+	call _GT__EQ_
+	bra _lbl___535
+_lbl___534
+	movf POSTDEC0,0,0
+	movf POSTDEC0,0,0
+	clrf PREINC0,0
+	clrf PREINC0,0
+_lbl___535
+	movf POSTDEC0,0,0
+	iorwf POSTDEC0,0,0
+	bz _lbl___524
 	return
 
 ;---------------------------------------------------------
