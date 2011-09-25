@@ -51,18 +51,6 @@ init_runtime
 
 main
 	call test1
-	bra _lbl___441
-_lbl___440
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
-	return
-_lbl___441
-	movlw LOW(_lbl___440)
-	movwf PREINC0,0
-	movlw HIGH(_lbl___440)
-	movwf PREINC0,0
-	call test2
 	bra _lbl___444
 _lbl___443
 	movf POSTDEC0,0,0
@@ -74,18 +62,30 @@ _lbl___444
 	movwf PREINC0,0
 	movlw HIGH(_lbl___443)
 	movwf PREINC0,0
+	call test2
 	bra _lbl___447
 _lbl___446
+	movf POSTDEC0,0,0
+	infsnz POSTINC0,1,0
+	incf INDF0,1,0
+	return
+_lbl___447
+	movlw LOW(_lbl___446)
+	movwf PREINC0,0
+	movlw HIGH(_lbl___446)
+	movwf PREINC0,0
+	bra _lbl___450
+_lbl___449
 	movlw LOW((-1))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
 	return
-_lbl___447
-	movlw LOW(_lbl___446)
+_lbl___450
+	movlw LOW(_lbl___449)
 	movwf PREINC0,0
-	movlw HIGH(_lbl___446)
+	movlw HIGH(_lbl___449)
 	movwf PREINC0,0
 
 _OP_bi_CP_
@@ -139,41 +139,41 @@ test1
 	movlw 3
 	movwf PREINC0,0
 	clrf PREINC0,0
-	bra _lbl___428
-_lbl___427
+	bra _lbl___431
+_lbl___430
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	return
-_lbl___428
-	movlw LOW(_lbl___427)
+_lbl___431
+	movlw LOW(_lbl___430)
 	movwf PREINC0,0
-	movlw HIGH(_lbl___427)
+	movlw HIGH(_lbl___430)
 	movwf PREINC0,0
-	bra _lbl___431
-_lbl___430
+	bra _lbl___434
+_lbl___433
 	movlw LOW((-1))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
 	return
-_lbl___431
+_lbl___434
 	call _OP_keep_CP_
-	bra _lbl___430
+	bra _lbl___433
 
 test2
-	bra _lbl___435
-_lbl___434
+	bra _lbl___438
+_lbl___437
 	movlw LOW((-1))
 	movf POSTDEC0,1,0
 	addwf POSTINC0,1,0
 	movlw HIGH((-1))
 	addwfc INDF0,1,0
 	return
-_lbl___435
+_lbl___438
 	call _OP_keep_CP_
-	bra _lbl___434
+	bra _lbl___437
 
 ;---------------------------------------------------------
 ; Section: memory

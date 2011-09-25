@@ -1,18 +1,6 @@
-TESTCASES = tests/test-suite.cmp tests/balise.cmp tests/sensors.cmp \
-            tests/test-bitops.cmp tests/pwm.cmp \
-            tests/test-can.cmp tests/test-plusminus.cmp tests/spi-pic.cmp \
-            tests/colortest.cmp tests/interrupts.cmp tests/increment.cmp \
-            tests/lshift.cmp tests/interrupts2.cmp tests/address_of.cmp \
-            tests/cfor.cmp tests/switchw.cmp tests/retlw.cmp \
-            tests/charinterp.cmp tests/duptow.cmp tests/cfetchdup.cmp \
-            tests/cfetchdrop.cmp tests/wnoop.cmp tests/doublezero.cmp \
-            tests/bitmask.cmp tests/addzero.cmp tests/staticminus.cmp \
-            tests/staticmult.cmp tests/oneplusstore.cmp \
-            tests/cplusstore.cmp tests/recurse.cmp tests/store.cmp \
-            tests/eeprom.cmp tests/values.cmp tests/commas.cmp \
-            tests/prefixasm.cmp tests/inline.cmp tests/fetch-bitop.cmp \
-	    tests/config.cmp
+TESTFILES = $(wildcard tests/*.fs)
 
+TESTCASES = ${TESTFILES:.fs=.cmp}
 ITESTCASES = ${TESTCASES:.cmp=.icmp}
 
 COMPILER = rforth.py
