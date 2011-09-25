@@ -54,16 +54,16 @@ main
 	movwf PREINC0,0
 	clrf PREINC0,0
 	call test1
-	bra _lbl___484
-_lbl___483
+	bra _lbl___497
+_lbl___496
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	return
-_lbl___484
-	movlw LOW(_lbl___483)
+_lbl___497
+	movlw LOW(_lbl___496)
 	movwf PREINC0,0
-	movlw HIGH(_lbl___483)
+	movlw HIGH(_lbl___496)
 	movwf PREINC0,0
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
@@ -98,20 +98,20 @@ _OP_execute_CP_
 	movwf PCL,0
 
 test1
-	bra _lbl___469
-_lbl___468
+	bra _lbl___482
+_lbl___481
 	movf POSTDEC0,0,0
 	infsnz POSTINC0,1,0
 	incf INDF0,1,0
 	return
-_lbl___469
+_lbl___482
 	call op_dup
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-	call _lbl___468
+	call _lbl___481
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
-	bra _lbl___468
+	bra _lbl___481
 
 ;---------------------------------------------------------
 ; Section: memory
