@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# (c) 2005-2011 Samuel Tardieu <sam@rfc1149.net>
+# (c) 2005-2012 Samuel Tardieu <sam@rfc1149.net>
 #
 # rforth1 is released under the GNU General Public License (see the
 # file COPYING in this directory)
