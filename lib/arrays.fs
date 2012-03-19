@@ -8,7 +8,7 @@ def parse_array():
             break
         number = parse_number(word)
         if number is None:
-            raise Compiler.FATAL_ERROR, "%s: unrecognized number %s" % (compiler.current_location(), word)
+            raise Compiler.FATAL_ERROR("%s: unrecognized number %s" % (compiler.current_location(), word))
         data.append(number.value)
     return data
 
