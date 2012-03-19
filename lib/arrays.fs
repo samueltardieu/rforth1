@@ -28,7 +28,7 @@ class Array (Primitive):
         insert_data(d, "words")
 
 class CArray (Primitive):
-    
+
     def run(self):
         insert_data(parse_array(), "bytes")
 
