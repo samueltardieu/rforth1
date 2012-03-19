@@ -17,4 +17,4 @@ foo
 main
 	return
 
-END
+	END

@@ -51,4 +51,4 @@ op_zeroeq_z
 	movwf PREINC0,0
 	return
 
-END
+	END

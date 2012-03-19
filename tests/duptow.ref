@@ -22,4 +22,4 @@ main
 	movf PLUSW0,0,0
 	return
 
-END
+	END

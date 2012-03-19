@@ -69,4 +69,4 @@ main
 	retlw 255
 	retlw 0
 
-END
+	END

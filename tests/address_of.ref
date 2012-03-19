@@ -14,4 +14,4 @@
 foo
 	return
 
-END
+	END

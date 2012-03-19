@@ -30,4 +30,4 @@ foo
 	movff RCREG,INDF0
 	return
 
-END
+	END

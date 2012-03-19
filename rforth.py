@@ -2567,7 +2567,7 @@ class Compiler:
       outfd.write("\treset\n")
 
   def output_epilogue(self, outfd):
-    outfd.write("END\n")
+    outfd.write("\tEND\n")
 
   def warning(self, str):
     warning('%s: %s' % (self.current_location(), str))

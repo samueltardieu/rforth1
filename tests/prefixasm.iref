@@ -26,4 +26,4 @@ bar
 	movff INDF0,RCREG
 	return 1
 
-END
+	END

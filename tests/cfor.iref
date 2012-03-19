@@ -621,4 +621,4 @@ test7_str
 test8_str
 	db 116,101,115,116,56
 
-END
+	END

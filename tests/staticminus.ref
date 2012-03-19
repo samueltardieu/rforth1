@@ -23,4 +23,4 @@ main
 	movwf PREINC0,0
 	return
 
-END
+	END
