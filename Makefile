@@ -46,20 +46,20 @@ clean:
 
 %.cmp: %.ref never
 	${RM} ${@:.cmp=.asm}
-	${MAKE} ${@:.cmp=.asm} OPTS="--no-comments" 2> /dev/null
+	${MAKE} ${@:.cmp=.asm} OPTS="--no-comments"
 	diff -u ${@:.cmp=.ref} ${@:.cmp=.asm}
 
 %.icmp: %.iref never
 	${RM} ${@:.icmp=.asm}
-	${MAKE} ${@:.icmp=.asm} OPTS="--no-comments -a" 2> /dev/null
+	${MAKE} ${@:.icmp=.asm} OPTS="--no-comments -a"
 	diff -u ${@:.icmp=.iref} ${@:.icmp=.asm}
 
 %.newref: never
 	${RM} ${@:.newref=.asm}
-	${MAKE} ${@:.newref=.asm} OPTS="--no-comments" 2> /dev/null
+	${MAKE} ${@:.newref=.asm} OPTS="--no-comments"
 	cp -p ${@:.newref=.asm} ${@:.newref=.ref}
 	${RM} ${@:.newref=.asm}
-	${MAKE} ${@:.newref=.asm} OPTS="--no-comments -a" 2> /dev/null
+	${MAKE} ${@:.newref=.asm} OPTS="--no-comments -a"
 	cp -p ${@:.newref=.asm} ${@:.newref=.iref}
 
 %.load: %.hex
