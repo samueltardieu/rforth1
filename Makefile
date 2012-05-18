@@ -21,6 +21,11 @@ TEXI2HTML ?= texi2html
 
 tests: ${TESTCASES} ${ITESTCASES}
 
+tests-gputils::
+	wget -O - http://downloads.sourceforge.net/sourceforge/gputils/gputils-0.14.1.tar.gz | tar zxf -
+	cd gputils-0.14.1 && ./configure --prefix=$$PWD && make install
+	PATH=$$PWD/gputils-0.14.1/bin:$$PATH make tests
+
 never::
 
 update-tests: ${TESTCASES:.cmp=.newref}
