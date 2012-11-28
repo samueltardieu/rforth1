@@ -310,6 +310,13 @@ class Mult(Binary):
   def compute(self, a1, a2):
     return a1*a2
 
+class Div(Binary):
+
+  op = '/'
+
+  def compute(self, a1, a2):
+    return a1/a2
+
 class LeftShift(Binary):
 
   op = '<<'
@@ -1020,6 +1027,23 @@ def primitive_times():
     x2 = compiler.ct_pop()
     x1 = compiler.ct_pop()
     compiler.ct_push(Mult(x1, x2))
+
+def primitive_div():
+  "/"
+  if compiler.state:
+    if is_static_push(compiler.last_instruction()) and \
+       is_static_push(compiler.before_last_instruction()):
+      res = Div(compiler.before_last_instruction()[1][0],
+                compiler.last_instruction()[1][0])
+      compiler.rewind()
+      compiler.rewind()
+      compiler.push(res)
+    else:
+      compiler.eval('op_/')
+  else:
+    x2 = compiler.ct_pop()
+    x1 = compiler.ct_pop()
+    compiler.ct_push(Div(x1, x2))
 
 def primitive_1_plus():
   "1+"

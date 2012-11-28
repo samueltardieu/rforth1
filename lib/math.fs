@@ -101,7 +101,7 @@ math-flags 0 bit negative
   intr-unprotect
   apply-sign ;
 
-: / ( n1 n2 -- n1/n2 )
+: op_/ ( n1 n2 -- n1/n2 )
   negative bit-clr normalize-tos-2
   intr-protect
   temp_l ! 0 temp_e ! temp_w ! div32 temp_w @
