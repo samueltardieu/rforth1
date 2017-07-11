@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# (c) 2005-2012 Samuel Tardieu <sam@rfc1149.net>
+# (c) 2005-2017 Samuel Tardieu <sam@rfc1149.net>
 #
 # rforth1 is released under the GNU General Public License (see the
 # file COPYING in this directory)
@@ -127,8 +127,7 @@ class Number(LiteralValue):
             s = ''
         if self.base == 10:
             return s + str(abs(self.value))
-        else:
-            return s + hex(abs(self.value))
+        return s + hex(abs(self.value))
 
     def deep_references(self, stack):
         return stack
@@ -174,10 +173,7 @@ def short_addr(addr):
 def access_bit(addr):
     """Return the right access bit depending on whether the address is present
     in the access bank or not."""
-    if in_access_bank(addr):
-        return access
-    else:
-        return no_access
+    return access if in_access_bank(addr) else no_access
 
 
 def ram_addr(addr):
@@ -309,10 +305,7 @@ class Binary(LiteralValue):
 
     def static_value(self):
         a1, a2 = self.v1.static_value(), self.v2.static_value()
-        if a1 is not None and a2 is not None:
-            return self.compute(a1, a2)
-        else:
-            return None
+        return self.compute(a1, a2) if a1 is not None and a2 is not None else None
 
     def makes_reference_to(self, l):
         return self.v1.makes_reference_to(l) or self.v2.makes_reference_to(l)
@@ -398,18 +391,12 @@ class High(Unary):
 
 def low(x):
     v = x.static_value()
-    if v is not None and v >= 0 and v <= 0xff:
-        return x
-    else:
-        return Low(x)
+    return x if v is not None and v >= 0 and v <= 0xff else Low(x)
 
 
 def high(x):
     v = x.static_value()
-    if v is not None and v >= 0 and v <= 0xff:
-        return Number(0)
-    else:
-        return High(x)
+    return Number(0) if v is not None and v >= 0 and v <= 0xff else High(x)
 
 
 class Negated(Unary):
@@ -552,7 +539,7 @@ def primitive_again(do_not_pop_counter=False):
     label = compiler.ct_pop()
     compiler.add_instruction('bra', [label])
     if not do_not_pop_counter:
-        assert(compiler.ct_pop() == 0)
+        assert compiler.ct_pop() == 0
 
 
 def primitive_ob():
@@ -1266,7 +1253,7 @@ def primitive_semicolon():
 
 
 def primitive_recurse():
-    assert(compiler.current_object.opcodes[0][0] == 'LABEL')
+    assert compiler.current_object.opcodes[0][0] == 'LABEL'
     compiler.add_call(compiler.current_object.opcodes[0][1][0])
 
 
@@ -1295,10 +1282,7 @@ class Constant(Named, LiteralValue):
             compiler.ct_push(self)
 
     def static_value(self):
-        if isinstance(self.value, int):
-            return self.value
-        else:
-            return self.value.static_value()
+        return self.value if isinstance(self.value, int) else self.value.static_value()
 
 
 class Bit(Constant):
@@ -1795,22 +1779,14 @@ class Word(Named, LiteralValue):
         self.nrefs = 0
 
     def __repr__(self):
-        if self.substitute:
-            return self.substitute.__repr__()
-        else:
-            return Named.__repr__(self)
+        return self.substitute.__repr__() if self.substitute else Named.__repr__(self)
 
     def real_instance(self):
         """Follow substitutions."""
-        if self.substitute:
-            return self.substitute.real_instance()
-        return self
+        return self.substitute.real_instance() if self.substitute else self
 
     def unsubstituted(self):
-        if self.substitute:
-            return '; %s' % self.name
-        else:
-            return repr(self)
+        return '; %s' % self.name if self.substitute else repr(self)
 
     def can_inline(self):
         if self.not_inlinable:
@@ -1831,7 +1807,7 @@ class Word(Named, LiteralValue):
         return actual_length >= projected_length
 
     def add_instruction(self, instruction, params):
-        assert(instruction != 'call' or len(params) == 2)
+        assert instruction != 'call' or len(params) == 2
         self.opcodes.append((instruction, params))
         for p in params:
             self.refers_to(p)
@@ -2229,13 +2205,11 @@ class Word(Named, LiteralValue):
                 append('EMPTY')
 
         # Return the new version if it has changed, the original otherwise
-        if l:
-            if l == [('EMPTY', [])]:
-                return []
-            else:
-                return l
-        else:
-            return [o]
+        if l == [('EMPTY', [])]:
+            return []
+        elif l:
+            return l
+        return [o]
 
     def expand(self):
         new_opcodes = []
@@ -2282,10 +2256,8 @@ class Input:
 
     def next_line(self):
         self.current_line += 1
-        if self.current_line > len(self.lines):
-            return None
-        else:
-            return self.lines[self.current_line - 1]
+        return None if self.current_line > len(self.lines) \
+            else self.lines[self.current_line - 1]
 
     def current_location(self):
         """Return an identifier of the current location"""
@@ -2409,7 +2381,7 @@ class Compiler:
     def add_default_content(self):
         self.add_asm_instructions()
         self.add_primitives()
-        assert(self.here < 0x60)
+        assert self.here < 0x60
         self.here = 0x100
         self.initialize_variables = True
 
@@ -2439,10 +2411,7 @@ class Compiler:
 
     def current_location(self):
         """Return an identifier of the current location"""
-        if self.input:
-            return self.input.current_location()
-        else:
-            return '<builtin>'
+        return self.input.current_location() if self.input else '<builtin>'
 
     def allot(self, n):
         self.here += n
@@ -2487,7 +2456,7 @@ class Compiler:
         result, self.input_buffer = self.input_buffer.split(char, 1)
         return result
 
-    _next_word = re.compile('(\s*)(\S+)\s?')
+    _next_word = re.compile(r'(\s*)(\S+)\s?')
 
     def parse_word(self):
         while True:
@@ -2566,10 +2535,7 @@ class Compiler:
         self.all_entities.remove(old)
         new.occurrence = old.occurrence
         def fix_it(o):
-            if o == old:
-                return new
-            else:
-                return o
+            return new if o == old else o
         for e in [self.current_object] + self.all_entities:
             if not e.immediate:
                 e.opcodes = [(name, [fix_it(p) for p in params])
@@ -2834,7 +2800,7 @@ class Compiler:
         if removable_end:
             # Check that the latest opcode was a return or an inlined call to
             # return.
-            assert(target.opcodes[-1][0] == 'return')
+            assert target.opcodes[-1][0] == 'return'
             name, params = compiler.last_instruction()
             if name == 'LABEL' and params == [rep[target.end_label]]:
                 compiler.rewind()
