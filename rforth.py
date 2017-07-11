@@ -428,7 +428,7 @@ class NamedReference(Named):
     """Label with an implicit or explicit name."""
 
     def __init__(self, name=None):
-        if name == None:
+        if name is None:
             label_name = '_lbl_'
         else:
             label_name = name
@@ -1295,7 +1295,7 @@ class Constant(Named, LiteralValue):
             compiler.ct_push(self)
 
     def static_value(self):
-        if type(self.value) == int:
+        if isinstance(self.value, int):
             return self.value
         else:
             return self.value.static_value()
