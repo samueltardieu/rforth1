@@ -265,7 +265,7 @@ class Named:
 
 class Binary(LiteralValue):
 
-  op = None
+  op = ''
 
   def __init__(self, v1, v2):
     self.v1 = v1
@@ -326,7 +326,7 @@ class LeftShift(Binary):
 
 class Unary(LiteralValue):
 
-  r = None
+  r = ''
 
   def __init__(self, value):
     self.value = value
