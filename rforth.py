@@ -11,22 +11,26 @@ Memory usage:
      - BSR always points onto bank 1 where variables will be preferably stored
      - for a 16 bits value, low byte is stored at the lowest address
      - data stack is indexed by FSR0; stack grows upward; low byte is pushed
-         first and high byte next; INDF0 points onto the latest high byte pushed
+       first and high byte next; INDF0 points onto the latest high byte pushed
      - data stack is located starting at 0x60 to let short-addressable part
-         of memory bank 0 free for user use
+       of memory bank 0 free for user use
      - FSR1 is used for indirect memory access
      - FSR2 is used for a return stack located starting at 0xc0 in bank 0;
-         data are stored MSB first on this stack to ease transfers between
-         stacks
+       data are stored MSB first on this stack to ease transfers between
+       stacks
      - RAM cells are using address between 0x0000 and 0x0FFF. EEPROM will
-         be designated as an address between 0x1000 and 0x1FFF. Flash will
-         use bounds of 0x8000 and 0xFFFF.
+       be designated as an address between 0x1000 and 0x1FFF. Flash will
+       use bounds of 0x8000 and 0xFFFF.
      - core defined variables are located between 0x000 and 0x05f (in the first
-         bank) and are not zero-initialized; they are typically temporary
-         variables used in computations
+       bank) and are not zero-initialized; they are typically temporary
+       variables used in computations
      - user-defined variables are located starting at 0x0100"""
 
-import optparse, os, re, string, sys
+import optparse
+import os
+import re
+import string
+import sys
 
 compiler = None
 warnings_as_errors = False
@@ -42,6 +46,7 @@ except AttributeError:
     pass
 forth_search_path.append(os.path.dirname(sys.argv[0]))
 
+
 def forth_open(path, mode):
     """Open a file according to the Forth search path if the name is relative."""
     if path[0] not in [os.path.sep, os.path.altsep]:
@@ -52,6 +57,7 @@ def forth_open(path, mode):
                 pass
     # Open locally or get an exception
     return open(path, mode)
+
 
 def parse_number(str):
     """Parse a string and return a Number object with the right number and the
@@ -67,9 +73,11 @@ def parse_number(str):
                 return None
     return None
 
+
 def stderror(str):
     """Write a string on standard error and add a carriage return."""
     sys.stderr.write("%s\n" % str)
+
 
 def warning(str):
     """Print a warning on standard error."""
@@ -78,16 +86,20 @@ def warning(str):
     else:
         stderror('WARNING: ' + str)
 
+
 def error(str):
     """Print a fatal error on standard error."""
     stderror('ERROR: ' + str)
 
+
 def make_tuple(insn, parameters):
     return insn, tuple(parameters)
+
 
 def octet(n):
     """Check whether n is between 0 and 255."""
     return n >= 0 and n <= 255
+
 
 class LiteralValue:
     """Represent any literal value that can be put on the stack."""
@@ -101,9 +113,10 @@ class LiteralValue:
     def makes_reference_to(self, l):
         return False
 
+
 class Number(LiteralValue):
 
-    def __init__(self, value, base = 10):
+    def __init__(self, value, base=10):
         self.value = value
         self.base = base
 
@@ -133,25 +146,30 @@ no_access = "1"
 no_fast = Number(0)
 fast = Number(1)
 
+
 def in_access_bank(addr):
     """Check whether an address can be accessed through the access bank."""
     addr = addr.static_value()
     return addr is not None and addr <= 0x5f or(addr >= 0xf60 and addr <= 0xfff)
+
 
 def is_special_register(addr):
     """Check whether an address denotes an internal PIC register."""
     a = addr.static_value()
     return a >= 0xf00 and a <= 0xfff
 
+
 def in_bank_1(addr):
     """Check whether an address can be accessed in bank 1 using BSR."""
     addr = addr.static_value()
     return addr is not None and(addr & 0xff00 == 0x0100)
 
+
 def short_addr(addr):
     """Check whether an address can be accessed using a short reference, with
     or without an access bank."""
     return in_access_bank(addr) or in_bank_1(addr)
+
 
 def access_bit(addr):
     """Return the right access bit depending on whether the address is present
@@ -161,21 +179,26 @@ def access_bit(addr):
     else:
         return no_access
 
+
 def ram_addr(addr):
     """Check whether the access designates a RAM address."""
     addr = addr.static_value()
     return addr is not None and(addr & 0xf000 == 0x0000)
+
 
 def eeprom_addr(addr):
     """Check whether the access designates an EEPROM address."""
     addr = addr.static_value()
     return addr is not None and(addr & 0xf000 == 0x1000)
 
+
 def is_static_push(opcode):
     return opcode[0] == 'OP_PUSH' and opcode[1][0].static_value() is not None
 
+
 def is_ram_fetch(opcode):
     return opcode[0] == 'OP_FETCH' and ram_addr(opcode[1][0])
+
 
 class Named:
 
@@ -190,7 +213,7 @@ class Named:
     not_inlinable = False
     definition = None
 
-    def __init__(self, name, compile = True):
+    def __init__(self, name, compile=True):
         self.name = name
         if compile:
             compiler.start_compilation(self)
@@ -226,11 +249,11 @@ class Named:
     def __repr__(self):
         name = self.name
         if name not in Compiler.all_opcodes:
-            for k,v in [('?', 'QM'), ('!', 'EX'), ('@', 'AT'), ('+', 'PL'),
-                                 ('-', '_'), ('*', 'ST'), ('/', 'SL'), ('=', 'EQ'),
-                                 ('<', 'LT'), ('>', 'GT'), ('$', '_'), ('.', '_'),
-                                 ('"', 'QU'), ("'", '_'), (':', 'CL'), (';', 'SC'),
-                                 ('(', 'OP'), (')', 'CP'), ('%', 'PC')]:
+            for k, v in [('?', 'QM'), ('!', 'EX'), ('@', 'AT'), ('+', 'PL'),
+                         ('-', '_'), ('*', 'ST'), ('/', 'SL'), ('=', 'EQ'),
+                         ('<', 'LT'), ('>', 'GT'), ('$', '_'), ('.', '_'),
+                         ('"', 'QU'), ("'", '_'), (':', 'CL'), (';', 'SC'),
+                         ('(', 'OP'), (')', 'CP'), ('%', 'PC')]:
                 if len(v) > 1:
                     v = '_%s_' % v
                 name = name.replace(k, v)
@@ -267,6 +290,7 @@ class Named:
         it is an unresolved forward reference (overriden in Forward)."""
         pass
 
+
 class Binary(LiteralValue):
 
     op = ''
@@ -293,33 +317,38 @@ class Binary(LiteralValue):
     def makes_reference_to(self, l):
         return self.v1.makes_reference_to(l) or self.v2.makes_reference_to(l)
 
+
 class Add(Binary):
 
     op = '+'
 
     def compute(self, a1, a2):
-        return a1+a2
+        return a1 + a2
+
 
 class Sub(Binary):
 
     op = '-'
 
     def compute(self, a1, a2):
-        return a1-a2
+        return a1 - a2
+
 
 class Mult(Binary):
 
     op = '*'
 
     def compute(self, a1, a2):
-        return a1*a2
+        return a1 * a2
+
 
 class Div(Binary):
 
     op = '/'
 
     def compute(self, a1, a2):
-        return a1/a2
+        return a1 / a2
+
 
 class LeftShift(Binary):
 
@@ -327,6 +356,7 @@ class LeftShift(Binary):
 
     def compute(self, a1, a2):
         return a1 << a2
+
 
 class Unary(LiteralValue):
 
@@ -349,12 +379,14 @@ class Unary(LiteralValue):
     def makes_reference_to(self, l):
         return self.value.makes_reference_to(l)
 
+
 class Low(Unary):
 
     r = 'LOW(%s)'
 
     def compute(self, a):
         return a & 0xff
+
 
 class High(Unary):
 
@@ -363,12 +395,14 @@ class High(Unary):
     def compute(self, a):
         return a >> 8
 
+
 def low(x):
     v = x.static_value()
     if v is not None and v >= 0 and v <= 0xff:
         return x
     else:
         return Low(x)
+
 
 def high(x):
     v = x.static_value()
@@ -377,6 +411,7 @@ def high(x):
     else:
         return High(x)
 
+
 class Negated(Unary):
 
     r = '(-%s)'
@@ -384,18 +419,20 @@ class Negated(Unary):
     def compute(self, a):
         return -a
 
+
 class Primitive(Named):
     pass
+
 
 class NamedReference(Named):
     """Label with an implicit or explicit name."""
 
-    def __init__(self, name = None):
+    def __init__(self, name=None):
         if name == None:
             label_name = '_lbl_'
         else:
             label_name = name
-        Named.__init__(self, label_name, compile = False)
+        Named.__init__(self, label_name, compile=False)
         self.from_source = name is not None
 
     def run(self):
@@ -404,17 +441,19 @@ class NamedReference(Named):
     def static_value(self):
         return None
 
+
 class Label(NamedReference):
 
     def makes_reference_to(self, l):
         return self == l
+
 
 class FlashData(NamedReference):
 
     section = 'static data'
     from_source = False
 
-    def __init__(self, data, original_data, basename = None):
+    def __init__(self, data, original_data, basename=None):
         if basename is None:
             basename = '_data_'
         NamedReference.__init__(self, basename)
@@ -423,7 +462,7 @@ class FlashData(NamedReference):
 
     def output_header(self, outfd):
         outfd.write('; defined at %s as:\n; %s\n' %
-                                (self.definition, self.original_data))
+                    (self.definition, self.original_data))
 
     def output(self, outfd):
         outfd.write('%s' % self)
@@ -437,6 +476,7 @@ class FlashData(NamedReference):
                 outfd.write(',')
             outfd.write('%d' % i)
         outfd.write('\n')
+
 
 class Forward(Label):
     """Forward declaration."""
@@ -453,36 +493,44 @@ class Forward(Label):
 
     def check_real(self):
         compiler.error('%s (defined at %s) needs to be overloaded' %
-                                     (self.name, self.definition))
+                       (self.name, self.definition))
 
     def can_inline(self):
         return False
 
+
 def make_primitive(runfunc):
     class _primitive(Primitive):
+
         def run(self, *args):
             runfunc(*args)
     return _primitive
 
+
 def register_primitives():
     return [(data.__doc__ or name[10:], make_primitive(data))
-                    for (name, data) in globals().items()
-                    if name.startswith('primitive_')]
+            for (name, data) in globals().items()
+            if name.startswith('primitive_')]
+
 
 def primitive_label():
     label = Label(compiler.parse_word())
     compiler.add_instruction('LABEL', [label])
 
+
 def primitive_forward():
     Forward(compiler.parse_word())
+
 
 def primitive_intr_protect():
     "intr-protect"
     compiler.add_instruction('OP_INTR_PROTECT', [])
 
+
 def primitive_intr_unprotect():
     "intr-unprotect"
     compiler.add_instruction('OP_INTR_UNPROTECT', [])
+
 
 def primitive_literal_char():
     "[char]"
@@ -492,30 +540,36 @@ def primitive_literal_char():
     else:
         compiler.ct_push(char)
 
+
 def primitive_begin():
     compiler.ct_push(0)
     label = Label()
     compiler.ct_push(label)
     compiler.add_instruction('LABEL', [label])
 
-def primitive_again(do_not_pop_counter = False):
+
+def primitive_again(do_not_pop_counter=False):
     label = compiler.ct_pop()
     compiler.add_instruction('bra', [label])
     if not do_not_pop_counter:
         assert(compiler.ct_pop() == 0)
 
+
 def primitive_ob():
     "["
     compiler.state = 0
+
 
 def primitive_cb():
     "]"
     compiler.state = 1
 
+
 def primitive_literal():
     compiler.push(compiler.ct_pop())
 
-def primitive_to_w(warn = True):
+
+def primitive_to_w(warn=True):
     ">w"
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
@@ -532,7 +586,7 @@ def primitive_to_w(warn = True):
             compiler.warning('value may not fit in W register')
         if short_addr(addr):
             compiler.add_instruction('movf',
-                                                                         [addr, dst_w, access_bit(addr)])
+                                     [addr, dst_w, access_bit(addr)])
         else:
             compiler.add_instruction('movff', [addr, compiler['WREG']])
     elif name == 'OP_DUP':
@@ -543,6 +597,7 @@ def primitive_to_w(warn = True):
         compiler.rewind()
     else:
         compiler.add_instruction('OP_POP_W', [])
+
 
 def primitive_dup():
     name, params = compiler.last_instruction()
@@ -557,16 +612,18 @@ def primitive_dup():
     else:
         compiler.add_instruction('OP_DUP')
 
+
 def primitive_drop():
     name, params = compiler.last_instruction()
     if name in ['OP_PUSH', 'OP_DUP']:
         compiler.rewind()
     elif name in ['OP_FETCH', 'OP_CFETCH'] and ram_addr(params[0]) and \
-             params[0].static_value() < 0xf60:
+            params[0].static_value() < 0xf60:
         # Regular memory read, can be safely removed
         compiler.rewind()
     else:
         compiler['>w'].run(False)
+
 
 def primitive_from_w():
     "w>"
@@ -582,6 +639,7 @@ def primitive_from_w():
     else:
         compiler.add_instruction('OP_PUSH_W', [])
 
+
 def primitive_and():
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH' and octet(params[0].static_value()):
@@ -592,16 +650,22 @@ def primitive_and():
     else:
         compiler.eval('op_and')
 
+
 def primitive_to_r():
     ">r"
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
         compiler.rewind()
-        compiler.add_instruction('movff', [high(params[0]), compiler['PREINC2']])
-        compiler.add_instruction('movff', [low(params[0]), compiler['PREINC2']])
+        compiler.add_instruction(
+            'movff', [high(params[0]), compiler['PREINC2']])
+        compiler.add_instruction(
+            'movff', [low(params[0]), compiler['PREINC2']])
     else:
-        compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
-        compiler.add_instruction('movff', [compiler['POSTDEC0'], compiler['PREINC2']])
+        compiler.add_instruction(
+            'movff', [compiler['POSTDEC0'], compiler['PREINC2']])
+        compiler.add_instruction(
+            'movff', [compiler['POSTDEC0'], compiler['PREINC2']])
+
 
 def primitive_keep():
     name, params = compiler.last_instruction()
@@ -614,6 +678,7 @@ def primitive_keep():
     else:
         compiler.eval('(keep)')
 
+
 def primitive_bi():
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
@@ -622,6 +687,7 @@ def primitive_bi():
         compiler.add_call(params[0])
     else:
         compiler.eval('(bi)')
+
 
 def primitive_cfor():
     name, params = compiler.last_instruction()
@@ -651,13 +717,14 @@ def primitive_cfor():
                 bound_checks = False
         compiler.eval('>w')
         compiler.add_instruction('movwf',
-                                                                     [compiler['PREINC2'], access])
+                                 [compiler['PREINC2'], access])
         if bound_checks:
             name, params = compiler.before_last_instruction()
             if name != 'OP_POP_W':
                 compiler.add_instruction('iorlw', [Number(0)])
             compiler.add_instruction('bz', [label_uncfor])
     compiler.eval('begin')
+
 
 def primitive_ob_ob():
     "[["
@@ -666,19 +733,23 @@ def primitive_ob_ob():
     compiler.eval('ahead')
     compiler.add_instruction('LABEL', [label])
 
+
 def primitive_cb_cb():
     "]]"
     compiler.eval('exit then')
     compiler.push(compiler.ct_pop())
+
 
 def primitive_ahead():
     label = Label()
     compiler.ct_push(label)
     compiler.add_instruction('bra', [label])
 
+
 def primitive_then():
     label = compiler.ct_pop()
     compiler.add_instruction('LABEL', [label])
+
 
 def primitive_repeat():
     compiler['again'].run(True)
@@ -686,7 +757,8 @@ def primitive_repeat():
     for _ in range(counter):
         compiler.eval('then')
 
-def primitive_if(invert = False):
+
+def primitive_if(invert=False):
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
         value = params[0].static_value()
@@ -720,9 +792,9 @@ def primitive_if(invert = False):
     else:
         if name != 'MARKER_ZSET':
             compiler.add_instruction('movf', [compiler['POSTDEC0'],
-                                                                                 dst_w, access])
+                                              dst_w, access])
             compiler.add_instruction('iorwf', [compiler['POSTDEC0'],
-                                                                                    dst_w, access])
+                                               dst_w, access])
         value, bit = compiler['Z']
         acc = access
     if invert:
@@ -731,6 +803,7 @@ def primitive_if(invert = False):
         ins = 'btfsc'
     compiler.add_instruction(ins, [value, bit, acc])
     compiler.eval('ahead')
+
 
 def primitive_question_if():
     "?if"
@@ -744,17 +817,20 @@ def primitive_question_if():
 #     - next label or None for the first case
 #     - switch end label
 #     - xored value
+
+
 def primitive_switchw():
     compiler.ct_push(None)
     compiler.ct_push(Label())
     compiler.ct_push(0)
 
-def primitive_casew(is_default = False):
+
+def primitive_casew(is_default=False):
     if not is_default:
         name, params = compiler.last_instruction()
         if name != 'OP_PUSH':
-            raise Compiler.FATAL_ERROR("%s: casew must be used with a constant" % \
-                        compiler.current_location)
+            raise Compiler.FATAL_ERROR("%s: casew must be used with a constant" %
+                                       compiler.current_location)
         compiler.rewind()
     xored = compiler.ct_pop()
     label = compiler.ct_pop()
@@ -775,11 +851,14 @@ def primitive_casew(is_default = False):
     else:
         compiler.ct_push(xored)
 
+
 def primitive_endcasew():
     pass
 
+
 def primitive_defaultw():
     compiler['casew'].run(True)
+
 
 def primitive_endswitchw():
     _xored = compiler.ct_pop()
@@ -788,9 +867,11 @@ def primitive_endswitchw():
     compiler.add_instruction('LABEL', [nlabel])
     compiler.add_instruction('LABEL', [label])
 
+
 def primitive_literal_address():
     "[']"
     compiler.push(compiler.find(compiler.parse_word()))
+
 
 def primitive_execute():
     name, params = compiler.last_instruction()
@@ -800,43 +881,50 @@ def primitive_execute():
     else:
         compiler.eval('(execute)')
 
+
 def primitive_jump():
-    compiler.add_instruction ('clrf', [compiler['PCLATU'], access])
+    compiler.add_instruction('clrf', [compiler['PCLATU'], access])
     compiler.push(compiler['PCL'])
     compiler.eval('!')
 
-def primitive_while(is_until = False):
+
+def primitive_while(is_until=False):
     flabel = compiler.ct_pop()
     counter = compiler.ct_pop()
     compiler['if'].run(is_until)
-    compiler.ct_push(counter+1)
+    compiler.ct_push(counter + 1)
     compiler.ct_push(flabel)
+
 
 def primitive_until():
     compiler['while'].run(True)
     compiler.eval('repeat')
 
+
 def primitive_cnext():
     compiler.add_instruction('decfsz',
-                                                                 [compiler['INDF2'], dst_f, access])
+                             [compiler['INDF2'], dst_f, access])
     compiler.eval('again')
     label = compiler.ct_pop()
     compiler.add_instruction('LABEL', [label])
     compiler.add_instruction('movf',
-                                                                 [compiler['POSTDEC2'], dst_f, access])
+                             [compiler['POSTDEC2'], dst_f, access])
     label = compiler.ct_pop()
     compiler.add_instruction('LABEL', [label])
+
 
 def primitive_else():
     compiler.eval('ahead')
     compiler.ct_swap()
     compiler.eval('then')
 
+
 def primitive_0_not_equal():
     "0<>"
     name, _params = compiler.last_instruction()
     if name != 'OP_NORMALIZE':
         compiler.add_instruction('OP_NORMALIZE', [])
+
 
 def primitive_0_equal():
     "0="
@@ -849,7 +937,8 @@ def primitive_0_equal():
         compiler.rewind()
     compiler.add_instruction('OP_0=', [])
 
-def bitop(kind): # kind can be 'set', 'clear' or 'toggle'
+
+def bitop(kind):  # kind can be 'set', 'clear' or 'toggle'
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
         # The bit to change is statically known
@@ -871,7 +960,7 @@ def bitop(kind): # kind can be 'set', 'clear' or 'toggle'
             # Latch through FSR1
             compiler.pop_to_fsr(1)
             compiler.add_instruction(op, [compiler['INDF1'], bit,
-                                                                                    access])
+                                          access])
     else:
         # Resort to a library function
         if kind == 'set':
@@ -881,19 +970,23 @@ def bitop(kind): # kind can be 'set', 'clear' or 'toggle'
         else:
             compiler.eval('op_bit_toggle')
 
+
 def primitive_bit_set():
     "bit-set"
     bitop('set')
+
 
 def primitive_bit_clr():
     "bit-clr"
     bitop('clear')
 
+
 def primitive_bit_toggle():
     "bit-toggle"
     bitop('toggle')
 
-def primitive_bit_is_set(invert = False):
+
+def primitive_bit_is_set(invert=False):
     "bit-set?"
     name, params = compiler.last_instruction()
     if name == 'OP_PUSH':
@@ -914,7 +1007,7 @@ def primitive_bit_is_set(invert = False):
             # Use FSR1 to latch the address
             compiler.pop_to_fsr(1)
             compiler.add_instruction(op, [compiler['INDF1'], bit,
-                                                                                    access])
+                                          access])
     else:
         # Resort to a library function
         if invert:
@@ -922,9 +1015,11 @@ def primitive_bit_is_set(invert = False):
         else:
             compiler.eval('op_bit_set_q')
 
+
 def primitive_bit_is_clr():
     "bit-clr?"
     compiler['bit-set?'].run(True)
+
 
 def primitive_bit_mask():
     "bit-mask"
@@ -937,22 +1032,28 @@ def primitive_bit_mask():
         # Default primitive
         compiler.eval('op_bit_mask')
 
+
 def primitive_comment():
     "\\"
     compiler.input_buffer = ''
+
 
 def primitive_op():
     "("
     compiler.parse(')')
 
+
 def primitive_include():
     compiler.include(compiler.parse_word())
+
 
 def primitive_needs():
     compiler.needs(compiler.parse_word())
 
+
 def primitive_exit():
     compiler.add_instruction('goto', [compiler.current_object.end_label])
+
 
 def primitive_plus():
     "+"
@@ -970,22 +1071,24 @@ def primitive_plus():
             elif v == 1:
                 compiler.eval('op_1+')
             elif v == 0x0100:
-                compiler.add_instruction('incf', [compiler['INDF0'], dst_f, access])
+                compiler.add_instruction(
+                    'incf', [compiler['INDF0'], dst_f, access])
             elif v == 0xff00:
-                compiler.add_instruction('decf', [compiler['INDF0'], dst_f, access])
+                compiler.add_instruction(
+                    'decf', [compiler['INDF0'], dst_f, access])
             elif v is not None and v & 0xff == 0:
                 compiler.add_instruction('movlw', [High(params[0])])
                 compiler.add_instruction('addwf',
-                                                                    [compiler['INDF0'], dst_f, access])
+                                         [compiler['INDF0'], dst_f, access])
             else:
                 compiler.add_instruction('movlw', [Low(params[0])])
                 compiler.add_instruction('movf', [compiler['POSTDEC0'],
-                                                                                     dst_f, access])
+                                                  dst_f, access])
                 compiler.add_instruction('addwf', [compiler['POSTINC0'],
-                                                                                        dst_f, access])
+                                                   dst_f, access])
                 compiler.add_instruction('movlw', [High(params[0])])
                 compiler.add_instruction('addwfc', [compiler['INDF0'],
-                                                                                         dst_f, access])
+                                                    dst_f, access])
         else:
             compiler.eval('op_plus')
     else:
@@ -993,13 +1096,14 @@ def primitive_plus():
         x1 = compiler.ct_pop()
         compiler.ct_push(Add(x1, x2))
 
+
 def primitive_minus():
     "-"
     if compiler.state:
         if is_static_push(compiler.last_instruction()) and \
-             is_static_push(compiler.before_last_instruction()):
+                is_static_push(compiler.before_last_instruction()):
             res = Sub(compiler.before_last_instruction()[1][0],
-                                         compiler.last_instruction()[1][0])
+                      compiler.last_instruction()[1][0])
             compiler.rewind()
             compiler.rewind()
             compiler.push(res)
@@ -1015,13 +1119,14 @@ def primitive_minus():
         x1 = compiler.ct_pop()
         compiler.ct_push(Sub(x1, x2))
 
+
 def primitive_times():
     "*"
     if compiler.state:
         if is_static_push(compiler.last_instruction()) and \
-             is_static_push(compiler.before_last_instruction()):
+                is_static_push(compiler.before_last_instruction()):
             res = Mult(compiler.before_last_instruction()[1][0],
-                                         compiler.last_instruction()[1][0])
+                       compiler.last_instruction()[1][0])
             compiler.rewind()
             compiler.rewind()
             compiler.push(res)
@@ -1032,13 +1137,14 @@ def primitive_times():
         x1 = compiler.ct_pop()
         compiler.ct_push(Mult(x1, x2))
 
+
 def primitive_div():
     "/"
     if compiler.state:
         if is_static_push(compiler.last_instruction()) and \
-             is_static_push(compiler.before_last_instruction()):
+                is_static_push(compiler.before_last_instruction()):
             res = Div(compiler.before_last_instruction()[1][0],
-                                compiler.last_instruction()[1][0])
+                      compiler.last_instruction()[1][0])
             compiler.rewind()
             compiler.rewind()
             compiler.push(res)
@@ -1049,15 +1155,18 @@ def primitive_div():
         x1 = compiler.ct_pop()
         compiler.ct_push(Div(x1, x2))
 
+
 def primitive_1_plus():
     "1+"
     compiler.push(Number(1))
     compiler.eval('+')
 
+
 def primitive_1_minus():
     "1-"
     compiler.push(Number(1))
     compiler.eval('-')
+
 
 def primitive_1_plus_store():
     "1+!"
@@ -1071,7 +1180,8 @@ def primitive_1_plus_store():
     else:
         compiler.eval('dup @ 1+ swap !')
 
-def primitive_c_plus_store(negate = False):
+
+def primitive_c_plus_store(negate=False):
     "c+!"
     name, params = compiler.last_instruction()
     if is_static_push((name, params)):
@@ -1087,10 +1197,12 @@ def primitive_c_plus_store(negate = False):
             if svalue == 0:
                 return
             elif svalue == 1:
-                compiler.add_instruction('incf', [addr, dst_f, access_bit(addr)])
+                compiler.add_instruction(
+                    'incf', [addr, dst_f, access_bit(addr)])
                 return
             elif svalue == -1 or svalue == 255:
-                compiler.add_instruction('decf', [addr, dst_f, access_bit(addr)])
+                compiler.add_instruction(
+                    'decf', [addr, dst_f, access_bit(addr)])
                 return
             else:
                 # Let the regular treatment proceed with the value on the stack
@@ -1105,14 +1217,16 @@ def primitive_c_plus_store(negate = False):
     else:
         compiler.eval('op_c+!')
 
+
 def primitive_c_minus_store():
     "c-!"
     compiler['c+!'].run(True)
 
+
 def primitive_lshift():
     if compiler.state:
         if is_static_push(compiler.last_instruction()) and \
-             is_static_push(compiler.before_last_instruction()):
+                is_static_push(compiler.before_last_instruction()):
             _name, nsteps = compiler.last_instruction()
             compiler.rewind()
             _name, operand = compiler.last_instruction()
@@ -1125,20 +1239,23 @@ def primitive_lshift():
         operand = compiler.ct_pop()
         compiler.ct_push(LeftShift(operand, nsteps))
 
+
 def primitive_equal():
     "="
     if is_static_push(compiler.last_instruction()) and \
-         compiler.last_instruction()[1][0].static_value() == 0:
+            compiler.last_instruction()[1][0].static_value() == 0:
         compiler.rewind()
         compiler.eval('0=')
     else:
         compiler.eval('op_=')
+
 
 def primitive_colon():
     ":"
     compiler.state = 1
     name = compiler.parse_word()
     Word(name).end_label = Label()
+
 
 def primitive_semicolon():
     ";"
@@ -1147,13 +1264,16 @@ def primitive_semicolon():
     compiler.enter()
     compiler.state = 0
 
+
 def primitive_recurse():
     assert(compiler.current_object.opcodes[0][0] == 'LABEL')
     compiler.add_call(compiler.current_object.opcodes[0][1][0])
 
+
 def primitive_constant():
     name = compiler.parse_word()
     Constant(name, compiler.ct_pop())
+
 
 class Constant(Named, LiteralValue):
 
@@ -1180,6 +1300,7 @@ class Constant(Named, LiteralValue):
         else:
             return self.value.static_value()
 
+
 class Bit(Constant):
 
     def __init__(self, name, value, bit):
@@ -1198,17 +1319,20 @@ class Bit(Constant):
     def static_value(self):
         raise Compiler.INTERNAL_ERROR("in Bit.static_value")
 
+
 def primitive_bit():
     name = compiler.parse_word()
     bit = compiler.ct_pop()
     addr = compiler.ct_pop()
     Bit(name, addr, bit)
 
+
 def write_w(addr):
     if short_addr(addr):
         compiler.add_instruction('movwf', [addr, access_bit(addr)])
     else:
         compiler.add_instruction('movff', [compiler['WREG'], addr])
+
 
 def write_literal(value, addr):
     if short_addr(addr):
@@ -1222,6 +1346,7 @@ def write_literal(value, addr):
     else:
         compiler.add_instruction('movlw', [value])
         compiler.add_instruction('movff', [compiler['WREG'], addr])
+
 
 def primitive_store():
     "!"
@@ -1248,15 +1373,15 @@ def primitive_store():
                 compiler.push(params[0])
                 compiler.eval('c@ >w')
                 compiler.add_instruction('movff', [Add(params[0], Number(1)),
-                                                                                     addr1])
+                                                   addr1])
                 compiler.eval('w>')
                 compiler.push(addr)
                 compiler.eval('c!')
             else:
                 compiler.add_instruction('movff',
-                                                                 [Add(params[0],
-                                                                            Number(1)),
-                                                                    addr1])
+                                         [Add(params[0],
+                                              Number(1)),
+                                          addr1])
                 compiler.add_instruction('movff', [params[0], addr])
         elif name == 'OP_CFETCH' and ram_addr(params[0]):
             # Memory byte move with one byte
@@ -1282,6 +1407,7 @@ def primitive_store():
         # Any address and content
         compiler.eval('op_store')
 
+
 def primitive_c_store():
     "c!"
     name, params = compiler.last_instruction()
@@ -1300,7 +1426,7 @@ def primitive_c_store():
             compiler.rewind()
             if name == 'OP_FETCH':
                 compiler.warning('target may not be large enough to '
-                                                 'store entire result')
+                                 'store entire result')
             compiler.add_instruction('movff', [params[0], addr])
         elif name == 'OP_PUSH_W':
             # Write W
@@ -1314,14 +1440,16 @@ def primitive_c_store():
         # Any address and content
         compiler.eval('op_cstore')
 
+
 def primitive_allot():
     compiler.allot(compiler.ct_pop().static_value())
+
 
 class Variable(Constant):
 
     section = 'memory'
 
-    def __init__(self, name, size, initial_value = None, zone = 'RAM'):
+    def __init__(self, name, size, initial_value=None, zone='RAM'):
         if zone == 'RAM':
             self.addr = compiler.here
             compiler.allot(size)
@@ -1332,7 +1460,7 @@ class Variable(Constant):
             raise Compiler.UNIMPLEMENTED
         Constant.__init__(self, name, Number(self.addr, 16))
         if compiler.initialize_variables and size > 0 and \
-                     initial_value != 'NO_INIT':
+                initial_value != 'NO_INIT':
             compiler.push_init_runtime()
             if not initial_value:
                 initial_value = Number(0)
@@ -1344,13 +1472,16 @@ class Variable(Constant):
                 compiler.eval('!')
             compiler.pop_object()
 
+
 def primitive_create():
     name = compiler.parse_word()
     Variable(name, 0)
 
+
 def primitive_variable():
     name = compiler.parse_word()
     Variable(name, 2)
+
 
 class Value(Variable):
 
@@ -1358,22 +1489,27 @@ class Value(Variable):
         compiler.push(self)
         compiler.eval('@')
 
+
 def primitive_cvariable():
     name = compiler.parse_word()
     Variable(name, 1)
+
 
 def primitive_eevariable():
     name = compiler.parse_word()
     Variable(name, 2, 'NO_INIT', 'EEPROM')
 
+
 def primitive_eecvariable():
     name = compiler.parse_word()
     Variable(name, 1, 'NO_INIT', 'EEPROM')
+
 
 def primitive_value():
     value = compiler.ct_pop()
     name = compiler.parse_word()
     Value(name, 2, value)
+
 
 class Comma(Primitive):
 
@@ -1384,14 +1520,16 @@ class Comma(Primitive):
         Comma.count += 1
         return r
 
-    def run(self, size = 2):
+    def run(self, size=2):
         value = compiler.ct_pop()
         name = '_unnamed_%d' % self.next_count()
         Variable(name, size, value)
 
+
 def primitive_c_comma():
     "c,"
-    compiler[','].run(size = 1)
+    compiler[','].run(size=1)
+
 
 def primitive_at():
     "@"
@@ -1406,7 +1544,9 @@ def primitive_at():
         else:
             compiler.add_instruction('OP_FETCH_TOS', [])
     else:
-        raise Compiler.FATAL_ERROR("%s: cannot fetch while interpreting" % compiler.current_location)
+        raise Compiler.FATAL_ERROR(
+            "%s: cannot fetch while interpreting" % compiler.current_location)
+
 
 def primitive_c_at():
     "c@"
@@ -1421,13 +1561,15 @@ def primitive_c_at():
         else:
             compiler.add_instruction('OP_CFETCH_TOS', [])
     else:
-        raise Compiler.FATAL_ERROR("%s: cannot fetch byte while interpreting" % \
-                    compiler.current_location)
+        raise Compiler.FATAL_ERROR("%s: cannot fetch byte while interpreting" %
+                                   compiler.current_location)
+
 
 def primitive_to():
     name = compiler.parse_word()
     compiler.push(compiler.find(name))
     compiler.eval('!')
+
 
 def primitive_2_to_1():
     "2>1"
@@ -1447,12 +1589,15 @@ def primitive_2_to_1():
         # Resort to library routine
         compiler.eval('op_2>1')
 
+
 def primitive_inline():
     compiler.current_object.inlined = True
+
 
 def primitive_no_inline():
     "no-inline"
     compiler.current_object.not_inlinable = True
+
 
 def primitive_low_interrupt():
     "low-interrupt"
@@ -1461,6 +1606,7 @@ def primitive_low_interrupt():
     compiler.rewind()
     compiler.add_instruction('retfie', [no_fast])
 
+
 def primitive_high_interrupt():
     "high-interrupt"
     compiler.check_interrupts()
@@ -1468,31 +1614,39 @@ def primitive_high_interrupt():
     compiler.rewind()
     compiler.add_instruction('retfie', [no_fast])
 
+
 def primitive_fast():
     name, params = compiler.last_instruction()
     if params == [no_fast]:
         compiler.rewind()
         compiler.add_instruction(name, [fast])
 
+
 def primitive_inw():
     compiler.current_object.inw = True
+
 
 def primitive_outw():
     compiler.current_object.outw = True
 
+
 def primitive_outz():
     compiler.current_object.outz = True
 
+
 def is_internal_jump(opcode):
     return opcode[0] in ['goto', 'bra'] and isinstance(opcode[1][0], Label)
+
 
 def is_external_jump(opcode):
     if opcode[0] in ['return', 'retfie', 'retlw']:
         return True
     return opcode[0] == 'goto' and isinstance(opcode[1][0], (Label, Word))
 
+
 def is_jump(opcode):
     return opcode[0] in ['goto', 'bra', 'return', 'retfie', 'retlw']
+
 
 def last_goto(x):
     """Check whether the last instruction of x is a real goto to somewhere
@@ -1502,8 +1656,9 @@ def last_goto(x):
     if len(x.opcodes) == 1:
         return is_jump(x.opcodes[-1])
     return is_jump(x.opcodes[-1]) and \
-                 x.opcodes[-2][0] not in ['btfss', 'btfsc', 'decfsz', 'incfsz',
-                                                                    'infsnz', 'dcfsnz', 'tstfsz']
+        x.opcodes[-2][0] not in ['btfss', 'btfsc', 'decfsz', 'incfsz',
+                                 'infsnz', 'dcfsnz', 'tstfsz']
+
 
 class PICIns(Primitive):
 
@@ -1550,6 +1705,7 @@ class PICIns(Primitive):
         compiler.add_instruction(repr(self), args)
         PICIns_reset()
 
+
 def PICIns_reset():
     PICIns.f = None
     PICIns.a = None
@@ -1557,53 +1713,72 @@ def PICIns_reset():
 
 PICIns_reset()
 
+
 def primitive_code():
     name = compiler.parse_word()
     Word(name)
     compiler.state = 0
     PICIns.ct_depth = len(compiler.data_stack)
 
+
 def primitive_python():
     lines = []
     while True:
         compiler.refill()
-        words = compiler.input_buffer.split('#',1)[0].split()
+        words = compiler.input_buffer.split('#', 1)[0].split()
         if words and words[0].strip() == ';python':
             break
         lines.append(compiler.input_buffer)
     compiler.input_buffer = ''
     exec('\n'.join(lines), globals())
 
+
 def primitive_colon_code():
     ";code"
     compiler.enter()
     if len(compiler.data_stack) != PICIns.ct_depth:
         compiler.warning('wrong count on items on compiler '
-                                         'stack (%d instead of %d)' %
-                                         (len(compiler.data_stack), PICIns.ct_depth))
+                         'stack (%d instead of %d)' %
+                         (len(compiler.data_stack), PICIns.ct_depth))
+
 
 def primitive_comma_a():
     ",a"
     PICIns.a = 0
+
+
 def primitive_comma_0():
     ",0"
     PICIns.a = 0
+
+
 def primitive_comma_1():
     ",1"
     PICIns.a = 1
+
+
 def primitive_comma_w():
     ",w"
     PICIns.f = 0
+
+
 def primitive_comma_f():
     ",f"
     PICIns.f = 1
+
+
 def primitive_comma_s():
     ",s"
     PICIns.s = 1
+
+
 def primitive_prefix():
     PICIns.prefix = True
+
+
 def primitive_postfix():
     PICIns.prefix = False
+
 
 class Word(Named, LiteralValue):
 
@@ -1616,7 +1791,8 @@ class Word(Named, LiteralValue):
         self.definition = compiler.current_location()
         self.prepared = None
         self.substitute = None
-        self.nrefs = 0                                    # Number of references to this word
+        # Number of references to this word
+        self.nrefs = 0
 
     def __repr__(self):
         if self.substitute:
@@ -1648,7 +1824,7 @@ class Word(Named, LiteralValue):
 
     def should_inline(self):
         if self.inlined or not self.from_source or \
-                     self == compiler.find_main():
+                self == compiler.find_main():
             return None
         actual_length = len(self.opcodes) + self.referenced_by
         projected_length = len(self.opcodes) * self.referenced_by
@@ -1671,12 +1847,13 @@ class Word(Named, LiteralValue):
         self.remove_markers()
         self.optimize()
 
-    def dump(self, msg = ''):
+    def dump(self, msg=''):
         if msg:
             msg = '(%s)' % msg
         stderror("Dumping content of %s%s:" % (self.name, msg))
         for o in self.opcodes:
-            stderror("     %s %s" % (o[0], ','.join([repr(x) for x in o[1] if x != ''])))
+            stderror("     %s %s" %
+                     (o[0], ','.join([repr(x) for x in o[1] if x != ''])))
 
     def remove_markers(self):
         self.opcodes = [o for o in self.opcodes if o[0][:7] != 'MARKER_']
@@ -1703,9 +1880,9 @@ class Word(Named, LiteralValue):
         o = 0
         while o < len(self.opcodes):
             if self.opcodes[o][0] == 'call' and \
-                         self.opcodes[o][1][1] == no_fast and \
-                         self.opcodes[o+1][0] == 'return' and \
-                         self.opcodes[o+1][1][0] == no_fast:
+                    self.opcodes[o][1][1] == no_fast and \
+                    self.opcodes[o + 1][0] == 'return' and \
+                    self.opcodes[o + 1][1][0] == no_fast:
                 # Replace call by goto and skip over return
                 target = self.opcodes[o][1][0]
                 if isinstance(target, Label) or target == self:
@@ -1722,7 +1899,7 @@ class Word(Named, LiteralValue):
         """Find the next non-label instruction following a label."""
         for o in range(len(self.opcodes)):
             if self.opcodes[o] == ('LABEL', [label]):
-                for i in range(o+1, len(self.opcodes)):
+                for i in range(o + 1, len(self.opcodes)):
                     if self.opcodes[i][0] != 'LABEL':
                         return self.opcodes[i]
         return None
@@ -1733,14 +1910,14 @@ class Word(Named, LiteralValue):
                 target = self.opcodes[o][1][0]
                 ins = self.instruction_at_label(target)
                 if ins and ins[0] in ['goto', 'bra', 'return', 'retfie', 'reset',
-                                                            'retlw']:
+                                      'retlw']:
                     self.opcodes[o] = ins
 
     def optimize_retlw(self):
         new = []
         while len(self.opcodes) > 1:
             if self.opcodes[0][0] == 'movlw' and \
-                 self.opcodes[1] == ('return', [no_fast]):
+                    self.opcodes[1] == ('return', [no_fast]):
                 new.append(('retlw', self.opcodes[0][1]))
                 del self.opcodes[0]
             else:
@@ -1784,7 +1961,7 @@ class Word(Named, LiteralValue):
                         # reference found after another label (otherwise, the backward
                         # reference belongs to the same execution block).
                         hit_label = False
-                        for oo in self.opcodes[o+1:]:
+                        for oo in self.opcodes[o + 1:]:
                             if oo[0] == 'LABEL':
                                 hit_label = True
                             elif hit_label and oo[1] and oo[1][0].makes_reference_to(label):
@@ -1793,33 +1970,33 @@ class Word(Named, LiteralValue):
                 if not dead:
                     new.append(self.opcodes[o])
             elif not dead and \
-                             self.opcodes[o][0] in ['btfss', 'btfsc', 'decfsz', 'dcfsnz',
-                                                                            'incfsz', 'infsnz',
-                                                                            'tstfsz']:
+                self.opcodes[o][0] in ['btfss', 'btfsc', 'decfsz', 'dcfsnz',
+                                       'incfsz', 'infsnz',
+                                       'tstfsz']:
                 new.append(self.opcodes[o])
                 o += 1
                 new.append(self.opcodes[o])
             elif not dead and self.opcodes[o][0] in ['goto', 'bra', 'retlw',
-                                                                                             'return', 'retfie', 'reset']:
+                                                     'return', 'retfie', 'reset']:
                 new.append(self.opcodes[o])
                 dead = True
             elif not dead and self.opcodes[o][0] == 'movwf' and \
-                             self.opcodes[o][1][0].static_value() == \
-                             compiler['PCL'].static_value() and \
-                             self.opcodes[o][1][1] == access:
-                    new.append(self.opcodes[o])
-                    dead = True
+                    self.opcodes[o][1][0].static_value() == \
+                    compiler['PCL'].static_value() and \
+                    self.opcodes[o][1][1] == access:
+                new.append(self.opcodes[o])
+                dead = True
             elif not dead:
                 new.append(self.opcodes[o])
             o += 1
         self.opcodes = new
 
-    conditions = {'btfss' : 'btfsc',
-                                'btfsc' : 'btfss',
-                                'decfsz': 'dcfsnz',
-                                'incfsz': 'infsnz',
-                                'infsnz': 'incfsz',
-                                'dcfsnz': 'decfsz'}
+    conditions = {'btfss': 'btfsc',
+                  'btfsc': 'btfss',
+                  'decfsz': 'dcfsnz',
+                  'incfsz': 'infsnz',
+                  'infsnz': 'incfsz',
+                  'dcfsnz': 'decfsz'}
 
     def optimize_small_gotos(self):
         """Invert conditional jump over tests if the following opcode jumps
@@ -1830,19 +2007,19 @@ class Word(Named, LiteralValue):
         o = 0
         while o < len(self.opcodes):
             if self.opcodes[o][0] in Word.conditions and \
-                         is_internal_jump(self.opcodes[o+1]):
-                if is_external_jump(self.opcodes[o+2]):
+                    is_internal_jump(self.opcodes[o + 1]):
+                if is_external_jump(self.opcodes[o + 2]):
                     new.append((Word.conditions[self.opcodes[o][0]],
-                                             self.opcodes[o][1]))
-                    new.append(self.opcodes[o+2])
-                    new.append(self.opcodes[o+1])
+                                self.opcodes[o][1]))
+                    new.append(self.opcodes[o + 2])
+                    new.append(self.opcodes[o + 1])
                     o += 3
                     continue
-                elif o+3 < len(self.opcodes) and \
-                         self.opcodes[o+3] == ('LABEL', [self.opcodes[o+1][1][0]]):
+                elif o + 3 < len(self.opcodes) and \
+                        self.opcodes[o + 3] == ('LABEL', [self.opcodes[o + 1][1][0]]):
                     new.append((Word.conditions[self.opcodes[o][0]],
-                                             self.opcodes[o][1]))
-                    new.append(self.opcodes[o+2])
+                                self.opcodes[o][1]))
+                    new.append(self.opcodes[o + 2])
                     o += 3
                     continue
             new.append(self.opcodes[o])
@@ -1856,39 +2033,41 @@ class Word(Named, LiteralValue):
         bit-test."""
         new = []
         short_conditions = {make_tuple('btfss', compiler['Z'] + [access]): 'bnz',
-                                                make_tuple('btfsc', compiler['Z'] + [access]): 'bz',
-                                                make_tuple('btfss', compiler['C'] + [access]): 'bnc',
-                                                make_tuple('btfsc', compiler['C'] + [access]): 'bc'}
+                            make_tuple('btfsc', compiler['Z'] + [access]): 'bz',
+                            make_tuple('btfss', compiler['C'] + [access]): 'bnc',
+                            make_tuple('btfsc', compiler['C'] + [access]): 'bc'}
         o = 0
         while o < len(self.opcodes):
             t = make_tuple(self.opcodes[o][0], self.opcodes[o][1])
             if t in short_conditions and \
-                 is_internal_jump(self.opcodes[o+1]):
-                new.append((short_conditions[t], [self.opcodes[o+1][1][0]]))
+                    is_internal_jump(self.opcodes[o + 1]):
+                new.append((short_conditions[t], [self.opcodes[o + 1][1][0]]))
                 o += 1
             elif t in short_conditions and \
-                     o+2 < len(self.opcodes) and \
-                     is_internal_jump(self.opcodes[o+2]):
+                    o + 2 < len(self.opcodes) and \
+                    is_internal_jump(self.opcodes[o + 2]):
                 reverse = (Word.conditions[t[0]], t[1])
-                new.append((short_conditions[reverse], [self.opcodes[o+2][1][0]]))
-                new.append(self.opcodes[o+1])
+                new.append((short_conditions[reverse], [
+                           self.opcodes[o + 2][1][0]]))
+                new.append(self.opcodes[o + 1])
                 o += 2
             elif self.opcodes[o][0] in list(short_conditions.values()) and \
-                             o+2 < len(self.opcodes) and \
-                             is_external_jump(self.opcodes[o+1]) and \
-                             self.opcodes[o+2][0] == 'LABEL' and \
-                             self.opcodes[o][1][0] == self.opcodes[o+2][1][0]:
+                    o + 2 < len(self.opcodes) and \
+                    is_external_jump(self.opcodes[o + 1]) and \
+                    self.opcodes[o + 2][0] == 'LABEL' and \
+                    self.opcodes[o][1][0] == self.opcodes[o + 2][1][0]:
                 for(n, a), v in list(short_conditions.items()):
                     if v == self.opcodes[o][0]:
                         new.append((Word.conditions[n], list(a)))
                         break
                 else:
-                    raise compiler.INTERNAL_ERROR("in optimize_short_conditions")
-                new.append(self.opcodes[o+1])
+                    raise compiler.INTERNAL_ERROR(
+                        "in optimize_short_conditions")
+                new.append(self.opcodes[o + 1])
                 o += 1
             else:
                 new.append(self.opcodes[o])
-            o+= 1
+            o += 1
         self.opcodes = new
 
     def optimize_useless_gotos(self):
@@ -1900,7 +2079,7 @@ class Word(Named, LiteralValue):
             if self.opcodes[o][0] in ['goto', 'bra']:
                 useless = True
                 target = self.opcodes[o][1][0]
-                for i in range(o+1, len(self.opcodes)):
+                for i in range(o + 1, len(self.opcodes)):
                     if self.opcodes[i][0] != 'LABEL':
                         useless = False
                         break
@@ -1937,8 +2116,8 @@ class Word(Named, LiteralValue):
         # Do other lines
         for o in range(len(self.opcodes) - 1):
             if self.opcodes[o][0] == 'LABEL' and \
-                 self.opcodes[o+1][0] == 'LABEL':
-                source = self.opcodes[o+1][1][0]
+                    self.opcodes[o + 1][0] == 'LABEL':
+                source = self.opcodes[o + 1][1][0]
                 target = self.opcodes[o][1][0]
                 self.replace_label(source, target)
 
@@ -1950,8 +2129,8 @@ class Word(Named, LiteralValue):
             if target != self:
                 self.substitute = target
                 self.opcodes[0] = ('COMMENT',
-                                                    ['replaced by equivalent %s' %
-                                                     self.substitute])
+                                   ['replaced by equivalent %s' %
+                                    self.substitute])
 
     def output(self, outfd):
         outfd.write('%s\n' % self.unsubstituted())
@@ -1991,7 +2170,7 @@ class Word(Named, LiteralValue):
             if ram_addr(params[0]):
                 append('movff', params[0], compiler['PREINC0'])
                 append('movff', Add(params[0], Number(1)),
-                                compiler['PREINC0'])
+                       compiler['PREINC0'])
             else:
                 push_byte(low(params[0]))
                 push_byte(high(params[0]))
@@ -2093,6 +2272,7 @@ class Word(Named, LiteralValue):
     def static_value(self):
         return None
 
+
 class Input:
 
     def __init__(self, name, lines):
@@ -2105,7 +2285,7 @@ class Input:
         if self.current_line > len(self.lines):
             return None
         else:
-            return self.lines [self.current_line - 1]
+            return self.lines[self.current_line - 1]
 
     def current_location(self):
         """Return an identifier of the current location"""
@@ -2113,6 +2293,7 @@ class Input:
 
     def __repr__(self):
         return self.current_location()
+
 
 class Compiler:
 
@@ -2138,13 +2319,13 @@ class Compiler:
         pass
 
     pic_opcodes = ['clrwdt', 'daw', 'nop', 'sleep', 'reset',
-                                'tblrd*', 'tblrd*+', 'tblrd*-', 'tblrd+*',
-                                 'tblwt*', 'tblwt*+', 'tblwt*-', 'tblwt+*']
+                   'tblrd*', 'tblrd*+', 'tblrd*-', 'tblrd+*',
+                   'tblwt*', 'tblwt*+', 'tblwt*-', 'tblwt+*']
 
     pic_opcodes_l = ['bc', 'bn', 'bnc', 'bnn', 'bnov', 'bnz', 'bov',
-                                     'bra', 'bz', 'goto', 'rcall',
-                                     'addlw', 'andlw', 'iorlw', 'movlb',
-                                     'movlw', 'mullw', 'retlw', 'sublw', 'xorlw']
+                     'bra', 'bz', 'goto', 'rcall',
+                     'addlw', 'andlw', 'iorlw', 'movlb',
+                     'movlw', 'mullw', 'retlw', 'sublw', 'xorlw']
 
     pic_opcodes_s = ['return', 'retfie']
 
@@ -2157,20 +2338,20 @@ class Compiler:
     pic_opcodes_ls = ['call']
 
     pic_opcodes_lfa = ['addwf', 'addwfc', 'andwf', 'comf', 'decf',
-                                         'decfsz', 'dcfsnz', 'incf', 'incfsz', 'infsnz',
-                                         'iorwf', 'movf', 'rlcf', 'rlncf', 'rrcf', 'rrncf',
-                                         'subfwb', 'subwf', 'subwfb', 'swapf',
-                                         'xorwf']
+                       'decfsz', 'dcfsnz', 'incf', 'incfsz', 'infsnz',
+                       'iorwf', 'movf', 'rlcf', 'rlncf', 'rrcf', 'rrncf',
+                       'subfwb', 'subwf', 'subwfb', 'swapf',
+                       'xorwf']
 
     pic_opcodes_lla = ['bcf', 'bsf', 'btfsc', 'btfss', 'btg']
 
     all_opcodes = pic_opcodes + pic_opcodes_l + pic_opcodes_s + \
-                                pic_opcodes_la + pic_opcodes_ll + pic_opcodes_ls + \
-                                pic_opcodes_lfa
+        pic_opcodes_la + pic_opcodes_ll + pic_opcodes_ls + \
+        pic_opcodes_lfa
 
     gpasm_directives = ['__badram', '__config', '__idlocs', '__maxram',
-                                            'bankisel', 'banksel', 'cblock', 'code', 'constant',
-                                            'da', 'data', 'db', 'de', 'dt', 'dw', 'else',
+                        'bankisel', 'banksel', 'cblock', 'code', 'constant',
+                        'da', 'data', 'db', 'de', 'dt', 'dw', 'else',
                                             'end', 'endc', 'endif', 'endm', 'endw', 'equ',
                                             'error', 'errorlevel', 'extern', 'exitm',
                                             'expand', 'fill', 'global', 'high',
@@ -2182,7 +2363,7 @@ class Compiler:
                                             'udata_ovr', 'udata_shr', 'variable', 'while']
 
     def __init__(self, processor, start, main, automatic_inlining,
-                             no_comments, infile, asmfile):
+                 no_comments, infile, asmfile):
         self.processor = processor
         self.start = start
         self.main = main
@@ -2222,8 +2403,8 @@ class Compiler:
 
     def check_interrupts(self):
         if not compiler.use_interrupts:
-            raise Compiler.FATAL_ERROR("%s: interrupts need to be enabled with -i" % \
-                        self.current_location())
+            raise Compiler.FATAL_ERROR("%s: interrupts need to be enabled with -i" %
+                                       self.current_location())
 
     def add_default_content(self):
         self.add_asm_instructions()
@@ -2270,7 +2451,8 @@ class Compiler:
         self.input_stack.append(self.input)
 
     def restore_input(self):
-        self.input, self.input_stack = self.input_stack[-1], self.input_stack[:-1]
+        self.input, self.input_stack = self.input_stack[
+            -1], self.input_stack[:-1]
 
     def include(self, filename):
         self.loaded_files.append(filename)
@@ -2291,7 +2473,8 @@ class Compiler:
         next_line = self.input.next_line()
         if next_line is None:
             raise Compiler.EOF("%s: end of file" % self.current_location())
-        if not next_line: return self.refill()
+        if not next_line:
+            return self.refill()
         self.input_buffer = next_line
 
     def next_char(self):
@@ -2311,7 +2494,8 @@ class Compiler:
             x = Compiler._next_word.match(self.input_buffer)
             if x:
                 word = x.group(2)
-                self.input_buffer = self.input_buffer[len(word)+len(x.group(1))+1:]
+                self.input_buffer = self.input_buffer[
+                    len(word) + len(x.group(1)) + 1:]
                 return word
             self.refill()
 
@@ -2346,7 +2530,7 @@ class Compiler:
         except:
             return None
 
-    def find_main(self, signal_error = False):
+    def find_main(self, signal_error=False):
         main = self.find(self.main)
         if signal_error and main is None:
             self.error("cannot find `%s' word" % self.main)
@@ -2362,7 +2546,7 @@ class Compiler:
             if not isinstance(previous, Forward):
                 if previous.from_source:
                     self.warning('redefinition of %s (defined at %s)' %
-                                             (previous.name, previous.definition))
+                                 (previous.name, previous.definition))
                 break
             self.fix_forward(previous, object)
             self.mask(previous)
@@ -2389,7 +2573,7 @@ class Compiler:
         for e in [self.current_object] + self.all_entities:
             if not e.immediate:
                 e.opcodes = [(name, [fix_it(p) for p in params])
-                                         for(name, params) in e.opcodes]
+                             for(name, params) in e.opcodes]
                 e.references = [fix_it(r) for r in e.references]
 
     def mask(self, object):
@@ -2406,7 +2590,7 @@ class Compiler:
         self.data_stack = [value] + self.data_stack
 
     def ct_pop(self):
-        value, self.data_stack = self.data_stack [0], self.data_stack [1:]
+        value, self.data_stack = self.data_stack[0], self.data_stack[1:]
         return value
 
     def ct_swap(self):
@@ -2443,11 +2627,11 @@ class Compiler:
                 if number is None:
                     input = self.input
                     raise Compiler.FATAL_ERROR("%s: unknown word %s" % (self.current_location(),
-                                                                                                                            word))
+                                                                        word))
                 if self.state:
-                                self.push(number)
+                    self.push(number)
                 else:
-                                self.ct_push(number)
+                    self.ct_push(number)
 
     def output(self, outfd):
         global compiler
@@ -2459,31 +2643,32 @@ class Compiler:
         for i in refs:
             i.check_real()
         if self.automatic_inlining:
-            to_inline = [x for x in refs if x in inlinable and x.should_inline()]
+            to_inline = [
+                x for x in refs if x in inlinable and x.should_inline()]
             if to_inline:
                 stderror("Restarting with automatic inlining of:\n     %s" %
-                                    "\n     ".join(["%s (%s)" % (x.name, x.definition)
-                                                                 for x in to_inline]))
+                         "\n     ".join(["%s (%s)" % (x.name, x.definition)
+                                         for x in to_inline]))
                 outfd.close()
                 compiler = Compiler(self.processor, self.start, self.main,
-                                                         self.automatic_inlining, self.no_comments,
-                                                        self.infile, self.asmfile)
+                                    self.automatic_inlining, self.no_comments,
+                                    self.infile, self.asmfile)
                 compiler.inline_list = self.inline_list + \
-                                                             [x.definition for x in to_inline]
+                    [x.definition for x in to_inline]
                 if self.use_interrupts:
                     compiler.enable_interrupts()
                 compiler.process()
                 return
         if compiler.here > 0x100:
             compiler.current_object.opcodes = [('movlb', [Number(1)])] + \
-                                                                                 compiler.current_object.opcodes
+                compiler.current_object.opcodes
         if compiler['FSR0H'] in refs or compiler['FSR0L'] in refs \
-             or compiler['POSTINC0'] in refs or compiler['POSTDEC0'] in refs \
-             or compiler['PREINC0'] in refs:
+                or compiler['POSTINC0'] in refs or compiler['POSTDEC0'] in refs \
+                or compiler['PREINC0'] in refs:
             compiler.add_call(compiler['init_stack'])
         if compiler['FSR2H'] in refs or compiler['FSR2L'] in refs \
-             or compiler['POSTINC2'] in refs or compiler['POSTDEC2'] in refs \
-             or compiler['PREINC2'] in refs:
+                or compiler['POSTINC2'] in refs or compiler['POSTDEC2'] in refs \
+                or compiler['PREINC2'] in refs:
             compiler.add_call(compiler['init_rstack'])
         self.add_instruction('goto', [self.find(self.main)])
         self.current_object.refers_to(self.find(self.main))
@@ -2509,16 +2694,16 @@ class Compiler:
             for o in range(len(i.opcodes)):
                 if i.opcodes[o][1]:
                     r = i.opcodes[o][1][0]
-                    if r in l and o+1 == len(i.opcodes):
-                            i.nrefs += 50
-                            r.nrefs += 100
+                    if r in l and o + 1 == len(i.opcodes):
+                        i.nrefs += 50
+                        r.nrefs += 100
 
     def reorder(self, l):
         """Find a good order for outputting the code section in which fallbacks
         through other words are used when possible. We favour highly used words
         as they are likely to be called more often."""
         self.count_references(l)
-        l.sort(key = lambda x: x.nrefs, reverse = True)
+        l.sort(key=lambda x: x.nrefs, reverse=True)
         r = []
         for i in l:
             if i.substitute:
@@ -2529,9 +2714,9 @@ class Compiler:
             for j in range(len(r)):
                 name, params = r[j].opcodes[-1]
                 if last_goto(r[j]) and isinstance(params[0], Word) and \
-                             params[0].real_instance() == i:
+                        params[0].real_instance() == i:
                     del r[j].opcodes[-1]
-                    r = r[:j+1] + [i] + r[j+1:]
+                    r = r[:j + 1] + [i] + r[j + 1:]
                     break
             else:
                 # If this words ends with a goto to a word already in r and the
@@ -2542,7 +2727,7 @@ class Compiler:
                 name, params = i.opcodes[-1]
                 if name == 'goto' and params[0] in r and not params[0].not_inlinable:
                     n = r.index(params[0])
-                    if n == 0 or last_goto(r[n-1]):
+                    if n == 0 or last_goto(r[n - 1]):
                         del i.opcodes[-1]
                         r = r[:n] + [i] + r[n:]
                         continue
@@ -2556,7 +2741,7 @@ class Compiler:
             for i in p:
                 if i not in l:
                     l.append(i)
-        l.sort(key = lambda x: x.order)
+        l.sort(key=lambda x: x.order)
         sections = []
         for i in l:
             if i.section not in sections:
@@ -2579,7 +2764,8 @@ class Compiler:
         outfd.write('\n;%s\n; Section: %s\n;%s\n' % (t, name, t))
 
     def output_prologue(self, outfd):
-        outfd.write("\tprocessor pic%s\n" % (self.processor or DEFAULT_PROCESSOR))
+        outfd.write("\tprocessor pic%s\n" %
+                    (self.processor or DEFAULT_PROCESSOR))
         outfd.write("\tradix dec\n")
         outfd.write("\torg %s\n" % self.start)
         outfd.write("\tgoto %s\n" % self['init_runtime'])
@@ -2601,9 +2787,10 @@ class Compiler:
         warning('%s: %s' % (self.current_location(), str))
 
     def error(self, str):
-        raise Compiler.COMPILATION_ERROR('%s: %s' % (self.current_location(), str))
+        raise Compiler.COMPILATION_ERROR(
+            '%s: %s' % (self.current_location(), str))
 
-    def add_instruction(self, instruction, params = []):
+    def add_instruction(self, instruction, params=[]):
         self.current_object.add_instruction(instruction, params)
 
     def add_call(self, target):
@@ -2635,7 +2822,8 @@ class Compiler:
             if is_internal_jump((n, p)) and p == target.end_label:
                 removable_end = False
             if is_external_jump((n, p)):
-                self.warning('inlining of %s uses a non-local jump' % target.name)
+                self.warning('inlining of %s uses a non-local jump' %
+                             target.name)
             if p and p[0] in rep:
                 self.add_instruction(n, [rep[p[0]]] + p[1:])
             else:
@@ -2644,7 +2832,8 @@ class Compiler:
         # optimizations can be performed between the inlined word and
         # subsequent instructions.
         if removable_end:
-            # Check that the latest opcode was a return or an inlined call to return.
+            # Check that the latest opcode was a return or an inlined call to
+            # return.
             assert(target.opcodes[-1][0] == 'return')
             name, params = compiler.last_instruction()
             if name == 'LABEL' and params == [rep[target.end_label]]:
@@ -2659,7 +2848,7 @@ class Compiler:
 
     def tos_to_addr(self, addr):
         self.add_instruction('movff', [self['POSTDEC0'],
-                                                                        Add(addr, Number(1))])
+                                       Add(addr, Number(1))])
         # Using movff with PCL as a target is forbidden. This route will
         # always be taken even if a constant has been pushed onto the stack
         # because PCLATU has been cleared in the meantime.
@@ -2695,12 +2884,12 @@ class Compiler:
             self.rewind()
             self.add_instruction('movff', [params[0], self['FSR%dL' % fsr]])
             self.add_instruction('movff', [Add(params[0], Number(1)),
-                                                                         self['FSR%dH' % fsr]])
+                                           self['FSR%dH' % fsr]])
         else:
             self.add_instruction('movff', [self['POSTDEC0'],
-                                                                         self['FSR%dH' % fsr]])
+                                           self['FSR%dH' % fsr]])
             self.add_instruction('movff', [self['POSTDEC0'],
-                                                                         self['FSR%dL' % fsr]])
+                                           self['FSR%dL' % fsr]])
 
     def last_instruction(self):
         try:
@@ -2728,12 +2917,13 @@ class Compiler:
             return e
         else:
             raise Compiler.INTERNAL_ERROR("%s: cannot find internal entity %s" % (self.current_location(),
-                                                                                                        item))
+                                                                                  item))
 
     def eval(self, str):
         """Eval a string after parsing it into words."""
         for w in str.split():
             self[w].run()
+
 
 def set_start_cb(option, opt, value, parser):
     s = parse_number(value)
@@ -2741,35 +2931,36 @@ def set_start_cb(option, opt, value, parser):
         raise optparse.OptionValueError("%s is not a valid address" % value)
     setattr(parser.values, 'start', s)
 
+
 def main():
     global compiler
-    parser = optparse.OptionParser(usage = '%prog [options] FILE')
-    parser.add_option('-a', '--auto-inline', action = 'store_true',
-            default = False, dest = 'automatic_inlining',
-            help = 'turn on automatic inlining')
-    parser.add_option('-c', '--compile', action = 'store_true',
-            default = False, dest = 'compile_only',
-            help = 'compile only, do not link')
-    parser.add_option('-i', '--interrupts', dest = 'enable_interrupts',
-            action = 'store_true', default = False,
-            help = 'enable interrupts usage')
-    parser.add_option('-m', '--main', dest = 'root', metavar = 'WORD',
-            default = 'main',
-            help = 'main word [main]')
-    parser.add_option('-N', '--no-comments', dest = 'no_comments',
-            default = False, action = 'store_true')
-    parser.add_option('-o', '--output', metavar = 'FILE', dest = 'outfile',
-            help = 'set output file name', default = None)
-    parser.add_option('-p', '--processor', metavar = 'MODEL',
-            default = None,
-            help = 'set processor type [%s]' % DEFAULT_PROCESSOR)
-    parser.add_option('-s', '--start', default = parse_number('0x2000'),
-            action = 'callback', callback = set_start_cb,
-            metavar = 'ADDR', type = 'string', dest = 'start',
-            help = 'set starting address [0x2000]')
-    parser.add_option('-w', '--warnings-as-errors', action = 'store_true',
-            default = False, dest = 'warnings_as_errors',
-            help = 'treat warnings as errors')
+    parser = optparse.OptionParser(usage='%prog [options] FILE')
+    parser.add_option('-a', '--auto-inline', action='store_true',
+                      default=False, dest='automatic_inlining',
+                      help='turn on automatic inlining')
+    parser.add_option('-c', '--compile', action='store_true',
+                      default=False, dest='compile_only',
+                      help='compile only, do not link')
+    parser.add_option('-i', '--interrupts', dest='enable_interrupts',
+                      action='store_true', default=False,
+                      help='enable interrupts usage')
+    parser.add_option('-m', '--main', dest='root', metavar='WORD',
+                      default='main',
+                      help='main word [main]')
+    parser.add_option('-N', '--no-comments', dest='no_comments',
+                      default=False, action='store_true')
+    parser.add_option('-o', '--output', metavar='FILE', dest='outfile',
+                      help='set output file name', default=None)
+    parser.add_option('-p', '--processor', metavar='MODEL',
+                      default=None,
+                      help='set processor type [%s]' % DEFAULT_PROCESSOR)
+    parser.add_option('-s', '--start', default=parse_number('0x2000'),
+                      action='callback', callback=set_start_cb,
+                      metavar='ADDR', type='string', dest='start',
+                      help='set starting address [0x2000]')
+    parser.add_option('-w', '--warnings-as-errors', action='store_true',
+                      default=False, dest='warnings_as_errors',
+                      help='treat warnings as errors')
     opts, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
@@ -2786,8 +2977,8 @@ def main():
     global warnings_as_errors
     warnings_as_errors = opts.warnings_as_errors
     compiler = Compiler(opts.processor, opts.start, opts.root,
-                                             opts.automatic_inlining, opts.no_comments,
-                                             infile, asmfile)
+                        opts.automatic_inlining, opts.no_comments,
+                        infile, asmfile)
     if opts.enable_interrupts:
         compiler.enable_interrupts()
     try:
