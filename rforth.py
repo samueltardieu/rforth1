@@ -29,6 +29,7 @@ Memory usage:
 import optparse, os, re, string, sys
 
 compiler = None
+warnings_as_errors = False
 
 DEFAULT_PROCESSOR = '18f248'
 
@@ -72,7 +73,10 @@ def stderror(str):
 
 def warning(str):
     """Print a warning on standard error."""
-    stderror('WARNING: ' + str)
+    if warnings_as_errors:
+        error(str)
+    else:
+        stderror('WARNING: ' + str)
 
 def error(str):
     """Print a fatal error on standard error."""
@@ -2741,28 +2745,31 @@ def main():
     global compiler
     parser = optparse.OptionParser(usage = '%prog [options] FILE')
     parser.add_option('-a', '--auto-inline', action = 'store_true',
-                                         default = False, dest = 'automatic_inlining',
-                                         help = 'turn on automatic inlining')
+            default = False, dest = 'automatic_inlining',
+            help = 'turn on automatic inlining')
     parser.add_option('-c', '--compile', action = 'store_true',
-                                         default = False, dest = 'compile_only',
-                                         help = 'compile only, do not link')
+            default = False, dest = 'compile_only',
+            help = 'compile only, do not link')
     parser.add_option('-i', '--interrupts', dest = 'enable_interrupts',
-                                         action = 'store_true', default = False,
-                                         help = 'enable interrupts usage')
+            action = 'store_true', default = False,
+            help = 'enable interrupts usage')
     parser.add_option('-m', '--main', dest = 'root', metavar = 'WORD',
-                                         default = 'main',
-                                         help = 'main word [main]')
+            default = 'main',
+            help = 'main word [main]')
     parser.add_option('-N', '--no-comments', dest = 'no_comments',
-                                        default = False, action = 'store_true')
+            default = False, action = 'store_true')
     parser.add_option('-o', '--output', metavar = 'FILE', dest = 'outfile',
-                                         help = 'set output file name', default = None)
+            help = 'set output file name', default = None)
     parser.add_option('-p', '--processor', metavar = 'MODEL',
-                                         default = None,
-                                         help = 'set processor type [%s]' % DEFAULT_PROCESSOR)
+            default = None,
+            help = 'set processor type [%s]' % DEFAULT_PROCESSOR)
     parser.add_option('-s', '--start', default = parse_number('0x2000'),
-                                         action = 'callback', callback = set_start_cb,
-                                         metavar = 'ADDR', type = 'string', dest = 'start',
-                                         help = 'set starting address [0x2000]')
+            action = 'callback', callback = set_start_cb,
+            metavar = 'ADDR', type = 'string', dest = 'start',
+            help = 'set starting address [0x2000]')
+    parser.add_option('-w', '--warnings-as-errors', action = 'store_true',
+            default = False, dest = 'warnings_as_errors',
+            help = 'treat warnings as errors')
     opts, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
@@ -2776,6 +2783,8 @@ def main():
             asmfile = opts.outfile
         else:
             hexfile = opts.outfile
+    global warnings_as_errors
+    warnings_as_errors = opts.warnings_as_errors
     compiler = Compiler(opts.processor, opts.start, opts.root,
                                              opts.automatic_inlining, opts.no_comments,
                                              infile, asmfile)
@@ -2788,7 +2797,10 @@ def main():
         sys.exit(1)
     if not opts.compile_only:
         if os.fork() == 0:
-            os.execlp('gpasm', 'gpasm', '-o', hexfile, asmfile)
+            if warnings_as_errors:
+                os.execlp('gpasm', 'gpasm', '-S', '2', '-o', hexfile, asmfile)
+            else:
+                os.execlp('gpasm', 'gpasm', '-o', hexfile, asmfile)
         else:
             _pid, status = os.wait()
             if status != 0:
