@@ -62,7 +62,7 @@ test2
 	return
 
 test3
-	movf RCREG,0,0
+	movf RCREG,w,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movwf a,1
@@ -83,14 +83,14 @@ test5
 	return
 
 test6
-	movf RCREG,0,0
+	movf RCREG,w,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff WREG,b
 	return
 
 test7
-	movf TMR1L,0,0
+	movf TMR1L,w,0
 	movff (TMR1L+1),(TMR0L+1)
 	movwf TMR0L,0
 	return
@@ -101,7 +101,7 @@ test8
 	return
 
 test9
-	movf a,0,1
+	movf a,w,1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movwf c__1,1

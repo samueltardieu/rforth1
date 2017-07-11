@@ -42,7 +42,7 @@ test3
 	return
 
 test4
-	movf RCREG,0,0
+	movf RCREG,w,0
 	return
 
 ;---------------------------------------------------------

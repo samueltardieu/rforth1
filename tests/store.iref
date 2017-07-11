@@ -40,7 +40,7 @@ main
 	movwf a,1
 	setf (a+1),1
 	clrf a,1
-	movf RCREG,0,0
+	movf RCREG,w,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movwf a,1
@@ -52,16 +52,16 @@ main
 	movff WREG,(b+1)
 	movlw LOW(0xff00)
 	movff WREG,b
-	movf RCREG,0,0
+	movf RCREG,w,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff WREG,b
-	movf TMR1L,0,0
+	movf TMR1L,w,0
 	movff (TMR1L+1),(TMR0L+1)
 	movwf TMR0L,0
 	movff a,c__1
 	clrf (c__1+1),1
-	movf a,0,1
+	movf a,w,1
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movwf c__1,1

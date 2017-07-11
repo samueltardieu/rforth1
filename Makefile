@@ -12,7 +12,7 @@ PREDEFINED = lib/core.fs lib/sfrnames.fs lib/primitives.fs lib/arithmetic.fs \
 STARTADDR ?= 0x2000
 PORT ?= /dev/ttyS0
 SPEED ?= 115200
-FLAGS = ${OPTS} --start ${STARTADDR}
+FLAGS = ${OPTS} --start ${STARTADDR} --warnings-as-errors
 
 PYTHON ?= python
 

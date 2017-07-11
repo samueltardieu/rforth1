@@ -77,17 +77,17 @@ an_
 	call _2_ST_
 	call _2_ST_
 	call _2_ST_
-	movf ADCON0,0,0
+	movf ADCON0,w,0
 	andlw 0xc7
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff POSTDEC0,temp_x1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,1,0
-	iorwf POSTINC0,1,0
-	movf temp_x1,0,0
-	iorwf INDF0,1,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,f,0
+	iorwf POSTINC0,f,0
+	movf temp_x1,w,0
+	iorwf INDF0,f,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,ADCON0
 	bsf ADCON0,2,0
 _lbl___509
@@ -95,7 +95,7 @@ _lbl___509
 	bra _lbl___509
 	movff ADRESL,PREINC0
 	movff (ADRESL+1),PREINC0
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -119,13 +119,13 @@ flash_addr_EX_
 
 table_addr_EX_
 	clrf TBLPTRU,0
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRH
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRL
 	bcf EECON1,6,0
 	return
@@ -153,7 +153,7 @@ main
 _lbl___527
 	btfss PIR1,5,0
 	bra _lbl___527
-	movf RCREG,0,0
+	movf RCREG,w,0
 	movlw LOW((disp0_str+0x8000))
 	movwf PREINC0,0
 	movlw HIGH((disp0_str+0x8000))
@@ -187,18 +187,18 @@ _lbl___527
 
 emit_8
 	call op_dup
-	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	swapf POSTINC0,f,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	andlw 0xf
 	addlw 0xf6
 	btfsc STATUS,0,0
 	addlw 7
 	addlw 0x3a
 	call emit
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	andlw 0xf
 	addlw 0xf6
 	btfsc STATUS,0,0
@@ -225,9 +225,9 @@ op_cfetch_tos
 
 _2_ST_
 	bcf STATUS,0,0
-	movf POSTDEC0,0,0
-	rlcf POSTINC0,1,0
-	rlcf INDF0,1,0
+	movf POSTDEC0,w,0
+	rlcf POSTINC0,f,0
+	rlcf INDF0,f,0
 	return
 
 flashc_AT_
@@ -244,8 +244,8 @@ eeprom_addr_EX_
 	return
 
 eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movff EEDATA,PREINC0
@@ -259,18 +259,18 @@ type
 _lbl___262
 	call op_dup
 	call op_cfetch_tos
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call emit
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
-	decfsz INDF2,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
+	decfsz INDF2,f,0
 	bra _lbl___262
 _lbl___260
-	movf POSTDEC2,1,0
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC2,f,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	return
 
 ;---------------------------------------------------------

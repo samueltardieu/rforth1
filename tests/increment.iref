@@ -19,10 +19,10 @@ init_runtime
 	clrf b,1
 
 main
-	infsnz a,1
-	incf (a+1),1
-	infsnz b,1
-	incf (b+1),1
+	infsnz a,f
+	incf (a+1),f
+	infsnz b,f
+	incf (b+1),f
 	return
 
 ;---------------------------------------------------------

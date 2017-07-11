@@ -71,12 +71,12 @@ main
 	movff (temp_x1+1),PREINC0
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	call eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	movwf INDF0,0
 	movlw LOW(b)
 	movwf PREINC0,0
@@ -92,15 +92,15 @@ main
 	movwf PREINC0,0
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
 	movff POSTINC2,PREINC0
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	call eepromc_EX_
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
@@ -114,10 +114,10 @@ main
 	movwf PREINC0,0
 
 eepromc_EX_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call eeprom_addr_EX_
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,EEDATA
 	bsf EECON1,2,0
 	movlw 0x55
@@ -145,8 +145,8 @@ eeprom_addr_EX_
 	return
 
 eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movff EEDATA,PREINC0

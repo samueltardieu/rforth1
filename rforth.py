@@ -126,10 +126,10 @@ class Number(LiteralValue):
     def __add__(self, i):
         return Number(self.value + i, self.base)
 
-dst_w = Number(0)
-dst_f = Number(1)
-access = Number(0)
-no_access = Number(1)
+dst_w = "w"
+dst_f = "f"
+access = "0"
+no_access = "1"
 no_fast = Number(0)
 fast = Number(1)
 
@@ -1676,7 +1676,7 @@ class Word(Named, LiteralValue):
             msg = '(%s)' % msg
         stderror("Dumping content of %s%s:" % (self.name, msg))
         for o in self.opcodes:
-            stderror("     %s %s" % (o[0], ','.join([repr(x) for x in o[1]])))
+            stderror("     %s %s" % (o[0], ','.join([repr(x) for x in o[1] if x != ''])))
 
     def remove_markers(self):
         self.opcodes = [o for o in self.opcodes if o[0][:7] != 'MARKER_']

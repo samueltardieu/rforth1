@@ -56,11 +56,11 @@ _high
 	movff POSTDEC0,FSR2L
 	movff POSTDEC0,(FSR1L+1)
 	movff POSTDEC0,FSR1L
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,STATUS
 	movff high_fsr0htemp,FSR0H
 	movff high_fsr0ltemp,FSR0L
-	movf high_wtemp,0,0
+	movf high_wtemp,w,0
 	retfie 0
 
 _low
@@ -84,11 +84,11 @@ _low
 	movff POSTDEC0,FSR2L
 	movff POSTDEC0,(FSR1L+1)
 	movff POSTDEC0,FSR1L
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,STATUS
 	movff low_fsr0htemp,FSR0H
 	movff low_fsr0ltemp,FSR0L
-	movf low_wtemp,0,0
+	movf low_wtemp,w,0
 	retfie 0
 
 main

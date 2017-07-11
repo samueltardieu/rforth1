@@ -24,7 +24,7 @@ init_runtime
 	clrf b,1
 
 main
-	movf RCREG,0,0
+	movf RCREG,w,0
 	return
 
 ;---------------------------------------------------------

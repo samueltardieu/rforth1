@@ -49,8 +49,8 @@ _QM_2dup
 	call _QM_dup
 
 _QM_dup
-	movf POSTDEC0,0,0
-	iorwf POSTINC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTINC0,w,0
 	btfsc STATUS,2,0
 	return
 
@@ -62,8 +62,8 @@ op_dup
 
 foobar
 	call _QM_dup
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTDEC0,w,0
 	btfsc STATUS,2,0
 	return
 	call op_dup
@@ -73,17 +73,17 @@ op__ST_
 	movff POSTDEC0,temp_x1
 	movff POSTDEC0,(temp_x2+1)
 	movff POSTDEC0,temp_x2
-	movf temp_x1,0,0
+	movf temp_x1,w,0
 	mulwf temp_x2,0
 	movff PRODL,PREINC0
 	movff PRODH,temp_x3
 	mulwf (temp_x2+1),0
-	movf PRODL,0,0
-	addwf temp_x3,1,0
-	movf (temp_x1+1),0,0
+	movf PRODL,w,0
+	addwf temp_x3,f,0
+	movf (temp_x1+1),w,0
 	mulwf temp_x2,0
-	movf PRODL,0,0
-	addwfc temp_x3,0,0
+	movf PRODL,w,0
+	addwfc temp_x3,w,0
 	movwf PREINC0,0
 	return
 

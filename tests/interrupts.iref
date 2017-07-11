@@ -31,7 +31,7 @@ _low
 	clrf (a+1),1
 	movlw 2
 	movwf a,1
-	movf w_save,0,1
+	movf w_save,w,1
 	retfie 0
 
 ;---------------------------------------------------------

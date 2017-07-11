@@ -81,13 +81,13 @@ init_runtime
 	clrf FSR2H,0
 
 main
-	infsnz a,1
-	incf (a+1),1
+	infsnz a,f
+	incf (a+1),f
 	call op_dup
 	call op_fetch_tos
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	movff POSTDEC0,(temp_x1+1)
 	movff POSTDEC0,temp_x1
 	movff POSTDEC0,PREINC2
@@ -103,7 +103,7 @@ op_store
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
 	movff POSTDEC0,PREINC1
-	movf POSTDEC1,0,0
+	movf POSTDEC1,w,0
 	movff POSTDEC0,INDF1
 	return
 
@@ -113,13 +113,13 @@ flash_addr_EX_
 
 table_addr_EX_
 	clrf TBLPTRU,0
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRH
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRL
 	bcf EECON1,6,0
 	return
@@ -127,26 +127,26 @@ table_addr_EX_
 eeprom_EX_
 	movff POSTDEC0,PREINC2
 	movff POSTDEC0,PREINC2
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
 	movff POSTDEC2,PREINC0
 	movff POSTINC2,PREINC0
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	call eepromc_EX_
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
 
 eepromc_EX_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,EEDATA
 	bsf EECON1,2,0
 	movlw 0x55
@@ -188,8 +188,8 @@ flash_AT_
 	return
 
 eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	movwf EEADR,0
 	bcf EECON1,7,0
 	bcf EECON1,6,0
@@ -209,12 +209,12 @@ eeprom_AT_
 	movff (temp_x1+1),PREINC0
 	movff POSTDEC2,PREINC0
 	movff POSTDEC2,PREINC0
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	call eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	movwf INDF0,0
 	return
 

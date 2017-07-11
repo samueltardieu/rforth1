@@ -56,9 +56,9 @@ main
 	call test1
 	bra _lbl___439
 _lbl___438
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	return
 _lbl___439
 	movlw LOW(_lbl___438)
@@ -102,15 +102,15 @@ op_dup
 _OP_execute_CP_
 	clrf PCLATU,0
 	movff POSTDEC0,(PCL+1)
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movwf PCL,0
 
 test1
 	bra _lbl___431
 _lbl___430
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
 	return
 _lbl___431
 	call op_dup

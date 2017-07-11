@@ -22,8 +22,8 @@ STATUS equ 0xfd8
 ;---------------------------------------------------------
 
 op_normalize
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTDEC0,w,0
 
 op_normalize_z
 	movlw -1
@@ -34,8 +34,8 @@ op_normalize_z
 	return
 
 op_zeroeq
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTDEC0,w,0
 
 op_zeroeq_z
 	movlw -1

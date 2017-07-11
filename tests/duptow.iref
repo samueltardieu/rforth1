@@ -19,7 +19,7 @@ PLUSW0 equ 0xfeb
 
 main
 	movlw -1
-	movf PLUSW0,0,0
+	movf PLUSW0,w,0
 	return
 
 	END

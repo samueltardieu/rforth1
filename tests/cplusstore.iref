@@ -36,23 +36,23 @@ init_runtime
 
 main
 	movlw 17
-	addwf a,1,1
-	incf a,1,1
-	decf a,1,1
-	decf a,1,1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	addwf a,1,1
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	subwf a,1,1
+	addwf a,f,1
+	incf a,f,1
+	decf a,f,1
+	decf a,f,1
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
+	addwf a,f,1
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
+	subwf a,f,1
 	movlw 2
-	subwf a,1,1
+	subwf a,f,1
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
-	subwf INDF1,1,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
+	subwf INDF1,f,0
 	return
 
 ;---------------------------------------------------------

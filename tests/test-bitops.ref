@@ -239,8 +239,8 @@ emit
 
 test_set
 	call op_bit_set_q
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTDEC0,w,0
 	bz _lbl___446
 	movlw LOW((test_set_str+0x8000))
 	movwf PREINC0,0
@@ -262,18 +262,18 @@ type
 _lbl___252
 	call op_dup
 	call op_cfetch_tos
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call emit
-	movf POSTDEC0,0,0
-	infsnz POSTINC0,1,0
-	incf INDF0,1,0
-	decfsz INDF2,1,0
+	movf POSTDEC0,w,0
+	infsnz POSTINC0,f,0
+	incf INDF0,f,0
+	decfsz INDF2,f,0
 	bra _lbl___252
 _lbl___250
-	movf POSTDEC2,1,0
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC2,f,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	return
 
 _
@@ -282,14 +282,14 @@ _
 
 emit_8
 	call op_dup
-	movf POSTDEC0,0,0
-	swapf POSTINC0,1,0
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	swapf POSTINC0,f,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	andlw 0xf
 	call emit_4
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	andlw 0xf
 
 emit_4
@@ -303,9 +303,9 @@ flash_addr_EX_
 table_addr_EX_
 	clrf TBLPTRU,0
 	call _1_GT_2
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRH
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,TBLPTRL
 	bcf EECON1,6,0
 	return
@@ -316,8 +316,8 @@ _space
 
 test_clr
 	call op_bit_clr_q
-	movf POSTDEC0,0,0
-	iorwf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	iorwf POSTDEC0,w,0
 	bz _lbl___450
 	movlw LOW((test_clr_str+0x8000))
 	movwf PREINC0,0
@@ -340,13 +340,13 @@ op_dup
 	return
 
 op_bit_mask_to_w
-	movf POSTDEC0,0,0
-	incf INDF0,1,0
+	movf POSTDEC0,w,0
+	incf INDF0,f,0
 	movlw 1
 op_bit_mask_loop
-	dcfsnz INDF0,1,0
+	dcfsnz INDF0,f,0
 	return
-	rlncf WREG,1,0
+	rlncf WREG,f,0
 	bra op_bit_mask_loop
 
 op_bit_mask
@@ -357,36 +357,36 @@ op_bit_mask
 
 op_bit_test_common
 	call op_bit_mask
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
-	andwf INDF1,0,0
+	andwf INDF1,w,0
 	return
 
 op_bit_set
 	call op_bit_mask_to_w
-	movf POSTDEC0,1,0
+	movf POSTDEC0,f,0
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
-	iorwf INDF1,1,0
+	iorwf INDF1,f,0
 	return
 
 op_bit_clr
 	call op_bit_mask_to_w
-	movf POSTDEC0,1,0
+	movf POSTDEC0,f,0
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
-	comf WREG,1,0
-	andwf INDF1,1,0
+	comf WREG,f,0
+	andwf INDF1,f,0
 	return
 
 op_bit_toggle
 	call op_bit_mask_to_w
-	movf POSTDEC0,1,0
+	movf POSTDEC0,f,0
 	movff POSTDEC0,FSR1H
 	movff POSTDEC0,FSR1L
-	xorwf INDF1,1,0
+	xorwf INDF1,f,0
 	return
 
 op_bit_set_q
@@ -418,7 +418,7 @@ op_cfetch_tos
 	return
 
 _1_GT_2
-	movf INDF0,0,0
+	movf INDF0,w,0
 	clrf INDF0,0
 	movwf PREINC0,0
 	clrf PREINC0,0
@@ -430,13 +430,13 @@ depth
 	movff temp_x1,PREINC0
 	movff (temp_x1+1),PREINC0
 	movlw LOW((-0x5f))
-	movf POSTDEC0,1,0
-	addwf POSTINC0,1,0
+	movf POSTDEC0,f,0
+	addwf POSTINC0,f,0
 	movlw HIGH((-0x5f))
-	addwfc INDF0,1,0
-	rlcf INDF0,0,0
-	rrcf POSTDEC0,1,0
-	rrcf POSTINC0,1,0
+	addwfc INDF0,f,0
+	rlcf INDF0,w,0
+	rrcf POSTDEC0,f,0
+	rrcf POSTINC0,f,0
 	return
 
 flashc_AT_
@@ -453,8 +453,8 @@ eeprom_addr_EX_
 	return
 
 eepromc_AT_
-	movf POSTDEC0,0,0
-	movf POSTDEC0,0,0
+	movf POSTDEC0,w,0
+	movf POSTDEC0,w,0
 	call eeprom_addr_EX_
 	bsf EECON1,0,0
 	movff EEDATA,PREINC0
