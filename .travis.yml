@@ -1,11 +1,7 @@
 language: python
 sudo: false
-addons:
-  apt:
-    packages:
-      - gputils
 python:
   - 2.7
   - 3.4
   - 3.6.1
-script: make tests
+script: make tests-gputils
