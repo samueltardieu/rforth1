@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GPUTILS_VERSION: 1.5.2
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache gputils
+        uses: actions/cache@v4
+        with:
+          path: gputils-${{ env.GPUTILS_VERSION }}/install
+          key: gputils-${{ env.GPUTILS_VERSION }}-${{ runner.os }}
+      - name: Run tests
+        run: make tests-gputils PYTHON=python GPUTILS_VERSION=${{ env.GPUTILS_VERSION }}
+      - name: Compile examples
+        run: |
+          export PATH=$PWD/gputils-$GPUTILS_VERSION/install/bin:$PATH
+          for f in examples/*.fs; do
+            echo "::group::$f"
+            python rforth.py --warnings-as-errors "$f"
+            echo "::endgroup::"
+          done

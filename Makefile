@@ -14,7 +14,9 @@ PORT ?= /dev/ttyS0
 SPEED ?= 115200
 FLAGS = ${OPTS} --start ${STARTADDR} --warnings-as-errors
 
-PYTHON ?= python
+PYTHON ?= python3
+
+GPUTILS_VERSION ?= 1.5.2
 
 TEXI2PDF ?= texi2pdf
 TEXI2HTML ?= texi2html
@@ -22,9 +24,10 @@ TEXI2HTML ?= texi2html
 tests: ${TESTCASES} ${ITESTCASES}
 
 tests-gputils::
-	wget -O - http://downloads.sourceforge.net/sourceforge/gputils/gputils-1.5.0.tar.gz | tar zxf -
-	cd gputils-1.5.0 && mkdir -p install && ./configure --prefix=$$PWD/install --disable-html-doc && make install
-	PATH=$$PWD/gputils-1.5.0/install/bin:$$PATH make tests
+	test -x gputils-${GPUTILS_VERSION}/install/bin/gpasm || { \
+	  curl -fsSL https://downloads.sourceforge.net/sourceforge/gputils/gputils-${GPUTILS_VERSION}.tar.bz2 | tar jxf - && \
+	  cd gputils-${GPUTILS_VERSION} && ./configure --prefix=$$PWD/install --disable-html-doc && ${MAKE} && ${MAKE} install; }
+	PATH=$$PWD/gputils-${GPUTILS_VERSION}/install/bin:$$PATH ${MAKE} tests
 
 never::
 
@@ -46,7 +49,7 @@ clean:
 	${RM} *.cod tests/*.cod examples/*.cod examples/engines/*.cod
 	${RM} doc/rforth1.{aux,cp,fn,ky,log,pg,toc,tp,vr}
 
-%.asm %.hex %.lst %.map %.cod: %.fs ${COMPILER} ${PREDEFINED}
+%.asm %.hex %.lst %.cod: %.fs ${COMPILER} ${PREDEFINED}
 	${PYTHON} ${COMPILER} ${FLAGS} $<
 
 %.cmp: %.ref never
