@@ -46,8 +46,8 @@ family, where @code{x} is @code{2}, @code{4}, or @code{5}.
 @node Prerequisites,  , Introduction, Introduction
 @section Prerequisites
 
-To run rforth1, you need to have Python 2.4 or greater installed as well
-as the gputils package for the gpasm program.
+To run rforth1, you need to have Python 3 installed as well
+as the gputils package (version 1.5 or later) for the gpasm program.
 
 @node Conventions,  , Introduction, Top
 @chapter Conventions

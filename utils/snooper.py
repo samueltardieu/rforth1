@@ -10,9 +10,9 @@ class Snooper:
 
     def read (self, l = None):
         if l is None:
-	  data = self.fd.read ()
-	else:
-	  data = self.fd.read (l)
+            data = self.fd.read ()
+        else:
+            data = self.fd.read (l)
         print("<<< %s" % data)
         return data
 
@@ -21,4 +21,3 @@ class Snooper:
 
     def flush (self):
         self.fd.flush ()
-        

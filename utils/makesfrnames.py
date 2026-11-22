@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Usage: makesfrname.py < gpasm-header-file > forth-file
 #
@@ -9,8 +9,8 @@ sep = re.compile (';(----- |=====)')
 regs = re.compile (';----- Register Files')
 bits = re.compile (';----- ((.*) Bits|PORT.)')
 
-reg = re.compile ("(\S+)\s+EQU\s+H'0([0-9A-F]{3})'\s*;?\s*(.*)")
-port = re.compile ("(\S+)\s+EQU\s+(\d)\s*;?\s*(.*)")
+reg = re.compile (r"(\S+)\s+EQU\s+H'0([0-9A-F]{3})'\s*;?\s*(.*)")
+port = re.compile (r"(\S+)\s+EQU\s+(\d)\s*;?\s*(.*)")
 
 all_regs = []
 all_bits = []
@@ -66,13 +66,13 @@ def output_bits_for_reg (regname, lines, prefix = ''):
             all_bits.append (name)
             d = "%s %d bit %s%s" % (regname, bit, prefix, name)
             if comment:
-                print("%-30s    \ %s" % (d, comment))
+                print("%-30s    \\ %s" % (d, comment))
             else:
                 print(d)
 
 def output (lines):
-    print('\ This file has been automatically generated')
-    print('\ Do not edit by hand')
+    print('\\ This file has been automatically generated')
+    print('\\ Do not edit by hand')
     while lines:
         if not lines: break
         before, lines = split (lines)

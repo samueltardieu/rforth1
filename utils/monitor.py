@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright (c) 2004-2017 Samuel Tardieu <sam@rfc1149.net>
 #

@@ -1,9 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 
 import re, sys
 
-_exr = re.compile ('(\s*)(\S+)\s(.*\S)(.*)')
+_exr = re.compile (r'(\s*)(\S+)\s(.*\S)(.*)')
 
 def main ():
     in_code = False
@@ -15,7 +15,7 @@ def main ():
         elif in_code and l[:5] == ';code':
             in_code = False
         elif in_code and l[:6:] != 'label ':
-            s = re.split ('\s+\\\\', l, 1)
+            s = re.split (r'\s+\\', l, 1)
             code = s[0]
             if len (s) == 2: comment = '   \\' + s[1]
             else: comment = ''
